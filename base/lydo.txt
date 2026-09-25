@@ -1,0 +1,1 @@
+Nextjs là framework phát triển web hiện đại dựa trên React, cung cấp nhiều cơ chế như Server-side Rendering, Static Rendering và Server Components, giúp cải thiện hiệu năng và khả năng tối ưu SEO. Thông qua đề tài, em muốn tìm hiểu kiến trúc, cách hoạt động và khả năng ứng dụng Next.js trong việc xây dựng các ứng dụng web thực tế.

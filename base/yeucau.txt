@@ -1,0 +1,8 @@
+TRỌNG TÂM CỦA MÔN HỌC: CÔNG NGHỆ, KHÔNG PHẢI NGHIỆP VỤ
+Môn học đánh giá năng lực làm chủ MỘT công nghệ cụ thể: hiểu đúng bản chất (Tầng 1), làm đúng chuẩn kỹ nghệ phần mềm (Tầng 2), và có khả năng đào sâu kỹ thuật nâng cao của công nghệ đó (Tầng 3). Ứng dụng nhóm xây dựng chỉ là PHƯƠNG TIỆN để có chỗ áp dụng và minh hoạ các mục trên — không phải một sản phẩm nghiệp vụ đầy đủ
+Một đề tài tốt cho môn này là đề tài có nghiệp vụ ĐƠN GIẢN, QUEN THUỘC, không cần nghiên cứu thêm hay xin dữ liệu thật — để toàn bộ công sức của nhóm dồn vào việc hiểu sâu và làm chủ công nghệ đã chọn. Nghiệp vụ phức tạp không cộng thêm điểm; nó chỉ lấy đi thời gian lẽ ra dành cho công nghệ.
+FE chỉ làm FE, tìm BE có sẵn để minh họa; BE chỉ làm BE, FE dùng những gì đơn giản nhất
+Gợi ý ba câu hỏi để mỗi nhóm tự kiểm tra:
+1. Nhóm đang dành nhiều thời gian tìm hiểu quy trình nghiệp vụ (hỏi người dùng thật, tra quy định, xin dữ liệu tổ chức) hơn là đọc tài liệu chính hãng của công nghệ đã chọn? Nếu có — đang lệch.
+2. Tên đề tài nhấn mạnh vào miền nghiệp vụ ("hệ thống quản lý...") hơn là công nghệ? Nếu có — nên đổi tư duy: công nghệ là chủ, nghiệp vụ chỉ là bối cảnh minh hoạ.
+3. Đề tài chỉ "có ý nghĩa" nếu xin được dữ liệu thật của một tổ chức? Nếu có — nghiệp vụ đang quá thật, cần đơn giản hoá bằng dữ liệu giả lập.
