@@ -1,7 +1,7 @@
 # 🎬 HỆ THỐNG THIẾT KẾ & QUY CHUẨN MÃ NGUỒN (MOVIEHUB DESIGN SYSTEM)
 
 > **DÀNH CHO TẤT CẢ AI AGENTS VÀ LẬP TRÌNH VIÊN TRONG DỰ ÁN:**  
-> Đọc kỹ tài liệu này trước khi viết bất kỳ dòng code nào. Dự án mô phỏng **100% trải nghiệm và phong cách điện ảnh của Netflix (Netflix Dark Cinema Aesthetic)** trên nền tảng **Next.js 16 (App Router) + React 19 + Tailwind CSS v4**.  
+> Đọc kỹ tài liệu này và file đặc tả quốc tế [`DESIGN.md`](./DESIGN.md) trước khi viết code. Dự án mô phỏng **100% trải nghiệm và phong cách điện ảnh của Netflix (Netflix Dark Cinema Aesthetic)** trên nền tảng **Next.js 16 (App Router) + React 19 + Tailwind CSS v4**.  
 > Mọi component, màn hình (Trang chủ, Chi tiết phim, Tìm kiếm, Danh sách yêu thích) bắt buộc phải tái sử dụng các Design Token, quy chuẩn CSS và kiến trúc kỹ thuật được quy định dưới đây.
 
 ---
