@@ -25,7 +25,7 @@ export default async function HomePage() {
             {trending.length === 0 && nowPlaying.length === 0 && topRated.length === 0 && (
                 <div className="container mx-auto px-4 sm:px-12 my-8">
                     <div className="rounded-md border border-[#E50914]/40 bg-[#181818] p-6 text-center text-gray-200 shadow-xl">
-                        <p className="text-xl font-bold text-[#E50914]">⚠️ Chưa cấu hình TMDB API Key</p>
+                        <p className="text-xl font-bold text-[#E50914]">Chưa cấu hình TMDB API Key</p>
                         <p className="text-sm text-gray-400 mt-2">
                             Vui lòng mở file <code className="text-white bg-black px-2 py-0.5 rounded">.env.local</code> và điền <code className="text-white bg-black px-2 py-0.5 rounded">TMDB_API_KEY</code> để tải toàn bộ poster phim từ TMDB.
                         </p>

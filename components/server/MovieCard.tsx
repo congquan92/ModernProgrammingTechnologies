@@ -31,7 +31,9 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
                 {/* Điểm số đánh giá nhỏ gọn */}
                 <div className="absolute top-1.5 right-1.5 flex items-center gap-1 rounded bg-black/75 px-1.5 py-0.5 text-[11px] font-bold text-yellow-400 backdrop-blur-sm">
-                    <span>⭐</span>
+                    <svg className="w-3 h-3 fill-yellow-400" viewBox="0 0 24 24">
+                        <path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z" />
+                    </svg>
                     <span>{movie.vote_average ? movie.vote_average.toFixed(1) : "0.0"}</span>
                 </div>
             </div>

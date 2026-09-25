@@ -100,3 +100,17 @@ export async function searchMovies(query: string): Promise<Movie[]> {
         return [];
     }
 }
+
+/**
+ * Lấy danh sách phim tương tự theo ID phim (Dành cho SimilarMovies component - Đại phụ trách)
+ * Chiến lược cache: 1 giờ (3600s)
+ */
+export async function getSimilarMovies(id: string): Promise<Movie[]> {
+    try {
+        const data = await fetchTMDB<MovieListResponse>(`/movie/${id}/similar`, 3600);
+        return data.results || [];
+    } catch (error) {
+        console.error("Lỗi getSimilarMovies:", error);
+        return [];
+    }
+}

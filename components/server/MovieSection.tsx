@@ -5,7 +5,6 @@ interface MovieSectionProps {
     title: string;
     movies: Movie[];
     accentColor?: "yellow" | "red" | "blue" | "emerald";
-    icon?: string;
     limit?: number;
 }
 
@@ -20,7 +19,7 @@ const colorMap = {
  * MovieSection - Component hiển thị từng danh mục phim ở trang chủ
  * Grid responsive 2 -> 3 -> 4 -> 5 cột theo breakpoint Tailwind
  */
-export default function MovieSection({ title, movies, accentColor = "yellow", icon = "🎬", limit = 10 }: MovieSectionProps) {
+export default function MovieSection({ title, movies, accentColor = "yellow", limit = 10 }: MovieSectionProps) {
     const displayMovies = movies.slice(0, limit);
 
     if (displayMovies.length === 0) {
@@ -34,7 +33,6 @@ export default function MovieSection({ title, movies, accentColor = "yellow", ic
         <section className="space-y-5">
             <div className="flex items-center justify-between">
                 <h2 className={`flex items-center gap-2.5 text-xl sm:text-2xl font-bold text-white border-l-4 ${borderColor} pl-3.5 tracking-tight`}>
-                    <span>{icon}</span>
                     <span>{title}</span>
                 </h2>
                 <span className="text-xs text-gray-500 font-medium">{displayMovies.length} bộ phim</span>
