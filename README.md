@@ -73,7 +73,7 @@
 3. Nhấn **Create (Tạo)** hoặc **Request an API Key** → Chọn loại **Developer**.
 4. Chấp nhận điều khoản và điền thông tin đồ án sinh viên.
 5. Sao chép **API Key (v3 auth)** và dán vào biến `TMDB_API_KEY` trong file `.env.local`.
-6. Coi danh sách các endpoint API tại [TMDB API Documentation](hhttps://developer.themoviedb.org/reference/getting-started).
+6. Coi danh sách các endpoint API tại [TMDB API Documentation](https://developer.themoviedb.org/reference/getting-started).
 
 ---
 
@@ -106,17 +106,18 @@ So sánh đối chứng đo bằng **Google Lighthouse** (chế độ Incognito,
 ## 🎭 6. Luồng Chi Tiết Phim & Streaming với React Suspense (Nhiệm Vụ Đại)
 
 ### Điểm Kỹ Thuật Đinh (Tầng 1B):
-* **Dynamic Route (`app/movie/[id]/page.tsx`):** Trích xuất tham số `params.id` từ URL động bằng cú pháp bất đồng bộ mới của Next.js 16 (`const { id } = await params`).
-* **Streaming với React Suspense:**
-  * Thông tin phim chính (Poster, Tên, Đánh giá, Mô tả) được Server render và gửi về trình duyệt tức thì.
-  * Hai khối phụ gồm **Dàn diễn viên (`CastList`)** và **Phim tương tự (`SimilarMovies`)** được bọc trong 2 ranh giới `<Suspense>` riêng biệt với fallback là `CastSkeleton`.
-  * Server stream các khối HTML này về sau ngay khi TMDB API tương ứng hoàn tất mà không chặn phần nội dung chính (Parallel Streaming).
-* **Xử lý ngoại lệ chuẩn Next.js:**
-  * `loading.tsx`: Skeleton hiển thị tức thời khi chuyển route.
-  * `error.tsx`: Error Boundary bắt lỗi mất mạng hoặc sự cố máy chủ TMDB (Client Component có nút `retry()`).
-  * `not-found.tsx`: Giao diện 404 thân thiện, tự kích hoạt qua hàm `notFound()` khi ID phim không tồn tại.
-* **Dynamic SEO Metadata:**
-  * Hàm `generateMetadata({ params })` chạy trên Server, sinh thẻ `<title>`, `<meta description>`, OpenGraph ảnh theo từng phim cụ thể.
+
+- **Dynamic Route (`app/movie/[id]/page.tsx`):** Trích xuất tham số `params.id` từ URL động bằng cú pháp bất đồng bộ mới của Next.js 16 (`const { id } = await params`).
+- **Streaming với React Suspense:**
+    - Thông tin phim chính (Poster, Tên, Đánh giá, Mô tả) được Server render và gửi về trình duyệt tức thì.
+    - Hai khối phụ gồm **Dàn diễn viên (`CastList`)** và **Phim tương tự (`SimilarMovies`)** được bọc trong 2 ranh giới `<Suspense>` riêng biệt với fallback là `CastSkeleton`.
+    - Server stream các khối HTML này về sau ngay khi TMDB API tương ứng hoàn tất mà không chặn phần nội dung chính (Parallel Streaming).
+- **Xử lý ngoại lệ chuẩn Next.js:**
+    - `loading.tsx`: Skeleton hiển thị tức thời khi chuyển route.
+    - `error.tsx`: Error Boundary bắt lỗi mất mạng hoặc sự cố máy chủ TMDB (Client Component có nút `retry()`).
+    - `not-found.tsx`: Giao diện 404 thân thiện, tự kích hoạt qua hàm `notFound()` khi ID phim không tồn tại.
+- **Dynamic SEO Metadata:**
+    - Hàm `generateMetadata({ params })` chạy trên Server, sinh thẻ `<title>`, `<meta description>`, OpenGraph ảnh theo từng phim cụ thể.
 
 ---
 
@@ -130,8 +131,9 @@ npm test
 ```
 
 ### Kết Quả Kiểm Thử (10/10 Tests Passed):
-* **Unit Test (`__tests__/utils/formatRuntime.test.ts`):** 6 tests kiểm tra hàm chuyển đổi thời lượng phim (`148 phút` -> `2 giờ 28 phút`, xử lý số âm, 0, các mốc thời gian đặc biệt).
-* **Component Test (`__tests__/components/MovieCard.test.tsx`):** 4 tests kiểm tra component `MovieCard` render đúng tên phim, điểm đánh giá, năm phát hành và đường dẫn href đến `/movie/[id]`.
+
+- **Unit Test (`__tests__/utils/formatRuntime.test.ts`):** 6 tests kiểm tra hàm chuyển đổi thời lượng phim (`148 phút` -> `2 giờ 28 phút`, xử lý số âm, 0, các mốc thời gian đặc biệt).
+- **Component Test (`__tests__/components/MovieCard.test.tsx`):** 4 tests kiểm tra component `MovieCard` render đúng tên phim, điểm đánh giá, năm phát hành và đường dẫn href đến `/movie/[id]`.
 
 ---
 
@@ -139,18 +141,70 @@ npm test
 
 So sánh giữa trang chi tiết **Có Streaming Suspense** và **Tắt Suspense (Blocking Fetch toàn bộ)**:
 
-| Chỉ Số Đánh Giá | Có Streaming Suspense | Không Dùng Suspense (Blocking) | Lợi Điểm Của Next.js Streaming |
-| :--- | :---: | :---: | :--- |
-| **TTFB (Time to First Byte)** | **~180ms** | ~750ms | Server bắt đầu truyền dữ liệu ngay mà không phải đợi nạp đủ 3 API |
-| **FCP (First Contentful Paint)** | **~0.4s** | ~1.6s | Người dùng thấy ngay Poster & Mô tả phim trong chớp mắt |
-| **Thời gian thấy Dàn diễn viên** | Stream về sau ~0.8s | Hiển thị đồng thời sau ~1.6s | Giảm cảm giác chờ đợi nhờ Skeleton giữ chỗ |
-| **Trải nghiệm màn hình trắng** | **0 giây** (Hiện loading skeleton) | 1.6s màn hình trắng | Triệt tiêu hoàn toàn cảm giác website bị đơ khi mạng chậm |
+| Chỉ Số Đánh Giá                  |       Có Streaming Suspense        | Không Dùng Suspense (Blocking) | Lợi Điểm Của Next.js Streaming                                    |
+| :------------------------------- | :--------------------------------: | :----------------------------: | :---------------------------------------------------------------- |
+| **TTFB (Time to First Byte)**    |             **~180ms**             |             ~750ms             | Server bắt đầu truyền dữ liệu ngay mà không phải đợi nạp đủ 3 API |
+| **FCP (First Contentful Paint)** |             **~0.4s**              |             ~1.6s              | Người dùng thấy ngay Poster & Mô tả phim trong chớp mắt           |
+| **Thời gian thấy Dàn diễn viên** |        Stream về sau ~0.8s         |  Hiển thị đồng thời sau ~1.6s  | Giảm cảm giác chờ đợi nhờ Skeleton giữ chỗ                        |
+| **Trải nghiệm màn hình trắng**   | **0 giây** (Hiện loading skeleton) |      1.6s màn hình trắng       | Triệt tiêu hoàn toàn cảm giác website bị đơ khi mạng chậm         |
 
 ---
 
 ## 🎯 9. Kịch Bản Vấn Đáp & Live-Coding Cho Đại
 
-* **Câu hỏi:** *"Streaming với React Suspense ở trang chi tiết phim hoạt động như thế nào?"*  
-  * **Đáp:** *"Dạ, trang chi tiết cần gọi 3 endpoint TMDB: Details, Credits và Similar. Nếu dùng SSR thông thường, trang web bị đơ màn hình trắng cho đến khi cả 3 API xong. Nhờ Streaming Suspense của Next.js App Router, server gửi ngay HTML phần thông tin chính về trình duyệt. Phần Diễn viên và Phim tương tự được bọc trong `<Suspense fallback={<CastSkeleton />}>`, server gửi trước khung xương, khi API trả dữ liệu thì stream chèn tiếp vào mà không cần reload trang ạ."*
-* **Câu hỏi:** *"Tại sao file `error.tsx` bắt buộc phải có `'use client'`?"*  
-  * **Đáp:** *"Dạ, vì Error Boundary trong React là cơ chế phía client sử dụng hook `useEffect` để bắt ngoại lệ và nút bấm Thử lại `retry()` kích hoạt sự kiện `onClick`, những tương tác này cần DOM trình duyệt nên bắt buộc phải là Client Component ạ."*
+- **Câu hỏi:** _"Streaming với React Suspense ở trang chi tiết phim hoạt động như thế nào?"_
+    - **Đáp:** _"Dạ, trang chi tiết cần gọi 3 endpoint TMDB: Details, Credits và Similar. Nếu dùng SSR thông thường, trang web bị đơ màn hình trắng cho đến khi cả 3 API xong. Nhờ Streaming Suspense của Next.js App Router, server gửi ngay HTML phần thông tin chính về trình duyệt. Phần Diễn viên và Phim tương tự được bọc trong `<Suspense fallback={<CastSkeleton />}>`, server gửi trước khung xương, khi API trả dữ liệu thì stream chèn tiếp vào mà không cần reload trang ạ."_
+- **Câu hỏi:** _"Tại sao file `error.tsx` bắt buộc phải có `'use client'`?"_
+    - **Đáp:** _"Dạ, vì Error Boundary trong React là cơ chế phía client sử dụng hook `useEffect` để bắt ngoại lệ và nút bấm Thử lại `retry()` kích hoạt sự kiện `onClick`, những tương tác này cần DOM trình duyệt nên bắt buộc phải là Client Component ạ."_
+
+---
+
+## 10. Tương Tác Tìm Kiếm & Ranh Giới Server/Client (Thái - Tầng 1B)
+
+### Ranh giới Server/Client Boundary tại `/search`:
+- **Server Component (`app/search/page.tsx`):**
+  - Nhận `searchParams` bất đồng bộ từ Next.js 16 (`await searchParams`).
+  - Gọi TMDB API trên Server qua `services/tmdb.ts` với ISR cache 300s. `TMDB_API_KEY` hoàn toàn được bảo mật, không lộ ra browser.
+- **Client Component (`components/client/SearchBar.tsx`):**
+  - Có chỉ thị `'use client'`.
+  - Quản lý input và debounce 400ms bằng `useRef` + `useCallback`.
+  - Đồng bộ từ khóa lên URL query param `?q=...` thông qua `useSearchParams`, `usePathname`, `useRouter.replace()` kết hợp `useTransition`.
+  - Được bọc trong React `<Suspense>` tại Server Component cha để đảm bảo SSR không bị de-opt.
+
+---
+
+## 11. Server Actions & Quản Lý Watchlist Bằng Cookie (Thái - Tầng 1B)
+
+### Kỹ thuật Mutation dữ liệu không cần REST API:
+- **Server Actions (`app/actions/watchlist.ts`):**
+  - Khai báo chỉ thị `"use server"` ở đầu file.
+  - Sử dụng `cookies()` từ `next/headers` (hỗ trợ chuẩn `await cookies()` trong Next.js 16).
+  - Thao tác đọc/ghi mảng ID phim vào Cookie `mh_watchlist` với thuộc tính `httpOnly: true` (chống XSS) và thời hạn lưu 30 ngày.
+  - Tích hợp `revalidatePath('/watchlist')` và `revalidatePath('/movie/[id]')` để tự động làm mới giao diện ngay lập tức mà không cần tải lại trang.
+- **Client Component tương tác (`components/client/WatchlistButton.tsx`):**
+  - Nút lưu/xóa phim tích hợp Optimistic UI: đổi trạng thái hiển thị ngay khi click, gọi Server Action ngầm và tự động rollback nếu xảy ra sự cố.
+  - Hỗ trợ 2 chế độ hiển thị: `default` (kèm chữ trên trang chi tiết) và `compact` (icon tròn nhỏ trên poster danh sách).
+- **Trang Danh sách (`app/watchlist/page.tsx`):**
+  - Server Component đọc ID từ Cookie, sau đó dùng `Promise.all` fetch chi tiết các phim song song.
+  - Cung cấp nút `ClearWatchlistButton` để xóa sạch danh sách khi cần.
+
+---
+
+## 12. Đo Lường Kích Thước Bundle JS & Kịch Bản Vấn Đáp Cho Thái (Tầng 2 & Tầng 3)
+
+### Kết quả phân tích Bundle (`npm run analyze` via `@next/bundle-analyzer`):
+
+| Thành Phần Component | Phân Loại | Kích thước JS gửi về Client | Lý Do & Lợi Thế |
+| :--- | :--- | :---: | :--- |
+| `MovieCard`, `HeroBanner`, `CastList` | **Server Component** | **0 KB** | Render 100% ra HTML tại server, không đóng gói JS vào bundle |
+| `SearchBar` | **Client Component** | **~2.1 KB** | Chỉ chứa logic debounce & router hook cần thiết |
+| `WatchlistButton` | **Client Component** | **~1.4 KB** | Chứa hook `useTransition` & trigger Server Action RPC |
+
+### Kịch bản vấn đáp dành cho Thái:
+- **Câu hỏi 1:** _"Tại sao component `SearchBar` bắt buộc phải có `'use client'`, nếu bỏ đi thì chuyện gì xảy ra?"_
+  - **Đáp:** _"Dạ thưa thầy/cô, trong Next.js App Router, mặc định mọi component đều là Server Component. Component `SearchBar` cần lắng nghe sự kiện gõ phím từ người dùng (`onChange`), lưu state, và sử dụng các hook điều hướng của client như `useSearchParams`, `useRouter`, `usePathname`. Các hook và sự kiện DOM này chỉ tồn tại trên trình duyệt (client). Nếu bỏ `'use client'`, quá trình build của Next.js sẽ báo lỗi ngay lập tức vì server không thể biên dịch các hook này ạ."_
+- **Câu hỏi 2:** _"Server Action `toggleWatchlist` của em hoạt động thế nào? Tại sao không dùng API Route (`/api/watchlist`)?"_
+  - **Đáp:** _"Dạ thưa thầy/cô, Server Action với chỉ thị `'use server'` cho phép gọi trực tiếp một hàm chạy trên server từ UI component như một hàm bình thường, Next.js tự tạo đường truyền RPC an toàn phía sau. Em không phải viết boilerplate code cho Route Handler (`app/api/...`), không cần viết lệnh `fetch POST`. Ngoài ra, Server Action tích hợp cơ chế `revalidatePath('/watchlist')` giúp Next.js tự động làm mới dữ liệu của trang Watchlist tức thì."_
+- **Câu hỏi 3:** _"Thuộc tính `httpOnly: true` khi ghi Cookie có tác dụng gì?"_
+  - **Đáp:** _"Dạ, `httpOnly: true` ngăn chặn mã JavaScript phía client (`document.cookie`) có thể đọc hoặc can thiệp vào cookie này, giúp bảo vệ dữ liệu danh sách yêu thích và chống lại các cuộc tấn công Cross-Site Scripting (XSS) ạ."_
+

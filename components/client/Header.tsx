@@ -2,20 +2,24 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 /**
  * Header - Client Component thanh điều hướng phong cách Netflix (Tầng 1B)
  *
- * 🎯 HIỆU ỨNG NETFLIX CHUẨN:
- * 1. Ở vị trí trên cùng (scrollY <= 30):
- *    - Trong suốt hoàn toàn (bg-transparent) kèm một lớp dốc mờ nhẹ (from-black/80 to-transparent)
- *    - Nằm đè lên trên ảnh Backdrop của Hero Banner (fixed top-0 left-0 right-0)
- * 2. Khi người dùng cuộn/vuốt xuống (scrollY > 30):
- *    - Mượt mà chuyển sang nền đen xám nguyên khối của Netflix (bg-[#141414])
- *    - Đổ bóng nhẹ phía dưới (shadow-md shadow-black/80)
+ * 🎯 HIỆU ỨNG NETFLIX CHUẨN (HOÀN TOÀN KHÔNG ĐỔ BÓNG - ZERO SHADOW):
+ * 1. Trên trang có Hero Banner (Trang chủ / Chi tiết phim):
+ *    - Khi ở trên cùng (scrollY <= 30): Trong suốt đè lên backdrop banner
+ *    - Khi cuộn xuống (scrollY > 30): Nền đen xám nguyên khối bg-[#141414], không đổ bóng
+ * 2. Trên các trang khác (Watchlist / Search):
+ *    - Nền đen xám nguyên khối bg-[#141414] phẳng hoàn toàn, không dốc gradient, không đổ bóng
  */
 export default function Header() {
+    const pathname = usePathname();
     const [isScrolled, setIsScrolled] = useState(false);
+
+    // Xác định các trang có hero banner lớn tràn viền ở đầu trang
+    const hasHeroBanner = pathname === "/" || pathname?.startsWith("/movie/");
 
     useEffect(() => {
         const handleScroll = () => {
@@ -36,9 +40,15 @@ export default function Header() {
         };
     }, []);
 
+    const isSolid = isScrolled || !hasHeroBanner;
+
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-in-out ${isScrolled ? "bg-[#141414] shadow-xl shadow-black/80 py-3 sm:py-4" : "bg-gradient-to-b from-black/80 via-black/30 to-transparent py-4 sm:py-6"}`}
+            className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ease-in-out ${
+                isSolid
+                    ? "bg-[#141414] py-3 sm:py-3.5"
+                    : "bg-gradient-to-b from-black/50 to-transparent py-3.5 sm:py-4"
+            }`}
         >
             <div className="container mx-auto flex items-center justify-between px-4 sm:px-12">
                 {/* Phía bên trái: Logo đỏ & Menu điều hướng */}

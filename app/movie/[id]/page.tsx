@@ -8,6 +8,8 @@ import { formatRuntime } from "@/utils/formatRuntime";
 import CastList from "@/components/server/CastList";
 import CastSkeleton from "@/components/server/CastSkeleton";
 import SimilarMovies from "@/components/server/SimilarMovies";
+import { isMovieSaved } from "@/app/actions/watchlist";
+import WatchlistButton from "@/components/client/WatchlistButton";
 
 interface MovieDetailPageProps {
   params: Promise<{ id: string }>;
@@ -86,6 +88,7 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
     ? Math.round(movie.vote_average * 10)
     : 90;
 
+  const isSaved = await isMovieSaved(movie.id);
 
   return (
     <main className="min-h-screen bg-[#141414] pb-20 relative">
@@ -216,6 +219,8 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
                 </svg>
                 <span>Xem Trailer</span>
               </button>
+
+              <WatchlistButton movieId={movie.id} initialSaved={isSaved} />
             </div>
           </div>
         </div>

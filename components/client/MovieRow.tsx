@@ -32,11 +32,11 @@ export default function MovieRow({ title, movies, isTop10 = false }: MovieRowPro
     if (displayMovies.length === 0) return null;
 
     return (
-        <div className="space-y-2 group relative">
+        <div className="space-y-2 group/row relative">
             {/* Tiêu đề hàng phong cách Netflix */}
-            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white px-4 sm:px-12 flex items-center gap-2 group-hover:text-white transition-colors">
+            <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white px-4 sm:px-12 flex items-center gap-2 group-hover/row:text-white transition-colors">
                 <span>{title}</span>
-                <span className="text-xs text-[#54b9c5] font-semibold opacity-0 group-hover:opacity-100 transition-opacity flex items-center cursor-pointer">Khám phá tất cả &gt;</span>
+                <span className="text-xs text-[#54b9c5] font-semibold opacity-0 group-hover/row:opacity-100 transition-opacity flex items-center cursor-pointer">Khám phá tất cả &gt;</span>
             </h2>
 
             {/* Vùng chứa các thẻ phim cuộn ngang */}
@@ -45,7 +45,7 @@ export default function MovieRow({ title, movies, isTop10 = false }: MovieRowPro
                 {isMoved && (
                     <button
                         onClick={() => handleScroll("left")}
-                        className="absolute top-0 bottom-0 left-0 z-40 m-auto h-full w-10 sm:w-12 bg-black/60 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                        className="absolute top-0 bottom-0 left-0 z-40 m-auto h-full w-10 sm:w-12 bg-black/60 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300 hover:scale-110"
                         aria-label="Cuộn sang trái"
                     >
                         <span className="text-2xl sm:text-3xl font-bold">‹</span>
@@ -78,7 +78,7 @@ export default function MovieRow({ title, movies, isTop10 = false }: MovieRowPro
                 {/* Nút trượt sang phải */}
                 <button
                     onClick={() => handleScroll("right")}
-                    className="absolute top-0 bottom-0 right-0 z-40 m-auto h-full w-10 sm:w-12 bg-black/60 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110"
+                    className="absolute top-0 bottom-0 right-0 z-40 m-auto h-full w-10 sm:w-12 bg-black/60 hover:bg-black/80 text-white flex items-center justify-center opacity-0 group-hover/row:opacity-100 transition-all duration-300 hover:scale-110"
                     aria-label="Cuộn sang phải"
                 >
                     <span className="text-2xl sm:text-3xl font-bold">›</span>
