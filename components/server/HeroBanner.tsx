@@ -9,6 +9,7 @@ interface HeroBannerProps {
 /**
  * HeroBanner - Server Component phong cách Billboard Banner biểu tượng của Netflix (Tầng 1A & Tầng 3)
  * Tối ưu hóa chỉ số LCP bằng thuộc tính priority trên thẻ <Image />
+ * Khung ảnh xuất phát từ đỉnh màn hình (top 0), nằm ngay dưới thanh Navbar trong suốt
  */
 export default function HeroBanner({ movie }: HeroBannerProps) {
   if (!movie) {
@@ -25,29 +26,29 @@ export default function HeroBanner({ movie }: HeroBannerProps) {
     ? movie.release_date.split("-")[0]
     : "2026";
 
-  // Giả lập điểm Match score chuẩn Netflix (dựa trên vote_average)
   const matchScore = movie.vote_average
     ? Math.round(movie.vote_average * 10)
     : 95;
 
   return (
-    <div className="relative -mt-16 sm:-mt-20 w-full h-[75vh] sm:h-[85vh] min-h-[500px] overflow-hidden select-none">
-      {/* Ảnh Backdrop toàn màn hình, tải ưu tiên để đạt LCP tối đa */}
+    <div className="relative w-full h-[80vh] sm:h-[90vh] min-h-[550px] overflow-hidden select-none">
+      {/* Ảnh Backdrop toàn màn hình tràn đỉnh, tải ưu tiên để đạt LCP tối đa */}
       <Image
         src={backdropUrl}
         alt={movie.title}
         fill
         priority
         sizes="100vw"
-        className="object-cover object-center brightness-[0.75]"
+        className="object-cover object-center brightness-[0.8]"
       />
 
-      {/* Các lớp chuyển sắc (Gradient) tạo chiều sâu điện ảnh Netflix */}
+      {/* Các lớp gradient tạo chiều sâu và làm dịu vùng đỉnh cho navbar trong suốt */}
+      <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-transparent to-transparent h-32" />
       <div className="absolute inset-0 bg-gradient-to-t from-[#141414] via-[#141414]/40 to-transparent" />
-      <div className="absolute inset-0 bg-gradient-to-r from-[#141414]/90 via-[#141414]/40 to-transparent" />
+      <div className="absolute inset-0 bg-gradient-to-r from-[#141414]/90 via-[#141414]/30 to-transparent" />
 
       {/* Khối thông tin Billboard nằm góc dưới bên trái */}
-      <div className="absolute bottom-16 sm:bottom-24 left-4 sm:left-12 lg:left-16 max-w-2xl space-y-4 z-10">
+      <div className="absolute bottom-20 sm:bottom-28 left-4 sm:left-12 lg:left-16 max-w-2xl space-y-4 z-10">
         {/* Huy hiệu TOP 10 hôm nay kiểu Netflix */}
         <div className="flex items-center gap-2.5">
           <div className="flex items-center gap-1 bg-[#E50914] text-white font-black text-xs px-2 py-0.5 rounded shadow">

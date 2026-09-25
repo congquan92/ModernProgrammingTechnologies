@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Header from "@/components/server/Header";
+import Header from "@/components/client/Header";
 import Footer from "@/components/server/Footer";
 
 // Tối ưu hóa font chữ bằng next/font (Tầng 1A & Tầng 2)

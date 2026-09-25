@@ -23,7 +23,9 @@ Toàn bộ ứng dụng sử dụng phong cách **Dark Cinema của Netflix**:
 
 ### 2.1. Header Điều Hướng (Netflix Navbar):
 * Phải có Logo **MOVIEHUB** đỏ in hoa đậm: `<span className="text-2xl font-black text-[#E50914] tracking-tighter">MOVIEHUB</span>`.
-* Header dính cố định (`sticky top-0 z-50`), có lớp gradient chuyển tiếp từ đen xuống trong suốt: `bg-gradient-to-b from-black/90 via-black/50 to-transparent`.
+* **Cơ chế cuộn trong suốt (Netflix Dynamic Transparency):** Header dùng `fixed top-0 left-0 right-0 z-50`.
+  - Khi ở đầu trang (`scrollY <= 30`): Hoàn toàn trong suốt với lớp dốc mờ nhẹ (`bg-gradient-to-b from-black/80 to-transparent`), để lộ trọn vẹn ảnh nền của Hero Banner bên dưới.
+  - Khi người dùng cuộn xuống (`scrollY > 30`): Tự động đổi màu mượt mà sang nền đen nguyên khối của Netflix (`bg-[#141414] shadow-xl shadow-black/80`).
 * Bên phải gồm: Nút Tìm kiếm (`/search`), Chuông thông báo, và Avatar Profile vuông bo góc nhẹ `rounded` kinh điển.
 
 ### 2.2. Billboard Hero Banner:
