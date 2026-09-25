@@ -4,73 +4,72 @@ import {
   getTopRatedMovies,
 } from "@/services/tmdb";
 import HeroBanner from "@/components/server/HeroBanner";
-import MovieSection from "@/components/server/MovieSection";
+import MovieRow from "@/components/client/MovieRow";
 
 /**
- * HomePage - Server Component chính của trang chủ (Tầng 1A)
+ * HomePage - Server Component trang chủ mang phong cách trải nghiệm Netflix (Tầng 1A & Tầng 1B)
  *
- * 🎯 ĐIỂM KỸ THUẬT QUAN TRỌNG ĐỂ VẤN ĐÁP VỚI THẦY CÔ:
- * 1. Server Component Data Fetching:
- *    - Toàn bộ hàm gọi API TMDB chạy 100% trên Next.js Server.
- *    - Bảo mật tuyệt đối: TMDB_API_KEY không bao giờ lộ ra tab Network của trình duyệt.
- *    - Tăng tốc độ hiển thị trang đầu (FCP/LCP) vì server render sẵn HTML cùng dữ liệu.
- * 2. Promise.all Fetch Song Song:
- *    - Gom 3 request Trending, Now Playing, Top Rated chạy đồng thời, tối ưu hoá TTFB.
- * 3. Caching & ISR (Incremental Static Regeneration):
- *    - Mỗi endpoint trong services/tmdb.ts được cấu hình thời gian cache riêng ({ next: { revalidate: N } }).
+ * 🎯 ĐIỂM KỸ THUẬT QUAN TRỌNG:
+ * 1. Fetch dữ liệu TMDB song song trên Server qua Promise.all, không lộ TMDB_API_KEY ở Client.
+ * 2. Caching theo chiến lược ISR (revalidate) định kỳ.
+ * 3. Hàng phim thiết kế dạng cuộn ngang (MovieRow) kèm hàng TOP 10 với số thứ tự khổng lồ.
  */
 export default async function HomePage() {
-  // Fetch song song 3 danh mục phim trực tiếp ở Server Component
   const [trending, nowPlaying, topRated] = await Promise.all([
     getTrendingMovies(),
     getNowPlayingMovies(),
     getTopRatedMovies(),
   ]);
 
-  // Lấy bộ phim đầu tiên trong danh sách Trending để làm Hero Banner nổi bật
+  // Bộ phim nổi bật nhất dùng cho Billboard Banner
   const featuredMovie = trending[0] || nowPlaying[0] || topRated[0];
 
   return (
-    <main className="container mx-auto px-4 sm:px-6 py-6 sm:py-10 space-y-12 sm:space-y-16">
-      {/* 1. Hero Banner Phim Nổi Bật (Tối ưu LCP bằng next/image priority) */}
+    <main className="min-h-screen bg-[#141414] pb-24 overflow-x-hidden">
+      {/* 1. Hero Billboard Banner (Tràn viền với 2 nút Phát & Thông tin khác) */}
       <HeroBanner movie={featuredMovie} />
 
-      {/* Thông báo nếu chưa cấu hình TMDB_API_KEY */}
+      {/* Thông báo nếu chưa có API Key */}
       {trending.length === 0 && nowPlaying.length === 0 && topRated.length === 0 && (
-        <div className="rounded-xl border border-yellow-500/30 bg-yellow-500/10 p-6 text-center text-yellow-300">
-          <p className="text-lg font-bold">⚠️ Chưa có dữ liệu phim từ TMDB</p>
-          <p className="text-sm text-gray-300 mt-2">
-            Vui lòng mở file <code className="bg-black/50 px-2 py-0.5 rounded text-yellow-400">.env.local</code> và điền <code className="bg-black/50 px-2 py-0.5 rounded text-yellow-400">TMDB_API_KEY</code> của bạn để tải dữ liệu thật.
-          </p>
+        <div className="container mx-auto px-4 sm:px-12 my-8">
+          <div className="rounded-md border border-[#E50914]/40 bg-[#181818] p-6 text-center text-gray-200 shadow-xl">
+            <p className="text-xl font-bold text-[#E50914]">
+              ⚠️ Chưa cấu hình TMDB API Key
+            </p>
+            <p className="text-sm text-gray-400 mt-2">
+              Vui lòng mở file <code className="text-white bg-black px-2 py-0.5 rounded">.env.local</code> và điền <code className="text-white bg-black px-2 py-0.5 rounded">TMDB_API_KEY</code> để tải toàn bộ poster phim từ TMDB.
+            </p>
+          </div>
         </div>
       )}
 
-      {/* 2. Danh mục: Phim Thịnh Hành Trong Tuần (ISR Cache: 3600s) */}
-      <MovieSection
-        title="Phim Thịnh Hành Trong Tuần"
-        icon="🔥"
-        movies={trending}
-        accentColor="yellow"
-        limit={10}
-      />
+      {/* 2. Các hàng danh mục phim cuộn ngang chuẩn Netflix (bắt đầu phủ lên chân Billboard) */}
+      <div className="-mt-10 sm:-mt-16 lg:-mt-24 relative z-20 space-y-6 sm:space-y-10">
+        {/* Hàng 1: Phim Thịnh Hành Trong Tuần */}
+        <MovieRow
+          title="Phim Thịnh Hành Trong Tuần"
+          movies={trending}
+        />
 
-      {/* 3. Danh mục: Phim Đang Chiếu Rạp (ISR Cache: 1800s) */}
-      <MovieSection
-        title="Phim Đang Chiếu Rạp"
-        icon="🎬"
-        movies={nowPlaying}
-        accentColor="red"
-        limit={10}
-      />
+        {/* Hàng 2: TOP 10 Phim Được Đánh Giá Cao Nhất (Có số thứ tự khổng lồ) */}
+        <MovieRow
+          title="Top 10 Phim Đánh Giá Cao Nhất Hôm Nay"
+          movies={topRated}
+          isTop10={true}
+        />
 
-      {/* 4. Danh mục: Phim Đánh Giá Cao Nhất (ISR Cache: 86400s) */}
-      <MovieSection
-        title="Phim Đánh Giá Cao Nhất"
-        icon="⭐"
-        movies={topRated}
-        accentColor="blue"
-        limit={10}
-      />
+        {/* Hàng 3: Phim Đang Chiếu Rạp */}
+        <MovieRow
+          title="Phim Đang Chiếu Rạp Dành Cho Bạn"
+          movies={nowPlaying}
+        />
+
+        {/* Hàng 4: Bộ Sưu Tập Phim Kinh Điển */}
+        <MovieRow
+          title="Có Thể Bạn Muốn Xem Lại"
+          movies={topRated.slice(5)}
+        />
+      </div>
     </main>
   );
 }
