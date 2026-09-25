@@ -60,12 +60,17 @@ export default function HeroBanner({ movie }: HeroBannerProps) {
                 {/* Cặp nút bấm huyền thoại của Netflix: Phát & Thông tin khác */}
                 <div className="flex items-center gap-3 pt-3">
                     <Link href={`/movie/${movie.id}`} className="flex items-center gap-2 bg-white hover:bg-white/80 text-black font-extrabold px-6 sm:px-8 py-2.5 sm:py-3 rounded-md transition-colors text-base shadow-lg">
-                        <span className="text-xl">▶</span>
+                        <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                            <path d="M8 5v14l11-7z" />
+                        </svg>
                         <span>Phát</span>
                     </Link>
 
                     <Link href={`/movie/${movie.id}`} className="flex items-center gap-2 bg-white/30 hover:bg-white/20 text-white font-bold px-5 sm:px-7 py-2.5 sm:py-3 rounded-md backdrop-blur-md transition-colors text-base">
-                        <span className="text-lg">ⓘ</span>
+                        <svg className="w-5 h-5 fill-none stroke-current" strokeWidth={2} viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10" />
+                            <path d="M12 16v-4m0-4h.01" />
+                        </svg>
                         <span>Thông tin khác</span>
                     </Link>
                 </div>
