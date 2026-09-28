@@ -71,17 +71,20 @@ export default function MovieRow({
 
     return (
         <div className="space-y-2 group/row relative">
-            {/* Tiêu đề hàng & Link Khám phá tất cả */}
-            <div className="flex items-center justify-between px-4 sm:px-12">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white flex items-center gap-2 group-hover/row:text-white transition-colors">
-                    <span>{title}</span>
-                </h2>
+            {/* Tiêu đề hàng & Link Khám phá tất cả phong cách Netflix */}
+            <div className="px-4 sm:px-12 flex items-baseline">
                 <Link
                     href={targetHref}
-                    className="text-xs text-[#54b9c5] hover:text-[#7ee2ed] font-semibold opacity-0 group-hover/row:opacity-100 transition-opacity flex items-center gap-1 cursor-pointer"
+                    className="group/title inline-flex items-baseline gap-2 cursor-pointer transition-colors"
+                    title={`Khám phá toàn bộ ${title}`}
                 >
-                    <span>Khám phá tất cả</span>
-                    <span>&gt;</span>
+                    <h2 className="text-lg sm:text-xl md:text-2xl font-bold text-white group-hover/title:text-zinc-200 transition-colors">
+                        {title}
+                    </h2>
+                    <span className="text-xs text-[#54b9c5] group-hover/title:text-[#7ee2ed] font-semibold opacity-0 group-hover/row:opacity-100 transition-all flex items-center gap-0.5">
+                        <span>Khám phá tất cả</span>
+                        <span className="text-sm font-bold leading-none">&gt;</span>
+                    </span>
                 </Link>
             </div>
 

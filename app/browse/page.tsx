@@ -4,7 +4,7 @@ import Link from "next/link";
 import { discoverMovies } from "@/services/tmdb";
 import MovieCard from "@/components/server/MovieCard";
 import FilterBar from "@/components/client/FilterBar";
-import { MOVIE_GENRES, COUNTRIES, YEARS } from "@/utils/constants";
+import { MOVIE_GENRES, COUNTRIES, YEARS, SORT_OPTIONS } from "@/utils/constants";
 
 interface BrowsePageProps {
     searchParams: Promise<{
@@ -18,7 +18,7 @@ interface BrowsePageProps {
 }
 
 // Hàm hỗ trợ tạo tiêu đề ngữ cảnh từ params
-function getFilterTitle(genre?: string, country?: string, year?: string, type?: string): string {
+function getFilterTitle(genre?: string, country?: string, year?: string, type?: string, sortBy?: string): string {
     const parts: string[] = [];
 
     if (type === "tv") {
@@ -41,6 +41,11 @@ function getFilterTitle(genre?: string, country?: string, year?: string, type?: 
 
     if (year && year !== "all") {
         const found = YEARS.find((y) => y.id === year);
+        if (found) parts.push(found.label);
+    }
+
+    if (sortBy && sortBy !== "all" && sortBy !== "popularity.desc") {
+        const found = SORT_OPTIONS.find((s) => s.id === sortBy);
         if (found) parts.push(found.label);
     }
 
@@ -69,7 +74,7 @@ function getPageRange(current: number, total: number): (number | "...")[] {
 
 export async function generateMetadata({ searchParams }: BrowsePageProps): Promise<Metadata> {
     const params = await searchParams;
-    const title = getFilterTitle(params.genre, params.country, params.year, params.type);
+    const title = getFilterTitle(params.genre, params.country, params.year, params.type, params.sortBy);
     return {
         title: `${title} | MovieHub`,
         description: `Khám phá danh sách ${title} chất lượng cao chuẩn Netflix trên MovieHub.`,
@@ -89,7 +94,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         page: currentPage,
     });
 
-    const pageTitle = getFilterTitle(params.genre, params.country, params.year, params.type);
+    const pageTitle = getFilterTitle(params.genre, params.country, params.year, params.type, params.sortBy);
 
     // Tạo hàm build link phân trang giữ nguyên query hiện tại
     const buildPaginationUrl = (pageNumber: number) => {
