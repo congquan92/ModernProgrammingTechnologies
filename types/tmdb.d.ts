@@ -10,6 +10,19 @@ export interface Movie {
     genre_ids?: number[];
     original_language?: string;
     popularity?: number;
+    name?: string;
+    first_air_date?: string;
+    media_type?: string;
+}
+
+export interface DiscoverParams {
+    type?: "movie" | "tv";
+    genre?: string;
+    year?: string;
+    country?: string;
+    sortBy?: string;
+    page?: number;
+    query?: string;
 }
 
 export interface MovieListResponse {

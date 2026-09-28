@@ -16,7 +16,9 @@ interface MovieCardProps {
 export default function MovieCard({ movie }: MovieCardProps) {
     const imageUrl = movie.poster_path ? `https://image.tmdb.org/t/p/w500${movie.poster_path}` : "/no-poster.svg";
 
-    const releaseYear = movie.release_date ? movie.release_date.split("-")[0] : "";
+    const displayTitle = movie.title || movie.name || "Chưa có tiêu đề";
+    const releaseDateStr = movie.release_date || movie.first_air_date || "";
+    const releaseYear = releaseDateStr ? releaseDateStr.split("-")[0] : "";
 
     const matchPercent = movie.vote_average ? Math.round(movie.vote_average * 10) : 90;
 
@@ -24,7 +26,7 @@ export default function MovieCard({ movie }: MovieCardProps) {
         <Link href={`/movie/${movie.id}`} className="group/card relative block overflow-hidden rounded-md bg-[#181818] transition-all duration-300 hover:scale-105 hover:z-30 hover:shadow-2xl hover:shadow-black/80">
             {/* Khung Poster cố định chống CLS */}
             <div className="relative aspect-[2/3] w-full bg-[#202020]">
-                <Image src={imageUrl} alt={movie.title} fill sizes="(max-width: 640px) 40vw, (max-width: 1024px) 25vw, 15vw" className="object-cover transition-opacity duration-300 group-hover/card:brightness-110" loading="lazy" />
+                <Image src={imageUrl} alt={displayTitle} fill sizes="(max-width: 640px) 40vw, (max-width: 1024px) 25vw, 15vw" className="object-cover transition-opacity duration-300 group-hover/card:brightness-110" loading="lazy" />
 
                 {/* Logo nhỏ chữ N kiểu Netflix ở góc trên bên trái */}
                 <div className="absolute top-1.5 left-1.5 font-black text-xs text-[#E50914] drop-shadow select-none">N</div>
@@ -40,8 +42,8 @@ export default function MovieCard({ movie }: MovieCardProps) {
 
             {/* Thông tin vắn tắt phía dưới thẻ */}
             <div className="p-2 sm:p-2.5 bg-[#181818] space-y-1">
-                <h3 className="truncate font-bold text-xs sm:text-sm text-white group-hover/card:text-[#E50914] transition-colors" title={movie.title}>
-                    {movie.title}
+                <h3 className="truncate font-bold text-xs sm:text-sm text-white group-hover/card:text-[#E50914] transition-colors" title={displayTitle}>
+                    {displayTitle}
                 </h3>
 
                 <div className="flex items-center justify-between text-[10px] sm:text-xs">
