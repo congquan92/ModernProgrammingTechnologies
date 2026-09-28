@@ -29,7 +29,7 @@ Giảng viên sẽ gọi từng bạn lên máy tính để kiểm tra trực ti
 ---
 
 ### 👤 2. ĐẠI (Chi tiết phim, Streaming Suspense & SEO)
-* **Phạm vi code:** Dynamic Route (`/movie/[id]`), kỹ thuật đinh **Streaming dữ liệu với `<Suspense>`**, xử lý ngoại lệ (`loading.tsx`, `error.tsx`, `not-found.tsx`), Dynamic SEO Metadata (`generateMetadata`), và Unit Test với Vitest.
+* **Phạm vi code:** Dynamic Route (`/movie/[id]`), kỹ thuật đinh **Streaming dữ liệu với `<Suspense>`**, xử lý ngoại lệ (`loading.tsx`, `error.tsx`, `not-found.tsx`), Dynamic SEO Metadata (`generateMetadata`), và đo lường TTFB/FCP.
 * 📄 **File nhiệm vụ chi tiết & Code mẫu:** 👉 [NHIEM_VU_DAI.md](./NHIEM_VU_DAI.md)
 * **Câu hỏi lý thuyết trọng tâm:**
   1. *Cơ chế Streaming với `<Suspense>` ở trang chi tiết giải quyết vấn đề gì?*  
@@ -45,7 +45,7 @@ Giảng viên sẽ gọi từng bạn lên máy tính để kiểm tra trực ti
 ---
 
 ### 👤 3. THÁI (Tìm kiếm, Client Component & Server Actions)
-* **Phạm vi code:** Trang Tìm kiếm (`/search`) với Debounce và đồng bộ URL SearchParams, kỹ thuật đinh **Server Actions** (`actions/watchlist.ts`) lưu Cookie qua `cookies()`, `revalidatePath`, và thiết lập CI GitHub Actions.
+* **Phạm vi code:** Trang Tìm kiếm (`/search`) với Debounce và đồng bộ URL SearchParams, kỹ thuật đinh **Server Actions** (`actions/watchlist.ts`) lưu Cookie qua `cookies()`, `revalidatePath`, và đo lường JS bundle.
 * 📄 **File nhiệm vụ chi tiết & Code mẫu:** 👉 [NHIEM_VU_THAI.md](./NHIEM_VU_THAI.md)
 * **Câu hỏi lý thuyết trọng tâm:**
   1. *Tại sao component `SearchBar` bắt buộc phải có `'use client'` trên đầu?*  
@@ -70,7 +70,7 @@ Giảng viên sẽ gọi từng bạn lên máy tính để kiểm tra trực ti
 2. **Quy tắc Pull Request (PR):**
    * Tuyệt đối không commit thẳng vào `main`.
    * Tạo PR vào `main`, phải có **ít nhất 1 thành viên khác review và Approve**.
-   * Pipeline CI GitHub Actions (`.github/workflows/ci.yml`) phải chạy qua (màu xanh lá) mới được bấm **Merge Pull Request**.
+   * Đảm bảo build Next.js thành công (`npm run build`) và không có lỗi TypeScript trước khi Merge Pull Request.
 3. **Commit message có ý nghĩa:**
    * Ví dụ: `feat: implement isr caching for home page`, `feat: add suspense streaming for cast list`.
 
@@ -80,5 +80,5 @@ Giảng viên sẽ gọi từng bạn lên máy tính để kiểm tra trực ti
 
 * [ ] Tab Network trên F12 trình duyệt không để lộ `TMDB_API_KEY`.
 * [ ] Đã có file `.env.example` và `README.md` hướng dẫn chạy chi tiết.
-* [ ] Đã có file GitHub Actions CI tự động kiểm tra `lint` và `build`.
+* [ ] Đã kiểm tra build (`npm run build`) và TypeScript (`npx tsc --noEmit`) không có lỗi.
 * [ ] Cả 3 thành viên đã đọc file nhiệm vụ riêng và tự tin làm thử thách live-coding trong 1 - 2 phút.

@@ -103,7 +103,7 @@ So sánh đối chứng đo bằng **Google Lighthouse** (chế độ Incognito,
 
 ---
 
-## 🎭 6. Luồng Chi Tiết Phim & Streaming với React Suspense (Nhiệm Vụ Đại)
+## 🎭 6. Luồng Chi Tiết Phim & Streaming với React Suspense
 
 ### Điểm Kỹ Thuật Đinh (Tầng 1B):
 
@@ -121,23 +121,7 @@ So sánh đối chứng đo bằng **Google Lighthouse** (chế độ Incognito,
 
 ---
 
-## 🧪 7. Kiểm Thử Tự Động Với Vitest (Tầng 2 - Kỹ Nghệ Phần Mềm)
-
-Dự án cài đặt và tích hợp **Vitest** + **React Testing Library** + **jsdom** để thực hiện kiểm thử tự động:
-
-```bash
-# Chạy toàn bộ bộ kiểm thử tự động
-npm test
-```
-
-### Kết Quả Kiểm Thử (10/10 Tests Passed):
-
-- **Unit Test (`__tests__/utils/formatRuntime.test.ts`):** 6 tests kiểm tra hàm chuyển đổi thời lượng phim (`148 phút` -> `2 giờ 28 phút`, xử lý số âm, 0, các mốc thời gian đặc biệt).
-- **Component Test (`__tests__/components/MovieCard.test.tsx`):** 4 tests kiểm tra component `MovieCard` render đúng tên phim, điểm đánh giá, năm phát hành và đường dẫn href đến `/movie/[id]`.
-
----
-
-## ⏱️ 8. Kết Quả Đo Lường Streaming Suspense (Tầng 3)
+## ⏱️ 7. Kết Quả Đo Lường Streaming Suspense (Tầng 3)
 
 So sánh giữa trang chi tiết **Có Streaming Suspense** và **Tắt Suspense (Blocking Fetch toàn bộ)**:
 
@@ -150,16 +134,7 @@ So sánh giữa trang chi tiết **Có Streaming Suspense** và **Tắt Suspense
 
 ---
 
-## 🎯 9. Kịch Bản Vấn Đáp & Live-Coding Cho Đại
-
-- **Câu hỏi:** _"Streaming với React Suspense ở trang chi tiết phim hoạt động như thế nào?"_
-    - **Đáp:** _"Dạ, trang chi tiết cần gọi 3 endpoint TMDB: Details, Credits và Similar. Nếu dùng SSR thông thường, trang web bị đơ màn hình trắng cho đến khi cả 3 API xong. Nhờ Streaming Suspense của Next.js App Router, server gửi ngay HTML phần thông tin chính về trình duyệt. Phần Diễn viên và Phim tương tự được bọc trong `<Suspense fallback={<CastSkeleton />}>`, server gửi trước khung xương, khi API trả dữ liệu thì stream chèn tiếp vào mà không cần reload trang ạ."_
-- **Câu hỏi:** _"Tại sao file `error.tsx` bắt buộc phải có `'use client'`?"_
-    - **Đáp:** _"Dạ, vì Error Boundary trong React là cơ chế phía client sử dụng hook `useEffect` để bắt ngoại lệ và nút bấm Thử lại `retry()` kích hoạt sự kiện `onClick`, những tương tác này cần DOM trình duyệt nên bắt buộc phải là Client Component ạ."_
-
----
-
-## 10. Tương Tác Tìm Kiếm & Ranh Giới Server/Client (Thái - Tầng 1B)
+## 🔍 8. Tương Tác Tìm Kiếm & Ranh Giới Server/Client Boundary
 
 ### Ranh giới Server/Client Boundary tại `/search`:
 - **Server Component (`app/search/page.tsx`):**
@@ -173,7 +148,7 @@ So sánh giữa trang chi tiết **Có Streaming Suspense** và **Tắt Suspense
 
 ---
 
-## 11. Server Actions & Quản Lý Watchlist Bằng Cookie (Thái - Tầng 1B)
+## 📦 9. Server Actions & Quản Lý Watchlist Bằng Cookie
 
 ### Kỹ thuật Mutation dữ liệu không cần REST API:
 - **Server Actions (`app/actions/watchlist.ts`):**
@@ -190,7 +165,7 @@ So sánh giữa trang chi tiết **Có Streaming Suspense** và **Tắt Suspense
 
 ---
 
-## 12. Đo Lường Kích Thước Bundle JS & Kịch Bản Vấn Đáp Cho Thái (Tầng 2 & Tầng 3)
+## ⚡ 10. Phân Tích & Đo Lường Kích Thước JS Bundle (Tầng 3)
 
 ### Kết quả phân tích Bundle (`npm run analyze` via `@next/bundle-analyzer`):
 
@@ -199,12 +174,4 @@ So sánh giữa trang chi tiết **Có Streaming Suspense** và **Tắt Suspense
 | `MovieCard`, `HeroBanner`, `CastList` | **Server Component** | **0 KB** | Render 100% ra HTML tại server, không đóng gói JS vào bundle |
 | `SearchBar` | **Client Component** | **~2.1 KB** | Chỉ chứa logic debounce & router hook cần thiết |
 | `WatchlistButton` | **Client Component** | **~1.4 KB** | Chứa hook `useTransition` & trigger Server Action RPC |
-
-### Kịch bản vấn đáp dành cho Thái:
-- **Câu hỏi 1:** _"Tại sao component `SearchBar` bắt buộc phải có `'use client'`, nếu bỏ đi thì chuyện gì xảy ra?"_
-  - **Đáp:** _"Dạ thưa thầy/cô, trong Next.js App Router, mặc định mọi component đều là Server Component. Component `SearchBar` cần lắng nghe sự kiện gõ phím từ người dùng (`onChange`), lưu state, và sử dụng các hook điều hướng của client như `useSearchParams`, `useRouter`, `usePathname`. Các hook và sự kiện DOM này chỉ tồn tại trên trình duyệt (client). Nếu bỏ `'use client'`, quá trình build của Next.js sẽ báo lỗi ngay lập tức vì server không thể biên dịch các hook này ạ."_
-- **Câu hỏi 2:** _"Server Action `toggleWatchlist` của em hoạt động thế nào? Tại sao không dùng API Route (`/api/watchlist`)?"_
-  - **Đáp:** _"Dạ thưa thầy/cô, Server Action với chỉ thị `'use server'` cho phép gọi trực tiếp một hàm chạy trên server từ UI component như một hàm bình thường, Next.js tự tạo đường truyền RPC an toàn phía sau. Em không phải viết boilerplate code cho Route Handler (`app/api/...`), không cần viết lệnh `fetch POST`. Ngoài ra, Server Action tích hợp cơ chế `revalidatePath('/watchlist')` giúp Next.js tự động làm mới dữ liệu của trang Watchlist tức thì."_
-- **Câu hỏi 3:** _"Thuộc tính `httpOnly: true` khi ghi Cookie có tác dụng gì?"_
-  - **Đáp:** _"Dạ, `httpOnly: true` ngăn chặn mã JavaScript phía client (`document.cookie`) có thể đọc hoặc can thiệp vào cookie này, giúp bảo vệ dữ liệu danh sách yêu thích và chống lại các cuộc tấn công Cross-Site Scripting (XSS) ạ."_
 

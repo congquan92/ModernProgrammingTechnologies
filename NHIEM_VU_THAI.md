@@ -1,8 +1,8 @@
 # BẢN GIAO VIỆC & KỊCH BẢN THI THỰC HÀNH TẠI CHỖ
 
 ## DÀNH CHO: THÁI
-### VAI TRÒ: TƯƠNG TÁC TÌM KIẾM, CLIENT COMPONENT, SERVER ACTIONS & CI PIPELINE
-> **Khối lượng công việc & Độ khó:** ⭐⭐⭐☆☆ (Đồng đều 33.3% toàn đồ án — Nắm mảng Ranh giới Server/Client, Mutation dữ liệu không cần Backend và Tự động hóa CI).
+### VAI TRÒ: TƯƠNG TÁC TÌM KIẾM, CLIENT COMPONENT, SERVER ACTIONS & ĐO LƯỜNG BUNDLE
+> **Khối lượng công việc & Độ khó:** ⭐⭐⭐☆☆ (Đồng đều 33.3% toàn đồ án — Nắm mảng Ranh giới Server/Client, Mutation dữ liệu không cần Backend và Tối ưu hóa Bundle Size).
 
 ---
 
@@ -22,7 +22,7 @@ Thái chịu trách nhiệm xây dựng toàn bộ mảng tương tác phía ng�
    * Đọc danh sách ID phim từ Cookie trong Server Component.
    * Lấy chi tiết các bộ phim đã lưu và hiển thị dạng danh sách lưới.
 4. **Kỹ nghệ phần mềm & Đo lường chuyên sâu (Tầng 2 & Tầng 3):**
-   * **Tầng 2:** Thiết lập quy trình **CI tự động với GitHub Actions** (`.github/workflows/ci.yml`) tự động chạy `lint`, `typecheck` và `build` khi bất kỳ thành viên nào tạo Pull Request.
+   * **Tầng 2:** Chuẩn hóa Server Actions với chuẩn Next.js 16 (`await cookies()`), bảo mật Cookie với cờ `httpOnly: true`.
    * **Tầng 3:** Cài đặt `@next/bundle-analyzer` để đo lường và phân tích dung lượng Javascript bundle của các Client Component (`SearchBar`, `WatchlistButton`) so với các Server Component để chứng minh lợi thế giảm bundle của Next.js.
 
 ---
@@ -145,38 +145,35 @@ export default function WatchlistButton({ movieId, isFavorited }: WatchlistButto
 }
 ```
 
-### File 4: `.github/workflows/ci.yml` (Quy trình CI tự động - Tầng 2)
-```yaml
-name: CI Pipeline
+### File 4: `src/components/client/ClearWatchlistButton.tsx` (Client Component gọi Server Action xóa toàn bộ)
+```tsx
+"use client";
 
-on:
-  pull_request:
-    branches: [ main, develop ]
+import { useTransition } from "react";
+import { clearAllWatchlist } from "@/app/actions/watchlist";
 
-jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
+export default function ClearWatchlistButton() {
+  const [isPending, startTransition] = useTransition();
 
-    steps:
-      - name: Checkout Code
-        uses: actions/checkout@v4
+  const handleClear = () => {
+    if (window.confirm("Bạn có chắc chắn muốn xóa toàn bộ phim khỏi danh sách yêu thích?")) {
+      startTransition(async () => {
+        await clearAllWatchlist();
+      });
+    }
+  };
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: 'npm'
-
-      - name: Install Dependencies
-        run: npm ci
-
-      - name: Run ESLint
-        run: npm run lint
-
-      - name: Check Build Next.js
-        run: npm run build
-        env:
-          TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+  return (
+    <button
+      type="button"
+      disabled={isPending}
+      onClick={handleClear}
+      className="inline-flex items-center gap-1.5 text-xs sm:text-sm text-zinc-400 hover:text-white border border-zinc-700 hover:border-zinc-500 px-3.5 py-2 rounded-md transition-colors disabled:opacity-50"
+    >
+      <span>{isPending ? "Đang xóa..." : "Xóa tất cả"}</span>
+    </button>
+  );
+}
 ```
 
 ---
@@ -196,12 +193,9 @@ jobs:
     2. *Hàm `toggleWatchlist` của em chạy trên server, truy xuất và sửa đổi Cookie của người dùng qua `cookies()` một cách an toàn.*
     3. *Đặc biệt, nó tích hợp sẵn cơ chế **Revalidation**: Khi gọi `revalidatePath('/watchlist')`, Next.js sẽ tự động purge cache và làm mới dữ liệu của trang Watchlist, người dùng sẽ thấy danh sách cập nhật ngay lập tức mà không cần reload trang."*
 
-* **Thầy cô hỏi:** *"GitHub Actions CI của em kiểm tra những gì trong một Pull Request?"*
+* **Thầy cô hỏi:** *"Thuộc tính `httpOnly: true` khi ghi Cookie có tác dụng gì và tại sao cần thiết?"*
   * **Thái trả lời:**  
-    *"Dạ, file CI của em thiết lập tự động kích hoạt mỗi khi có ai trong nhóm tạo Pull Request vào nhánh chính. Nó thực hiện 3 bước kiểm tra:*
-    1. *Kiểm tra lint code (`npm run lint`) để đảm bảo không ai viết sai cú pháp hoặc code ẩu.*
-    2. *Kiểm tra type TypeScript để tránh lỗi runtime.*
-    3. *Chạy lệnh `npm run build` giả lập. Nếu build thành công trên GitHub Actions thì nhóm mới được phép merge PR vào nhánh chính ạ."*
+    *"Dạ, `httpOnly: true` ngăn chặn mã JavaScript phía client (`document.cookie`) có thể đọc hoặc can thiệp vào cookie này, giúp bảo vệ dữ liệu danh sách yêu thích và chống lại các cuộc tấn công Cross-Site Scripting (XSS) ạ."*
 
 ---
 
@@ -235,3 +229,15 @@ jobs:
      * File `src/app/search/page.tsx` là **Server Component** (không có chữ `'use client'`), nó nhận prop `searchParams` để fetch dữ liệu từ TMDB trên server.
      * Bên trong trang này, nó nhúng component `<SearchBar />`. Đây là **Client Component** (có chữ `'use client'`) để hứng tương tác gõ phím của người dùng.
      * **Kết luận:** *Dữ liệu hiển thị vẫn được render tối ưu từ server, trong khi ô tìm kiếm vẫn phản hồi mượt mà ở client.*
+
+---
+
+## 4. KẾT QUẢ ĐO LƯỜNG BUNDLE SIZE JS (TẦNG 3)
+
+Bảng số liệu phân tích Bundle (`npm run analyze` via `@next/bundle-analyzer`):
+
+| Thành Phần Component | Phân Loại | Kích thước JS gửi về Client | Lý Do & Lợi Thế |
+| :--- | :--- | :---: | :--- |
+| `MovieCard`, `HeroBanner`, `CastList` | **Server Component** | **0 KB** | Render 100% ra HTML tại server, không đóng gói JS vào bundle |
+| `SearchBar` | **Client Component** | **~2.1 KB** | Chỉ chứa logic debounce & router hook cần thiết |
+| `WatchlistButton` | **Client Component** | **~1.4 KB** | Chứa hook `useTransition` & trigger Server Action RPC |
