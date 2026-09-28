@@ -1,5 +1,5 @@
 import { getSimilarMovies } from "@/services/tmdb";
-import MovieCard from "@/components/server/MovieCard";
+import SimilarMoviesSlider from "@/components/client/SimilarMoviesSlider";
 
 interface SimilarMoviesProps {
   movieId: string;
@@ -11,9 +11,8 @@ interface SimilarMoviesProps {
  */
 export default async function SimilarMovies({ movieId }: SimilarMoviesProps) {
   const movies = await getSimilarMovies(movieId);
-  const displayed = movies.slice(0, 10);
 
-  if (displayed.length === 0) {
+  if (!movies || movies.length === 0) {
     return (
       <p className="text-gray-500 text-sm italic py-2">
         Không tìm thấy phim tương tự cho nội dung này.
@@ -21,13 +20,5 @@ export default async function SimilarMovies({ movieId }: SimilarMoviesProps) {
     );
   }
 
-  return (
-    <div className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-2">
-      {displayed.map((movie) => (
-        <div key={movie.id} className="w-36 sm:w-44 shrink-0">
-          <MovieCard movie={movie} />
-        </div>
-      ))}
-    </div>
-  );
+  return <SimilarMoviesSlider movies={movies} />;
 }

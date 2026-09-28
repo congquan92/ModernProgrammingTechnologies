@@ -22,6 +22,7 @@ export interface DiscoverParams {
     country?: string;
     sortBy?: string;
     page?: number;
+    perPage?: number;
     query?: string;
 }
 
@@ -56,3 +57,22 @@ export interface MovieCredits {
     id: number;
     cast: CastMember[];
 }
+
+export interface MovieVideo {
+    id: string;
+    iso_639_1: string;
+    iso_3166_1: string;
+    key: string;
+    name: string;
+    site: string;
+    size: number;
+    type: "Trailer" | "Teaser" | "Clip" | "Featurette" | "Behind the Scenes" | string;
+    official: boolean;
+    published_at: string;
+}
+
+export interface MovieVideosResponse {
+    id: number;
+    results: MovieVideo[];
+}
+

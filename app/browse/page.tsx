@@ -4,7 +4,7 @@ import Link from "next/link";
 import { discoverMovies } from "@/services/tmdb";
 import MovieCard from "@/components/server/MovieCard";
 import FilterBar from "@/components/client/FilterBar";
-import { MOVIE_GENRES, COUNTRIES, YEARS } from "@/utils/constants";
+import { MOVIE_GENRES, COUNTRIES, YEARS, SORT_OPTIONS } from "@/utils/constants";
 
 interface BrowsePageProps {
     searchParams: Promise<{
@@ -18,7 +18,7 @@ interface BrowsePageProps {
 }
 
 // Hàm hỗ trợ tạo tiêu đề ngữ cảnh từ params
-function getFilterTitle(genre?: string, country?: string, year?: string, type?: string): string {
+function getFilterTitle(genre?: string, country?: string, year?: string, type?: string, sortBy?: string): string {
     const parts: string[] = [];
 
     if (type === "tv") {
@@ -44,12 +44,37 @@ function getFilterTitle(genre?: string, country?: string, year?: string, type?: 
         if (found) parts.push(found.label);
     }
 
+    if (sortBy && sortBy !== "all" && sortBy !== "popularity.desc") {
+        const found = SORT_OPTIONS.find((s) => s.id === sortBy);
+        if (found) parts.push(found.label);
+    }
+
     return parts.join(" - ");
+}
+
+function getPageRange(current: number, total: number): (number | "...")[] {
+    if (total <= 7) {
+        return Array.from({ length: total }, (_, i) => i + 1);
+    }
+    const pages: (number | "...")[] = [1];
+    if (current > 3) {
+        pages.push("...");
+    }
+    const start = Math.max(2, current - 1);
+    const end = Math.min(total - 1, current + 1);
+    for (let i = start; i <= end; i++) {
+        pages.push(i);
+    }
+    if (current < total - 2) {
+        pages.push("...");
+    }
+    pages.push(total);
+    return pages;
 }
 
 export async function generateMetadata({ searchParams }: BrowsePageProps): Promise<Metadata> {
     const params = await searchParams;
-    const title = getFilterTitle(params.genre, params.country, params.year, params.type);
+    const title = getFilterTitle(params.genre, params.country, params.year, params.type, params.sortBy);
     return {
         title: `${title} | MovieHub`,
         description: `Khám phá danh sách ${title} chất lượng cao chuẩn Netflix trên MovieHub.`,
@@ -67,9 +92,10 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         year: params.year,
         sortBy: params.sortBy,
         page: currentPage,
+        perPage: 24,
     });
 
-    const pageTitle = getFilterTitle(params.genre, params.country, params.year, params.type);
+    const pageTitle = getFilterTitle(params.genre, params.country, params.year, params.type, params.sortBy);
 
     // Tạo hàm build link phân trang giữ nguyên query hiện tại
     const buildPaginationUrl = (pageNumber: number) => {
@@ -83,6 +109,8 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         return `/browse?${current.toString()}`;
     };
 
+    const paginationPages = getPageRange(currentPage, totalPages);
+
     return (
         <main className="min-h-screen bg-[#141414] pt-28 pb-20">
             <div className="container mx-auto px-4 sm:px-8 lg:px-12">
@@ -92,13 +120,17 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                         <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
                             {pageTitle}
                         </h1>
-                        <p className="text-zinc-400 text-xs sm:text-sm mt-1">
-                            Tổng cộng <span className="text-[#E50914] font-bold">{totalResults.toLocaleString()}</span> tác phẩm phù hợp
+                        <p className="text-zinc-400 text-xs sm:text-sm mt-1 flex items-center gap-2 flex-wrap">
+                            <span>Tổng cộng</span>
+                            <span className="text-[#E50914] font-bold text-base">{totalResults.toLocaleString("vi-VN")}</span>
+                            <span>tác phẩm phù hợp</span>
+                            <span className="text-zinc-600">·</span>
+                            <span>Trang <strong className="text-white">{currentPage}</strong> / {totalPages}</span>
                         </p>
                     </div>
 
                     <div className="text-xs text-zinc-500 font-medium">
-                        Trang {currentPage} / {totalPages}
+                        Hiển thị {results.length} phim / trang
                     </div>
                 </div>
 
@@ -132,43 +164,86 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                     </div>
                 ) : (
                     <>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4 mb-10">
-                            {results.map((movie) => (
-                                <MovieCard key={movie.id} movie={movie} />
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4 mb-10">
+                            {results.map((movie, index) => (
+                                <MovieCard key={`${movie.id}-${index}`} movie={movie} />
                             ))}
                         </div>
 
-                        {/* Phân Trang Chuẩn */}
+                        {/* Phân Trang Số Phong Cách Phimmoi / Netflix */}
                         {totalPages > 1 && (
-                            <div className="flex items-center justify-center gap-2 pt-6 border-t border-[#2E2E2E]">
+                            <div className="flex items-center justify-center gap-1.5 pt-8 border-t border-[#2E2E2E] flex-wrap">
+                                {/* Nút Đầu Trang */}
+                                {currentPage > 2 && (
+                                    <Link
+                                        href={buildPaginationUrl(1)}
+                                        className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
+                                        title="Về trang đầu"
+                                    >
+                                        ««
+                                    </Link>
+                                )}
+
+                                {/* Nút Trang Trước */}
                                 {currentPage > 1 ? (
                                     <Link
                                         href={buildPaginationUrl(currentPage - 1)}
-                                        className="px-4 py-2 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
+                                        className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
+                                        title="Trang trước"
                                     >
-                                        ← Trang trước
+                                        ‹ Trước
                                     </Link>
                                 ) : (
-                                    <span className="px-4 py-2 rounded bg-zinc-900 text-zinc-600 text-xs sm:text-sm cursor-not-allowed">
-                                        ← Trang trước
+                                    <span className="px-3 py-1.5 rounded bg-zinc-900 text-zinc-600 text-xs sm:text-sm cursor-not-allowed">
+                                        ‹ Trước
                                     </span>
                                 )}
 
-                                <div className="px-4 py-2 rounded bg-[#181818] border border-zinc-800 text-white text-xs sm:text-sm font-bold">
-                                    {currentPage} / {totalPages}
-                                </div>
+                                {/* Danh Sách Số Trang */}
+                                {paginationPages.map((page, idx) =>
+                                    page === "..." ? (
+                                        <span key={`ellipsis-${idx}`} className="px-2 py-1.5 text-zinc-500 text-xs sm:text-sm select-none">
+                                            ...
+                                        </span>
+                                    ) : (
+                                        <Link
+                                            key={`page-${page}`}
+                                            href={buildPaginationUrl(page)}
+                                            className={`px-3 py-1.5 rounded text-xs sm:text-sm font-bold transition-colors ${
+                                                page === currentPage
+                                                    ? "bg-[#E50914] text-white shadow-lg shadow-red-900/40"
+                                                    : "bg-[#202020] hover:bg-zinc-700 text-zinc-300 hover:text-white"
+                                            }`}
+                                        >
+                                            {page}
+                                        </Link>
+                                    )
+                                )}
 
+                                {/* Nút Trang Kế Tiếp */}
                                 {currentPage < totalPages ? (
                                     <Link
                                         href={buildPaginationUrl(currentPage + 1)}
-                                        className="px-4 py-2 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
+                                        className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
+                                        title="Trang kế tiếp"
                                     >
-                                        Trang sau →
+                                        Tiếp ›
                                     </Link>
                                 ) : (
-                                    <span className="px-4 py-2 rounded bg-zinc-900 text-zinc-600 text-xs sm:text-sm cursor-not-allowed">
-                                        Trang sau →
+                                    <span className="px-3 py-1.5 rounded bg-zinc-900 text-zinc-600 text-xs sm:text-sm cursor-not-allowed">
+                                        Tiếp ›
                                     </span>
+                                )}
+
+                                {/* Nút Về Trang Cuối */}
+                                {currentPage < totalPages - 1 && (
+                                    <Link
+                                        href={buildPaginationUrl(totalPages)}
+                                        className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
+                                        title="Trang cuối cùng"
+                                    >
+                                        »»
+                                    </Link>
                                 )}
                             </div>
                         )}

@@ -78,8 +78,8 @@ export default async function WatchlistPage() {
                     </div>
                 ) : (
                     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-                        {movies.map((movie) => (
-                            <div key={movie.id} className="relative group/item">
+                        {movies.map((movie, index) => (
+                            <div key={`${movie.id}-${index}`} className="relative group/item">
                                 <MovieCard movie={movie} />
                                 {/* Nút WatchlistButton nhỏ gọn góc phải trên poster (bên dưới star badge) */}
                                 <div className="absolute top-8 right-1.5 z-40">
