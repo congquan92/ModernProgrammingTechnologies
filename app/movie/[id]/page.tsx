@@ -3,13 +3,14 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getMovieDetails } from "@/services/tmdb";
+import { getMovieDetails, getMovieVideos, selectBestTrailer } from "@/services/tmdb";
 import { formatRuntime } from "@/utils/formatRuntime";
 import CastList from "@/components/server/CastList";
 import CastSkeleton from "@/components/server/CastSkeleton";
 import SimilarMovies from "@/components/server/SimilarMovies";
 import { isMovieSaved } from "@/app/actions/watchlist";
 import WatchlistButton from "@/components/client/WatchlistButton";
+import TrailerModal from "@/components/client/TrailerModal";
 
 interface MovieDetailPageProps {
   params: Promise<{ id: string }>;
@@ -88,7 +89,12 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
     ? Math.round(movie.vote_average * 10)
     : 90;
 
-  const isSaved = await isMovieSaved(movie.id);
+  const [isSaved, videos] = await Promise.all([
+    isMovieSaved(movie.id),
+    getMovieVideos(movie.id.toString()),
+  ]);
+
+  const bestTrailer = selectBestTrailer(videos);
 
   return (
     <main className="min-h-screen bg-[#141414] pb-20 relative">
@@ -210,15 +216,7 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
 
             {/* Nút hành động */}
             <div className="flex flex-wrap items-center gap-3 pt-3">
-              <button
-                type="button"
-                className="flex items-center gap-2 bg-white hover:bg-white/80 text-black font-extrabold px-6 sm:px-8 py-2.5 rounded-md transition-colors text-sm sm:text-base shadow-lg cursor-pointer"
-              >
-                <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
-                  <path d="M8 5v14l11-7z" />
-                </svg>
-                <span>Xem Trailer</span>
-              </button>
+              <TrailerModal trailerKey={bestTrailer?.key} movieTitle={movie.title} />
 
               <WatchlistButton movieId={movie.id} initialSaved={isSaved} />
             </div>
