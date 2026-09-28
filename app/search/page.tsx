@@ -41,8 +41,8 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     let trendingMovies: Movie[] = [];
 
     if (query) {
-        // Có từ khóa: Gọi searchMovies từ TMDB
-        const searchResults = await searchMovies(query);
+        // Có từ khóa: Gọi searchMovies từ TMDB (lấy 48 phim để lọc và hiển thị đủ 24 phim)
+        const searchResults = await searchMovies(query, 48);
 
         // Áp dụng bộ lọc bổ sung nếu có
         results = searchResults.filter((movie) => {
@@ -72,19 +72,23 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     new Date(b.release_date || 0).getTime() - new Date(a.release_date || 0).getTime()
             );
         }
+
+        // Giới hạn hiển thị 24 phim để vừa khít hoàn hảo lưới (4 hàng x 6 cột)
+        results = results.slice(0, 24);
     } else if (hasFilters) {
-        // Không có từ khóa nhưng có bộ lọc: Gọi discoverMovies
+        // Không có từ khóa nhưng có bộ lọc: Gọi discoverMovies lấy chuẩn 24 phim
         const discoverData = await discoverMovies({
             type: (params.type as "movie" | "tv") || undefined,
             genre: params.genre,
             country: params.country,
             year: params.year,
             sortBy: params.sortBy,
+            perPage: 24,
         });
         results = discoverData.results;
     } else {
-        // Chưa nhập từ khóa: Lấy phim thịnh hành để hiển thị gợi ý
-        trendingMovies = await getTrendingMovies();
+        // Chưa nhập từ khóa: Lấy 24 phim thịnh hành để hiển thị gợi ý
+        trendingMovies = await getTrendingMovies(24);
     }
 
     const hasSearched = Boolean(query || hasFilters);
@@ -139,9 +143,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                                 Phim Thịnh Hành Được Tìm Kiếm Nhiều Nhất
                             </h2>
                         </div>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-                            {trendingMovies.map((movie) => (
-                                <MovieCard key={movie.id} movie={movie} />
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
+                            {trendingMovies.map((movie, index) => (
+                                <MovieCard key={`${movie.id}-${index}`} movie={movie} />
                             ))}
                         </div>
                     </div>
@@ -160,9 +164,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     </div>
                 ) : (
                     // Lưới hiển thị danh sách phim
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
-                        {results.map((movie) => (
-                            <MovieCard key={movie.id} movie={movie} />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6 gap-3 sm:gap-4">
+                        {results.map((movie, index) => (
+                            <MovieCard key={`${movie.id}-${index}`} movie={movie} />
                         ))}
                     </div>
                 )}

@@ -22,6 +22,7 @@ export interface DiscoverParams {
     country?: string;
     sortBy?: string;
     page?: number;
+    perPage?: number;
     query?: string;
 }
 

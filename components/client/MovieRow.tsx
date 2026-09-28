@@ -121,7 +121,7 @@ export default function MovieRow({
                     {displayMovies.map((movie, index) => {
                         if (isTop10) {
                             return (
-                                <div key={movie.id} className="flex items-center shrink-0 relative group/item">
+                                <div key={`${movie.id}-${index}`} className="flex items-center shrink-0 relative group/item">
                                     {/* Chữ số thứ tự TOP 10 khổng lồ kiểu Netflix */}
                                     <span className="netflix-number text-7xl sm:text-8xl md:text-9xl font-black select-none -mr-4 sm:-mr-6 z-0 leading-none">
                                         {index + 1}
@@ -135,7 +135,7 @@ export default function MovieRow({
 
                         return (
                             <div
-                                key={movie.id}
+                                key={`${movie.id}-${index}`}
                                 className="w-36 sm:w-44 md:w-52 shrink-0 transition-transform duration-300"
                             >
                                 <MovieCard movie={movie} />

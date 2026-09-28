@@ -75,9 +75,9 @@ export default function SimilarMoviesSlider({ movies }: SimilarMoviesSliderProps
                 ref={rowRef}
                 className="flex items-center gap-2.5 sm:gap-3.5 overflow-x-auto no-scrollbar py-2 scroll-smooth"
             >
-                {movies.map((movie) => (
+                {movies.map((movie, index) => (
                     <div
-                        key={movie.id}
+                        key={`${movie.id}-${index}`}
                         className="w-36 sm:w-44 md:w-52 shrink-0 transition-transform duration-300"
                     >
                         <MovieCard movie={movie} />
