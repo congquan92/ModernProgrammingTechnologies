@@ -15,28 +15,39 @@ interface CastSliderProps {
  */
 export default function CastSlider({ cast }: CastSliderProps) {
     const rowRef = useRef<HTMLDivElement>(null);
+    const lastScrollPosRef = useRef<{ left: number; time: number }>({ left: 0, time: 0 });
 
     if (!cast || cast.length === 0) return null;
 
     const handleScroll = (direction: "left" | "right") => {
         if (rowRef.current) {
-            const { scrollLeft, clientWidth, scrollWidth } = rowRef.current;
+            const el = rowRef.current;
+            const { scrollLeft, clientWidth, scrollWidth } = el;
             const maxScrollLeft = scrollWidth - clientWidth;
             const scrollStep = Math.max(clientWidth * 0.6, 280);
 
+            const now = Date.now();
+            const wasStuck =
+                Math.abs(scrollLeft - lastScrollPosRef.current.left) < 15 &&
+                now - lastScrollPosRef.current.time < 1500;
+
             if (direction === "right") {
-                if (scrollLeft >= maxScrollLeft - 20) {
-                    rowRef.current.scrollTo({ left: 0, behavior: "smooth" });
+                if (scrollLeft >= maxScrollLeft - 80 || wasStuck) {
+                    el.scrollTo({ left: 0, behavior: "smooth" });
+                    lastScrollPosRef.current = { left: 0, time: now };
                 } else {
                     const scrollTo = Math.min(scrollLeft + scrollStep, maxScrollLeft);
-                    rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+                    el.scrollTo({ left: scrollTo, behavior: "smooth" });
+                    lastScrollPosRef.current = { left: scrollLeft, time: now };
                 }
             } else {
-                if (scrollLeft <= 20) {
-                    rowRef.current.scrollTo({ left: maxScrollLeft, behavior: "smooth" });
+                if (scrollLeft <= 80 || wasStuck) {
+                    el.scrollTo({ left: maxScrollLeft, behavior: "smooth" });
+                    lastScrollPosRef.current = { left: maxScrollLeft, time: now };
                 } else {
                     const scrollTo = Math.max(scrollLeft - scrollStep, 0);
-                    rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+                    el.scrollTo({ left: scrollTo, behavior: "smooth" });
+                    lastScrollPosRef.current = { left: scrollLeft, time: now };
                 }
             }
         }

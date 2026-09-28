@@ -26,6 +26,7 @@ export default function MovieRow({
     exploreHref,
 }: MovieRowProps) {
     const rowRef = useRef<HTMLDivElement>(null);
+    const lastScrollPosRef = useRef<{ left: number; time: number }>({ left: 0, time: 0 });
 
     // Xác định link khám phá thông minh theo danh mục
     const targetHref =
@@ -44,26 +45,38 @@ export default function MovieRow({
 
     const handleScroll = (direction: "left" | "right") => {
         if (rowRef.current) {
-            const { scrollLeft, clientWidth, scrollWidth } = rowRef.current;
+            const el = rowRef.current;
+            const { scrollLeft, clientWidth, scrollWidth } = el;
             const maxScrollLeft = scrollWidth - clientWidth;
-            // Tối ưu bước cuộn: mỗi lần trượt khoảng 55% độ rộng màn hình (~3-4 thẻ) để cuộn được nhiều lượt
+            // Tối ưu bước cuộn: mỗi lần trượt khoảng 55% độ rộng màn hình (~3-4 thẻ)
             const scrollStep = Math.max(clientWidth * 0.55, 320);
 
+            const now = Date.now();
+            // Nếu vị trí cuộn hiện tại gần như không đổi so với lần bấm trước đó
+            // nghĩa là đã bị kịch biên của container trình duyệt
+            const wasStuck =
+                Math.abs(scrollLeft - lastScrollPosRef.current.left) < 15 &&
+                now - lastScrollPosRef.current.time < 1500;
+
             if (direction === "right") {
-                // Nếu đã chạm hoặc cách điểm cuối <= 25px: Lặp vòng về đầu hàng
-                if (scrollLeft >= maxScrollLeft - 25) {
-                    rowRef.current.scrollTo({ left: 0, behavior: "smooth" });
+                // Đến gần kịch biên (khoảng cách <= 80px do padding ngang px-12 chiếm 48px) HOẶC bị kẹt kịch biên
+                if (scrollLeft >= maxScrollLeft - 80 || wasStuck) {
+                    el.scrollTo({ left: 0, behavior: "smooth" });
+                    lastScrollPosRef.current = { left: 0, time: now };
                 } else {
                     const scrollTo = Math.min(scrollLeft + scrollStep, maxScrollLeft);
-                    rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+                    el.scrollTo({ left: scrollTo, behavior: "smooth" });
+                    lastScrollPosRef.current = { left: scrollLeft, time: now };
                 }
             } else {
-                // Nếu đang ở đầu hàng (hoặc cách đầu <= 25px): Lặp vòng đến cuối hàng
-                if (scrollLeft <= 25) {
-                    rowRef.current.scrollTo({ left: maxScrollLeft, behavior: "smooth" });
+                // Ở gần đầu danh sách (<= 80px) HOẶC bị kẹt kịch biên trái
+                if (scrollLeft <= 80 || wasStuck) {
+                    el.scrollTo({ left: maxScrollLeft, behavior: "smooth" });
+                    lastScrollPosRef.current = { left: maxScrollLeft, time: now };
                 } else {
                     const scrollTo = Math.max(scrollLeft - scrollStep, 0);
-                    rowRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+                    el.scrollTo({ left: scrollTo, behavior: "smooth" });
+                    lastScrollPosRef.current = { left: scrollLeft, time: now };
                 }
             }
         }
