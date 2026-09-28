@@ -1,6 +1,6 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
-import { searchMovies, discoverMovies } from "@/services/tmdb";
+import { searchMovies, discoverMovies, getTrendingMovies } from "@/services/tmdb";
 import SearchBar from "@/components/client/SearchBar";
 import FilterBar from "@/components/client/FilterBar";
 import MovieCard from "@/components/server/MovieCard";
@@ -38,6 +38,7 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     );
 
     let results: Movie[] = [];
+    let trendingMovies: Movie[] = [];
 
     if (query) {
         // Có từ khóa: Gọi searchMovies từ TMDB
@@ -81,6 +82,9 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
             sortBy: params.sortBy,
         });
         results = discoverData.results;
+    } else {
+        // Chưa nhập từ khóa: Lấy phim thịnh hành để hiển thị gợi ý
+        trendingMovies = await getTrendingMovies();
     }
 
     const hasSearched = Boolean(query || hasFilters);
@@ -127,17 +131,19 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
 
                 {/* Trạng thái và Kết quả */}
                 {!hasSearched ? (
-                    // Trạng thái chờ: chưa nhập từ khóa và chưa chọn bộ lọc
-                    <div className="flex flex-col items-center justify-center py-20 text-center space-y-4 bg-[#181818]/40 rounded-xl border border-[#2E2E2E]">
-                        <div className="w-16 h-16 rounded-full bg-[#202020] border border-zinc-800 flex items-center justify-center text-zinc-500">
-                            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                    // Trạng thái chờ: Hiển thị phim thịnh hành nổi bật thay vì màn hình trống
+                    <div className="space-y-4">
+                        <div className="flex items-center gap-2 border-b border-[#2E2E2E] pb-3">
+                            <span className="text-lg">🔥</span>
+                            <h2 className="text-lg sm:text-xl font-bold text-white tracking-tight">
+                                Phim Thịnh Hành Được Tìm Kiếm Nhiều Nhất
+                            </h2>
                         </div>
-                        <p className="text-zinc-200 text-lg font-bold">Nhập tên phim hoặc dùng bộ lọc ở trên</p>
-                        <p className="text-zinc-500 text-sm max-w-md">
-                            Khám phá hàng chục ngàn bộ phim theo Thể loại, Quốc gia, Năm phát hành hoặc tìm kiếm trực tiếp theo tên phim yêu thích.
-                        </p>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+                            {trendingMovies.map((movie) => (
+                                <MovieCard key={movie.id} movie={movie} />
+                            ))}
+                        </div>
                     </div>
                 ) : results.length === 0 ? (
                     // Không có kết quả nào
