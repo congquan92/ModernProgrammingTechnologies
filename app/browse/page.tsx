@@ -4,7 +4,7 @@ import Link from "next/link";
 import { discoverMovies } from "@/services/tmdb";
 import MovieCard from "@/components/server/MovieCard";
 import FilterBar from "@/components/client/FilterBar";
-import { MOVIE_GENRES, COUNTRIES, YEARS, SORT_OPTIONS } from "@/utils/constants";
+import { MOVIE_GENRES, COUNTRIES, YEARS } from "@/utils/constants";
 
 interface BrowsePageProps {
     searchParams: Promise<{

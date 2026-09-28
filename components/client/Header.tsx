@@ -36,11 +36,6 @@ export default function Header() {
         };
     }, []);
 
-    // Đóng mobile menu khi chuyển trang
-    useEffect(() => {
-        setIsMobileMenuOpen(false);
-    }, [pathname]);
-
     const isSolid = isScrolled || !hasHeroBanner;
 
     // Chuẩn bị dữ liệu cho Dropdown
@@ -192,19 +187,19 @@ export default function Header() {
             {isMobileMenuOpen && (
                 <div className="md:hidden bg-[#181818] border-b border-[#2E2E2E] px-4 py-4 space-y-3 max-h-[80vh] overflow-y-auto">
                     <div className="flex flex-col space-y-2 text-sm font-medium">
-                        <Link href="/" className="py-1 text-white hover:text-[#E50914]">
+                        <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-1 text-white hover:text-[#E50914]">
                             Trang chủ
                         </Link>
-                        <Link href="/tv" className="py-1 text-zinc-300 hover:text-[#E50914]">
+                        <Link href="/tv" onClick={() => setIsMobileMenuOpen(false)} className="py-1 text-zinc-300 hover:text-[#E50914]">
                             Phim Truyền Hình
                         </Link>
-                        <Link href="/browse?type=movie" className="py-1 text-zinc-300 hover:text-[#E50914]">
+                        <Link href="/browse?type=movie" onClick={() => setIsMobileMenuOpen(false)} className="py-1 text-zinc-300 hover:text-[#E50914]">
                             Phim Lẻ
                         </Link>
-                        <Link href="/browse?sortBy=popularity.desc" className="py-1 text-zinc-300 hover:text-[#E50914]">
+                        <Link href="/browse?sortBy=popularity.desc" onClick={() => setIsMobileMenuOpen(false)} className="py-1 text-zinc-300 hover:text-[#E50914]">
                             Mới & Phổ biến
                         </Link>
-                        <Link href="/watchlist" className="py-1 text-zinc-300 hover:text-[#E50914]">
+                        <Link href="/watchlist" onClick={() => setIsMobileMenuOpen(false)} className="py-1 text-zinc-300 hover:text-[#E50914]">
                             Danh sách của tôi
                         </Link>
                     </div>
@@ -216,12 +211,13 @@ export default function Header() {
                                 <Link
                                     key={g.id}
                                     href={`/browse?genre=${g.id}`}
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                     className="text-zinc-300 hover:text-[#E50914] py-1 truncate"
                                 >
                                     {g.label}
                                 </Link>
                             ))}
-                            <Link href="/browse" className="text-[#E50914] font-semibold py-1">
+                            <Link href="/browse" onClick={() => setIsMobileMenuOpen(false)} className="text-[#E50914] font-semibold py-1">
                                 Xem tất cả thể loại →
                             </Link>
                         </div>
@@ -234,6 +230,7 @@ export default function Header() {
                                 <Link
                                     key={c.id}
                                     href={`/browse?country=${c.id}`}
+                                    onClick={() => setIsMobileMenuOpen(false)}
                                     className="text-zinc-300 hover:text-[#E50914] py-1 truncate"
                                 >
                                     {c.label}

@@ -175,3 +175,26 @@ So sánh giữa trang chi tiết **Có Streaming Suspense** và **Tắt Suspense
 | `SearchBar` | **Client Component** | **~2.1 KB** | Chỉ chứa logic debounce & router hook cần thiết |
 | `WatchlistButton` | **Client Component** | **~1.4 KB** | Chứa hook `useTransition` & trigger Server Action RPC |
 
+---
+
+## 🧭 11. Hệ Thống Mega Menu Navbar, Live Search & Bộ Lọc Đa Tiêu Chí
+
+Nhằm nâng cấp trải nghiệm người dùng theo tiêu chuẩn Netflix và các nền tảng phim hiện đại (Phimmoi, TMDB), hệ thống điều hướng và khám phá phim đã được mở rộng toàn diện:
+
+### 1. Mega Menu Dropdown trên Header:
+- **Thể Loại ⌵:** Lưới 3 cột gồm 24 thể loại phim phong phú (Hành động, Cổ trang, Kinh dị, Tình cảm, Hoạt hình/Anime, TV Shows...).
+- **Quốc Gia ⌵:** Dropdown chọn theo nguồn gốc xuất xứ phim (Âu Mỹ, Hàn Quốc, Trung Quốc, Nhật Bản, Việt Nam, Thái Lan, Ấn Độ...).
+- **Năm Phát Hành ⌵:** Lọc theo các năm từ 2026 lùi dần về trước 2015.
+- Khắc phục toàn bộ các liên kết điều hướng trên thanh Navbar: "Phim T.hình" (`/tv`), "Phim Lẻ" (`/browse?type=movie`), "Mới & Phổ biến" (`/browse?sortBy=popularity.desc`).
+
+### 2. Thanh Tìm Kiếm Co Giãn & Gợi Ý Trực Tiếp (Live Autocomplete):
+- **Slide-in Animation:** Biểu tượng kính lúp mở rộng mượt mà khi nhấp chuột chuẩn giao diện Netflix.
+- **Instant Preview Popover:** Debounce 300ms gọi Server Action an toàn phía máy chủ, hiển thị ngay danh sách 5 phim gợi ý (kèm Poster, Năm và Điểm sao rating ⭐) khi đang nhập từ khóa.
+- Phím tắt tiện lợi: `Enter` để tới trang kết quả đầy đủ, `Escape` hoặc nhấp ra ngoài để đóng nhanh.
+
+### 3. Bộ Lọc Phim Đa Tiêu Chí (Comprehensive Filter Bar):
+- Tích hợp tại cả 2 trang `/browse` và `/search`.
+- Cho phép người dùng kết hợp linh hoạt 5 tiêu chí cùng lúc: **Định dạng (Phim lẻ / Phim bộ) + Thể loại + Quốc gia + Năm phát hành + Sắp xếp (Phổ biến / Điểm cao / Mới nhất)**.
+- Đồng bộ URL SearchParams hai chiều, hỗ trợ lưu link, chia sẻ bộ lọc và phân trang mượt mà qua React Transitions.
+
+
