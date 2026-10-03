@@ -1,3 +1,4 @@
+Tên đề tài : TÌM HIỂU CÔNG NGHỆ NEXT.JS QUA ỨNG DỤNG TRA CỨU & KHÁM PHÁ PHIM ẢNH
 -Quy định chung
 5
 a) Trích dẫn tham khảo và lập danh mục các tài liệu tham khảo khi sử dụng thông
