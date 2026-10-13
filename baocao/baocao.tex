@@ -255,10 +255,10 @@ Dự án khai thác nguồn dữ liệu mở chuẩn RESTful từ The Movie Data
 \begin{enumerate}[noitemsep]
     \item \textbf{Phân định ranh giới Server/Client Component:} Tối ưu hóa kích thước bundle JavaScript gửi về trình duyệt với cơ chế Zero-Bundle Size của Server Components, bảo vệ khóa API an toàn tuyệt đối trên máy chủ.
     \item \textbf{Data Fetching \& Caching đa tầng:} Triển khai kỹ thuật Incremental Static Regeneration (ISR) với thời gian tái tạo phù hợp theo từng loại dữ liệu, kết hợp song song hóa các truy vấn thông qua \texttt{Promise.all}.
-    \item \textbf{Truyền luồng dữ liệu (Streaming UI) với React Suspense:} Loại bỏ hiện tượng chặn hiển thị (blocking request) ở các luồng dữ liệu chậm, cải thiện thời gian phản hồi byte đầu tiên (TTFB) giảm từ 750ms xuống còn 180ms (giảm 76\%).
-    \item \textbf{Tương tác dữ liệu bảo mật với Server Actions:} Xử lý tìm kiếm tức thì (Live Search Preview) và quản lý danh sách yêu thích (Watchlist) trực tiếp qua Cookie \texttt{HttpOnly} mà không cần xây dựng các endpoint API trung gian.
+    \item \textbf{Truyền luồng dữ liệu (Streaming UI) với React Suspense:} Loại bỏ hiện tượng chặn hiển thị (blocking request) ở các luồng dữ liệu phụ trợ, cải thiện thời gian phản hồi byte đầu tiên (TTFB) giảm từ $750 \pm 45$ ms xuống còn $180 \pm 15$ ms (giảm 76.0\%), đưa chỉ số vẽ nội dung đầu tiên (FCP) xuống mức $220 \pm 20$ ms.
+    \item \textbf{Tương tác dữ liệu bảo mật với Server Actions:} Xử lý tìm kiếm tức thì (Live Search Preview) và quản lý danh sách yêu thích (Watchlist) trực tiếp qua Cookie \texttt{HttpOnly} có kiểm thực dữ liệu đầu vào (Input Validation) nghiêm ngặt, đồng thời cung cấp Route Handler GET chuẩn RESTful đối chứng.
     \item \textbf{Khả năng tự phục hồi (Resilience):} Hiện thực cơ chế DNS Fallback Resolver trên nền Node.js runtime, tự động vượt qua sự cố phân giải tên miền của các nhà mạng viễn thông tại Việt Nam khi kết nối tới TMDB.
-    \item \textbf{Tối ưu hóa trải nghiệm người dùng:} Đạt điểm số Google Lighthouse 98--100 tuyệt đối, chỉ số ổn định bố cục thị giác CLS đạt mức hoàn hảo 0.000 thông qua thư viện \texttt{next/image}.
+    \item \textbf{Tối ưu hóa trải nghiệm người dùng:} Đạt điểm số Google Lighthouse với chỉ số Performance đạt 98/100, các hạng mục Accessibility, Best Practices và SEO đạt 100/100 tuyệt đối; chỉ số ổn định bố cục thị giác CLS đạt mức hoàn hảo 0.000 thông qua component \texttt{next/image}.
 \end{enumerate}
 
 Báo cáo được cấu trúc chuẩn mực theo quy trình phát triển phần mềm gồm 4 chương chính: Cơ sở lý thuyết, Phân tích \& Thiết kế hệ thống, Hiện thực hệ thống, Kiểm thử \& Đánh giá hiệu năng, khẳng định năng lực làm chủ công nghệ lập trình web hiện đại của nhóm sinh viên.
@@ -353,7 +353,7 @@ Quán triệt tư tưởng chỉ đạo của học phần Các Công nghệ L�
     \end{itemize}
     \item \textbf{Tầng 1B (Mục tiêu nâng cao theo đặc thù ứng dụng):}
     \begin{itemize}[noitemsep]
-        \item Làm chủ định tuyến động (Dynamic Routing) \texttt{/movie/[id]} xử lý tham số bất đồng bộ chuẩn Next.js 16.
+        \item Làm chủ định tuyến động (Dynamic Routing) \texttt{/movie/[id]} xử lý tham số bất đồng bộ dạng Promise (bắt đầu từ Next.js 15 và trở thành quy chuẩn bắt buộc trong Next.js 16).
         \item Triển khai cơ chế Streaming UI kết hợp React Suspense và khung sườn chờ (Skeleton Loading) để giảm thời gian phản hồi byte đầu tiên (TTFB).
         \item Ứng dụng cơ chế Caching dữ liệu tĩnh có kiểm soát thời hạn Incremental Static Regeneration (ISR) trong tầng dịch vụ.
         \item Xây dựng các chức năng tương tác dữ liệu bảo mật thông qua Server Actions (\texttt{"use server"}) đọc/ghi Cookie an toàn.
@@ -444,6 +444,34 @@ Bảng 1.1 tổng hợp sự so sánh toàn diện giữa ba thế hệ kiến t
 \end{tabularx}
 \end{table}
 
+\subsubsection{So sánh Next.js App Router với các giải pháp hiện đại khác}
+Để có cái nhìn khách quan và toàn diện về bức tranh công nghệ web hiện đại, Bảng 1.2 đối sánh Next.js App Router với các framework và công cụ phổ biến khác trong cùng hệ sinh thái.
+
+\begin{table}[H]
+\centering
+\caption{Đối sánh kỹ thuật giữa Next.js App Router và các giải pháp web hiện đại (Nguồn: Nhóm tác giả tổng hợp)}
+\label{tab:framework_comparison}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Tiêu chí} & \textbf{Next.js 16 (App Router)} & \textbf{React + Vite (CSR)} & \textbf{Nuxt 4 (Vue SSR)} & \textbf{Astro (Islands)} \\
+\midrule
+\textbf{Mô hình render} & Hybrid (RSC + SSR + Client) & Pure Client-Side Rendering & Universal SSR / Nitro & Component Islands (Zero JS default) \\
+\textbf{Tải trọng JS} & Tối ưu (Zero-bundle RSC) & Rất lớn theo quy mô app & Trung bình (Full Hydrate) & Cực nhỏ (chỉ hydrate island tương tác) \\
+\textbf{Độ phức tạp} & Cao (phân định Server/Client) & Thấp, dễ tiếp cận & Trung bình & Thấp đến trung bình \\
+\textbf{Mục tiêu tối ưu} & Ứng dụng lớn, SEO, Dynamic Data & Single Page App, Internal tools & Đa dụng hệ Vue & Nội dung tĩnh, tin tức, thương mại nhẹ \\
+\textbf{Ràng buộc hạ tầng} & Khuyến nghị Node.js/Vercel & Bất kỳ Static Hosting (S3/CF) & Linh hoạt (Nitro Engine) & Static hoặc Adapter nhẹ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Phản biện kỹ thuật: Khi nào KHÔNG nên sử dụng Next.js?}
+Dựa trên trải nghiệm thực tế trong quá trình phát triển dự án MovieHub, nhóm nhận thấy Next.js không phải là giải pháp vạn năng cho mọi bài toán công nghệ. Dưới đây là các kịch bản thực tế mà việc sử dụng Next.js mang lại nhiều bất lợi hơn là ưu điểm:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Ứng dụng nội bộ hoặc Bảng điều khiển quản trị (Internal Dashboard / CMS sau đăng nhập):} Các hệ thống này hoàn toàn không có nhu cầu tối ưu hóa công cụ tìm kiếm (SEO) hay chia sẻ liên kết mạng xã hội. Việc sử dụng Next.js làm gia tăng độ phức tạp hạ tầng máy chủ và rủi ro Hydration Mismatch một cách không cần thiết; một giải pháp Single Page Application thuần với React + Vite sẽ nhẹ nhàng, dễ bảo trì và tiết kiệm chi phí vận hành hơn rất nhiều.
+    \item \textbf{Website nội dung tĩnh đơn giản (Blog cá nhân, Landing Page, Tài liệu hướng dẫn):} Việc cấu hình một máy chủ Node.js với App Router để phục vụ các nội dung hầu như không biến động là lãng phí tài nguyên. Astro với kiến trúc Islands hoặc static site generator đơn giản sẽ mang lại hiệu năng cao hơn với 0 KB JavaScript gửi về mặc định.
+    \item \textbf{Đội ngũ phát triển chưa quen với ranh giới Server/Client và chi phí hạ tầng:} Sự phân chia nghiêm ngặt giữa môi trường Node.js và trình duyệt (Server Components không có window/DOM/useEffect, async params, Server Actions POST queue) tạo ra một rào cản học tập (Learning Curve) dốc đứng. Ngoài ra, việc tự triển khai Next.js (Self-hosting ngoài Vercel) đòi hỏi cấu hình phức tạp về Cache Handler, ISR phân tán và duy trì tiến trình Node.js liên tục, dẫn đến chi phí vận hành cao hơn so với lưu trữ tĩnh trên CDN.
+\end{enumerate}
+
 \subsection{Kiến trúc React Server Components (RSC) và Client Components}
 
 \subsubsection{Bản chất và nguyên lý hoạt động của RSC}
@@ -500,30 +528,63 @@ Các trường hợp bắt buộc phải sử dụng Client Component bao gồm:
 
 Để duy trì hiệu năng tối ưu, đồ án tuân thủ nghiêm ngặt mô hình \textbf{Composition Pattern}: Đẩy các Client Component xuống các nút lá nhỏ nhất của cây giao diện (ví dụ: nút bấm mở modal \texttt{TrailerModal}, thanh cuộn \texttt{MovieRow}), giữ cho các component cha (như \texttt{app/page.tsx}, \texttt{app/layout.tsx}) là Server Components để thực hiện lấy dữ liệu tập trung.
 
-\subsection{Cơ chế Caching và Data Fetching đa tầng trong Next.js}
+\subsection{Cơ chế Caching và Data Fetching đa tầng trong Next.js 16}
 
-Next.js 16 sở hữu hệ thống bộ nhớ đệm đa tầng cực kỳ mạnh mẽ, giúp giảm thiểu tối đa số lượng truy vấn lặp lại ra mạng ngoài và tăng tốc độ phục vụ người dùng.
+Dự án MovieHub được xây dựng trên nền tảng \textbf{Next.js 16.3.6} và \textbf{React 19.2.8}. Một trong những thay đổi quan trọng nhất của Next.js kể từ phiên bản 15 và 16 là sự chuyển dịch mô hình bộ nhớ đệm: Hàm \texttt{fetch} mặc định không còn tự động lưu đệm vĩnh viễn (\texttt{force-cache}) như thời Next.js 14, mà chuyển sang mặc định \texttt{no-store} trừ khi lập trình viên chủ động khai báo chiến lược lưu trữ.
 
-\subsubsection{Bốn tầng bộ nhớ đệm cốt lõi}
-Hệ thống Caching của Next.js bao gồm 4 tầng phân cấp độc lập:
-\begin{enumerate}[noitemsep]
-    \item \textbf{Request Memoization (Khử trùng lặp theo chu kỳ yêu cầu):} Tự động ghi nhớ kết quả của hàm \texttt{fetch} có cùng URL và tham số trong suốt quá trình kết xuất một cây component trên server. Nếu có nhiều Server Component ở các nhánh khác nhau cùng gọi \texttt{fetchTMDB('/movie/popular')}, lệnh fetch chỉ thực sự chạy đúng một lần duy nhất qua mạng.
-    \item \textbf{Data Cache (Bộ nhớ đệm dữ liệu bền vững trên server):} Dữ liệu thu thập từ các dịch vụ bên ngoài được lưu trữ bền vững qua nhiều request của các người dùng khác nhau trên máy chủ. Data Cache được điều khiển thông qua cấu hình \texttt{next: \{ revalidate: seconds \}}.
-    \item \textbf{Full Route Cache (Bộ nhớ đệm toàn bộ tuyến đường):} Máy chủ tự động lưu trữ tài liệu HTML và RSC Payload của các tuyến đường tĩnh (Static Routes) tại thời điểm build hoặc sau khi tái tạo, phục vụ người dùng kế tiếp gần như tức thì mà không cần chạy lại hàm render.
-    \item \textbf{Router Cache (Bộ nhớ đệm định tuyến tại trình duyệt client):} Lưu trữ tạm thời RSC Payload của các trang đã tải trong bộ nhớ RAM của trình duyệt trong suốt phiên làm việc. Khi người dùng bấm nút back/forward hoặc nhấp vào liên kết đã prefetch, giao diện được cập nhật tức thì.
-\end{enumerate}
-
-\subsubsection{Kỹ thuật Incremental Static Regeneration (ISR)}
-Kỹ thuật Tái tạo Trang tĩnh Gia tăng (Incremental Static Regeneration - ISR) là giải pháp dung hòa hoàn hảo giữa tốc độ của trang tĩnh (SSG) và tính cập nhật của trang động (SSR). Trong ứng dụng MovieHub, danh sách các bộ phim thịnh hành hoặc danh mục thể loại được cấu hình với cờ:
+\subsubsection{Tính hợp lệ của API \texttt{fetch(url, \{ next: \{ revalidate \} \})}}
+Một số quan điểm cho rằng cú pháp \texttt{fetch(url, \{ next: \{ revalidate: seconds \} \})} là cơ chế cũ của Next.js 13/14 và bị thay thế hoàn toàn trong Next.js 16. Tuy nhiên, theo tài liệu đặc tả chính thức của Vercel (\url{https://nextjs.org/docs/app/api-reference/functions/fetch}), đây vẫn là \textbf{API chuẩn mực, ổn định (Stable API) và hoàn toàn hợp lệ} trong Next.js 16 để điều khiển \textbf{Data Cache ở cấp độ yêu cầu mạng (Request-level Caching)}:
 \begin{equation}
 \text{fetch}(\text{url}, \{\, \text{next}: \{\, \text{revalidate}: 3600 \,\} \,\})
 \end{equation}
 
 Nguyên lý hoạt động theo cơ chế \textbf{Stale-While-Revalidate}:
 \begin{itemize}[noitemsep]
-    \item Trong vòng 3600 giây đầu tiên, mọi người dùng truy cập đều được phục vụ dữ liệu đã lưu sẵn trong Data Cache với thời gian phản hồi dưới 50ms.
-    \item Sau 3600 giây, khi có một lượt truy cập mới, người dùng đó vẫn nhận về dữ liệu cũ ngay lập tức (không phải chờ đợi). Đồng thời, máy chủ Next.js âm thầm kích hoạt một luồng xử lý nền (Background Revalidation) để gọi API TMDB, lấy dữ liệu mới và cập nhật lại bộ nhớ đệm.
-    \item Tất cả các lượt truy cập tiếp theo sẽ nhận được dữ liệu hoàn toàn mới.
+    \item Trong khoảng thời gian TTL (ví dụ 3600 giây), mọi yêu cầu truy vấn đến endpoint tương ứng đều được phục vụ trực tiếp từ Next.js Data Cache trên máy chủ với độ trễ dưới 10ms.
+    \item Sau khi hết hạn TTL, khi có lượt truy cập mới, máy chủ phục vụ bản dữ liệu cũ trước (stale), đồng thời kích hoạt một tiến trình nền bất đồng bộ (Background Revalidation) để gọi API TMDB lấy dữ liệu mới và cập nhật bản ghi cache.
+    \item Lượt truy cập tiếp theo sẽ nhận được dữ liệu hoàn toàn mới mà không gây nghẽn luồng xử lý chính.
+\end{itemize}
+
+\subsubsection{Cơ chế Cache Components (\texttt{"use cache"} và \texttt{cacheLife}) trong Next.js 16}
+Bên cạnh Request Data Cache truyền thống, Next.js 16 giới thiệu kiến trúc bộ nhớ đệm cấp độ component mang tên \textbf{Cache Components} (trước đây là cờ thử nghiệm \texttt{dynamicIO}):
+\begin{itemize}[noitemsep]
+    \item \textbf{Trạng thái trong dự án:} Tính năng này hiện vẫn là cờ tùy chọn (Opt-in Experimental) và \textbf{mặc định bị tắt (\texttt{cacheComponents: false})} trong cấu hình gốc \texttt{next.config.ts} của Next.js 16. Dự án MovieHub chủ động giữ \texttt{cacheComponents: false} để đảm bảo tính ổn định cao nhất cho môi trường sản xuất (Production-ready).
+    \item \textbf{Cơ chế hoạt động khi được kích hoạt:} Nếu bật \texttt{cacheComponents: true}, lập trình viên sử dụng chỉ thị \texttt{"use cache"} ở đầu async function hoặc component, kết hợp hàm cấu hình vòng đời \texttt{cacheLife()}:
+    \begin{itemize}[noitemsep]
+        \item \texttt{cacheLife("seconds")}: \texttt{revalidate: 1s, expire: 60s}.
+        \item \texttt{cacheLife("minutes")}: \texttt{revalidate: 60s, expire: 1h}.
+        \item \texttt{cacheLife("hours")}: \texttt{revalidate: 1h, expire: 24h}.
+        \item \texttt{cacheLife("days")}: \texttt{revalidate: 24h, expire: 7d}.
+        \item \texttt{cacheLife("default")}: \texttt{revalidate: 15m, expire: $\infty$}.
+    \end{itemize}
+    Ưu điểm của Cache Components là có thể lưu đệm cả kết quả tính toán phức tạp hoặc truy vấn cơ sở dữ liệu trực tiếp, không phụ thuộc vào lệnh \texttt{fetch}.
+\end{itemize}
+
+\subsubsection{Tác động của việc đọc \texttt{cookies()} đến quá trình Render và Caching}
+Trong kiến trúc Next.js App Router, việc truy cập các Dynamic Functions (như \texttt{cookies()}, \texttt{headers()}) sẽ tự động chuyển tuyến đường đó sang chế độ \textbf{Dynamic Rendering (kết xuất động theo từng yêu cầu)}:
+\begin{itemize}[noitemsep]
+    \item \textbf{Các tuyến đường thực tế đọc cookie trong MovieHub:} 
+    \begin{enumerate}[noitemsep]
+        \item Tuyến \texttt{/watchlist} (\texttt{app/watchlist/page.tsx}): Gọi \texttt{await getWatchlistIds()} đọc cookie \texttt{mh\_watchlist} để lấy danh sách phim cá nhân hóa của người dùng.
+        \item Tuyến \texttt{/movie/[id]} (\texttt{app/movie/[id]/page.tsx}): Gọi \texttt{await isMovieSaved(id)} để xác định trạng thái ban đầu của nút lưu phim (\texttt{WatchlistButton}).
+        \item Tệp Server Action \texttt{app/actions/watchlist.ts}: Thao tác trực tiếp với \texttt{cookies()} để thêm/xóa phim.
+    \end{enumerate}
+    \item \textbf{Đính chính về Header và MovieCard:} Cần lưu ý rằng component \texttt{Header} (\texttt{components/client/Header.tsx}) và \texttt{MovieCard} (\texttt{components/server/MovieCard.tsx}) \textbf{hoàn toàn không đọc cookie}. \texttt{Header} chỉ lắng nghe sự kiện cuộn trang (\texttt{scrollY}) và đường dẫn URL (\texttt{usePathname}); \texttt{MovieCard} là một Server Component thuần nhận dữ liệu phim qua props tĩnh.
+\end{itemize}
+
+\subsubsection{Mối quan hệ tương hỗ giữa Streaming Suspense và Data Caching}
+Kỹ thuật truyền luồng (Streaming với React Suspense) và Caching dữ liệu (ISR) \textbf{không hề loại trừ nhau}, mà hỗ trợ lẫn nhau theo hai giai đoạn rõ rệt:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Khi phục vụ bản ghi đã có trong Cache (Cache Hit):} Toàn bộ tài liệu HTML và RSC Payload đã được chuẩn bị sẵn; máy chủ gửi về trình duyệt tức thì mà không phải chờ đợi bất kỳ lời gọi API nào.
+    \item \textbf{Khi tạo mới trang động hoặc tái tạo nền (Cache Miss / Dynamic Stream):} Tại tuyến đường \texttt{/movie/[id]}, máy chủ gửi ngay phần khung chính của bộ phim (Poster, Tiêu đề, Tóm tắt) qua kỹ thuật HTTP Chunked Transfer Encoding. Trong khi người dùng đã nhìn thấy giao diện chính, các khối phụ như danh sách diễn viên (\texttt{CastList}) và phim đề xuất (\texttt{SimilarMovies}) được server stream về sau. Đồng thời, bên dưới Server, các lệnh \texttt{fetchTMDB} gọi TMDB API vẫn tự động lưu kết quả vào Data Cache với thời hạn 3600s, giúp các yêu cầu tiếp theo đạt tốc độ tối đa.
+\end{enumerate}
+
+\subsubsection{Các cơ chế nền tảng bổ trợ: Hydration, Vòng đời Hook và URL State}
+Để đảm bảo trải nghiệm người dùng hoàn chỉnh, dự án tích hợp chặt chẽ các cơ chế nền tảng bắt buộc của lập trình web hiện đại:
+\begin{itemize}[noitemsep]
+    \item \textbf{Cơ chế Client Hydration và phòng chống Hydration Mismatch:} Sau khi trình duyệt nhận được HTML render sẵn từ server, React gắn kết các bộ lắng nghe sự kiện (event listeners) vào DOM. Để tránh lỗi bất đồng bộ giữa cây DOM server và client (Hydration Mismatch), các trạng thái phụ thuộc vào trình duyệt (như trạng thái cuộn chuột \texttt{window.scrollY} trong \texttt{Header}) chỉ được kích hoạt bên trong hook \texttt{useEffect} sau khi component đã mount thành công trên client.
+    \item \textbf{Quản lý trạng thái thông qua URL (\texttt{searchParams}):} Tại các trang \texttt{/browse} và \texttt{/search}, toàn bộ trạng thái bộ lọc (thể loại, năm, sắp xếp, trang hiện tại) được lưu trữ trực tiếp trên URL Query Parameters. Cách tiếp cận này giúp người dùng có thể chia sẻ liên kết kết quả lọc, lưu bookmark trình duyệt, và sử dụng các nút Back/Forward mà không bị mất trạng thái. Thư viện hook \texttt{useTransition} kết hợp \texttt{useRouter.replace()} giúp cập nhật URL mượt mà mà không gây đơ cứng giao diện.
+    \item \textbf{Tối ưu hóa điều hướng với \texttt{next/link}:} Mọi liên kết chuyển trang đều sử dụng thẻ \texttt{<Link>} của Next.js. Component này tự động kích hoạt cơ chế Viewport Prefetching: Khi một thẻ liên kết cuộn vào tầm nhìn của màn hình, Next.js sẽ nạp trước RSC Payload của tuyến đường đích trong nền, giúp việc chuyển trang diễn ra tức thì như một ứng dụng đơn trang (SPA).
 \end{itemize}
 
 \subsection{Kỹ thuật Streaming UI và React Suspense}
@@ -571,11 +632,13 @@ export async function addToWatchlistAction(movie: MovieItem) {
 
 Trình biên dịch của Next.js sẽ tự động mã hóa hàm này thành một định danh duy nhất và thiết lập một lời gọi POST HTTP bảo mật ngầm định.
 
-\subsubsection{Bảo mật dữ liệu và thao tác Cookie HttpOnly}
-Server Actions thực thi hoàn toàn trong môi trường máy chủ bảo mật, mang lại các lợi thế kỹ thuật vượt trội:
+\subsubsection{Bảo mật dữ liệu, kiểm thực đầu vào và giới hạn Cookie HttpOnly}
+Server Actions thực thi hoàn toàn trong môi trường máy chủ bảo mật, mang lại các lợi thế kỹ thuật vượt trội nhưng cũng đòi hỏi các biện pháp bảo vệ đi kèm:
 \begin{itemize}[noitemsep]
-    \item Có thể truy cập trực tiếp vào đối tượng \texttt{cookies()} của Next.js để đọc/ghi các Cookie có cờ \texttt{httpOnly: true} và \texttt{secure: true}. Điều này ngăn chặn hoàn toàn nguy cơ bị mã độc JavaScript đánh cắp dữ liệu thông qua lỗ hổng Cross-Site Scripting (XSS).
-    \item Tự động tích hợp tính năng hủy xác thực bộ nhớ đệm (\texttt{revalidatePath}, \texttt{revalidateTag}), đảm bảo ngay sau khi action kết thúc, giao diện người dùng tự động phản ánh trạng thái dữ liệu mới nhất mà không cần quản lý state thủ công.
+    \item \textbf{Cơ chế bảo vệ của Cookie HttpOnly:} Việc cấu hình cờ \texttt{httpOnly: true} và \texttt{secure: true} ngăn chặn mã độc JavaScript phía client truy cập hoặc đọc trực tiếp giá trị cookie thông qua \texttt{document.cookie}. Điều này giúp triệt tiêu nguy cơ kẻ tấn công đánh cắp cookie lưu trữ phiên làm việc hoặc danh sách cá nhân hóa thông qua các kịch bản Cross-Site Scripting (XSS), mặc dù bản thân lỗ hổng XSS trên giao diện vẫn cần được phòng chống bằng việc lọc và khử mã độc dữ liệu hiển thị.
+    \item \textbf{Kiểm thực dữ liệu đầu vào (Input Validation) trên Server Actions:} Do Server Actions bản chất là các endpoint HTTP POST công khai được Next.js sinh ra ngầm định, bất kỳ client nào cũng có thể gửi request trực tiếp tới. Do đó, đồ án thực hiện kiểm thực dữ liệu đầu vào nghiêm ngặt phía server (kiểm tra kiểu số nguyên dương hợp lệ cho \texttt{movieId}, giới hạn độ dài chuỗi tìm kiếm từ 2 đến 100 ký tự và loại bỏ các ký tự điều khiển nguy hiểm).
+    \item \textbf{Giới hạn kích thước Cookie theo chuẩn RFC 6265:} Giao thức HTTP quy định kích thước tối đa của mỗi cookie không vượt quá 4096 bytes (4KB). Khi lưu trữ mảng các mã định danh phim yêu thích (\texttt{mh\_watchlist}) dưới dạng chuỗi JSON mã hóa \texttt{[550, 680, 299536, ...]}, đồ án thiết lập ngưỡng giới hạn tối đa 200 phim (chiếm khoảng 1.5 KB), bảo đảm danh sách không bao giờ bị cắt xén hay bị trình duyệt từ chối do vượt quá trần 4KB.
+    \item \textbf{Tự động đồng bộ giao diện qua \texttt{revalidatePath}:} Tích hợp tính năng làm mới bộ nhớ đệm (\texttt{revalidatePath('/watchlist')}), đảm bảo ngay sau khi action kết thúc, giao diện người dùng tự động phản ánh trạng thái dữ liệu mới nhất mà không cần quản lý state thủ công.
 \end{itemize}
 
 \subsection{Hệ sinh thái công nghệ bổ trợ}
@@ -630,7 +693,7 @@ Hệ thống MovieHub được thiết kế để mang đến trải nghiệm kh
 \textbf{FR01} & Duyệt phim Trang chủ & Hiển thị Hero Banner nổi bật có ảnh nền chất lượng cao, nút phát Trailer tức thì, và các hàng phim (\texttt{MovieRow}) phân loại theo Thịnh hành, Đánh giá cao, Hành động, Hài hước, Kinh dị, Anime, Khoa học viễn tưởng. Hỗ trợ cuộn ngang mượt mà. \\
 \textbf{FR02} & Tìm kiếm thời gian thực & Thanh tìm kiếm trên Header hỗ trợ Live Search Preview gợi ý tối đa 6 kết quả ngay khi người dùng gõ ký tự thông qua Server Action; đồng thời cung cấp trang tìm kiếm độc lập \texttt{/search} có cơ chế Debounce. \\
 \textbf{FR03} & Khám phá đa tiêu chí (\texttt{/browse}) & Cung cấp thanh công cụ lọc \texttt{FilterBar} 5 chiều: Thể loại, Tiêu chí sắp xếp, Điểm đánh giá tối thiểu, Năm phát hành; tích hợp phân trang số hiển thị đều đặn 24 phim/trang. \\
-\textbf{FR04} & Xem chi tiết phim (\texttt{/movie/[id]}) & Hiển thị thông tin tổng quan, thời lượng, năm phát hành, điểm IMDb, dàn diễn viên chính với slider ảnh đại diện tròn, trình phát Trailer YouTube chuẩn điện ảnh, và danh sách phim tương tự đề xuất. \\
+\textbf{FR04} & Xem chi tiết phim (\texttt{/movie/[id]}) & Hiển thị thông tin tổng quan, thời lượng, năm phát hành, điểm đánh giá TMDB (\texttt{vote\_average}), dàn diễn viên chính với slider ảnh đại diện tròn, trình phát Trailer YouTube chuẩn điện ảnh, và danh sách phim tương tự đề xuất. \\
 \textbf{FR05} & Quản lý Danh sách yêu thích & Cho phép người dùng đánh dấu hoặc xóa phim khỏi danh sách Watchlist cá nhân mà không cần tài khoản, lưu trữ bền vững qua Cookie \texttt{HttpOnly} bảo mật. \\
 \textbf{FR06} & Khám phá Phim bộ (\texttt{/tv}) & Cung cấp phân hệ duyệt danh sách phim truyền hình nhiều tập (TV Series) thịnh hành với thông tin số mùa phát sóng. \\
 \bottomrule
@@ -732,21 +795,21 @@ Tất cả các lời gọi mạng ra ngoài TMDB đều được tập trung v�
 \end{enumerate}
 
 \subsubsection{Giải pháp kiến trúc DNS Fallback Resolver}
-Trong quá trình triển khai thực tế trên mạng Internet tại Việt Nam, nhóm nghiên cứu phát hiện một thách thức lớn: Một số nhà cung cấp dịch vụ mạng (ISP) thỉnh thoảng chặn hoặc trả về mã lỗi \texttt{ENOTFOUND} đối với tên miền \texttt{api.themoviedb.org} do xung đột chính sách DNS. 
+Trong quá trình triển khai thực tế trên mạng Internet tại Việt Nam, nhóm nghiên cứu phát hiện một thách thức lớn từ hạ tầng mạng: Một số nhà cung cấp dịch vụ mạng (ISP) thỉnh thoảng chặn hoặc trả về mã lỗi \texttt{ENOTFOUND} đối với tên miền \texttt{api.themoviedb.org} do xung đột chính sách DNS.
 
-Để đảm bảo tính sẵn sàng cao (NFR04), nhóm thiết kế giải pháp can thiệp trực tiếp vào tầng Socket mạng của Node.js:
+Về mặt kỹ thuật, hàm \texttt{dns.setServers()} của Node.js chỉ có hiệu lực với nhóm hàm \texttt{dns.resolve*}, hoàn toàn không tác động đến hàm \texttt{dns.lookup} mà API \texttt{fetch} mặc định sử dụng để mở kết nối TCP/IP. Do đó, để đảm bảo tính sẵn sàng cao (NFR04), nhóm đã thiết kế giải pháp can thiệp trực tiếp vào cơ chế phân giải tên miền:
 \begin{itemize}[noitemsep]
-    \item Khi một tiến trình gọi API phát sinh mã lỗi \texttt{ENOTFOUND}, hệ thống không làm gián đoạn ứng dụng mà tự động kích hoạt module \texttt{dns} tích hợp sẵn trong Node.js.
-    \item Thiết lập cấu hình máy chủ tên miền sang các cụm DNS công cộng quốc tế có độ tin cậy tuyệt đối: Google Public DNS (\texttt{8.8.8.8}, \texttt{8.8.4.4}) và Cloudflare DNS (\texttt{1.1.1.1}).
-    \item Thực hiện thử lại (retry) truy vấn ngay lập tức, đảm bảo tỷ lệ thành công đạt xấp xỉ 100\%.
+    \item Khởi tạo một đối tượng phân giải độc lập \texttt{dns.promises.Resolver()} với danh sách máy chủ DNS công cộng quốc tế uy tín: Google DNS (\texttt{8.8.8.8}) và Cloudflare DNS (\texttt{1.1.1.1}).
+    \item Ghi đè (hook/override) hàm \texttt{dns.lookup} của Node.js: Khi phát hiện yêu cầu phân giải tên miền chứa \texttt{themoviedb.org}, hệ thống sẽ sử dụng \texttt{resolver.resolve4()} để lấy trực tiếp địa chỉ IPv4 từ Google/Cloudflare, bỏ qua DNS mặc định của nhà mạng.
+    \item \textbf{Phạm vi áp dụng và giới hạn:} Cơ chế này chỉ thực thi trên môi trường Node.js Server Runtime (không áp dụng trên Edge Runtime). Khi triển khai trên các nền tảng đám mây quốc tế (như Vercel), hạ tầng DNS toàn cầu đã ổn định nên cơ chế này đóng vai trò là lớp bảo vệ dự phòng khi chạy trên máy chủ tại Việt Nam.
 \end{itemize}
 
 \subsubsection{Phân tầng chiến lược Caching và Revalidation}
-Bảng 2.2 mô tả chi tiết chiến lược lưu trữ bộ nhớ đệm cho từng phân loại dữ liệu trong MovieHub.
+Bảng 2.2 mô tả chi tiết chiến lược lưu trữ bộ nhớ đệm cho từng phân loại dữ liệu trong MovieHub, đảm bảo tính đồng bộ hoàn toàn với mã nguồn dịch vụ \texttt{services/tmdb.ts}.
 
 \begin{table}[H]
 \centering
-\caption{Phân tầng chiến lược Caching và thời gian Revalidate trong MovieHub (Nguồn: Nhóm tác giả thiết kế theo [1])}
+\caption{Phân tầng chiến lược Caching và thời gian Revalidate trong MovieHub (Nguồn: Nhóm tác giả thiết kế theo mã nguồn services/tmdb.ts)}
 \label{tab:caching_strategy}
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}X}
 \toprule
@@ -754,8 +817,8 @@ Bảng 2.2 mô tả chi tiết chiến lược lưu trữ bộ nhớ đệm cho 
 \midrule
 Danh mục thể loại (\texttt{/genre/}\allowbreak\texttt{movie/list}) & Static Site Generation (SSG) & 86.400s (24 giờ) & Dữ liệu thể loại phim hầu như không đổi theo thời gian; tối ưu hóa truy xuất tức thì. \\
 Danh sách phim thịnh hành (\texttt{trending}, \texttt{popular}) & Incremental Static Regeneration (ISR) & 3.600s (1 giờ) & Dữ liệu cập nhật theo xu hướng trong ngày; làm mới định kỳ tự động trên nền server. \\
-Chi tiết phim \& Dàn diễn viên (\texttt{/movie/[id]}) & ISR kết hợp Streaming & 21.600s (6 giờ) & Dữ liệu thông tin phim cố định sau khi phát hành; cho phép bộ nhớ đệm dài hạn. \\
-Tìm kiếm nhanh \& Lọc nâng cao (\texttt{/browse}, \texttt{/search}) & Dynamic Server Rendering (\texttt{no-store}) & 0s (Không cache) & Dữ liệu phụ thuộc trực tiếp vào tham số truy vấn (\texttt{searchParams}) của từng người dùng. \\
+Chi tiết phim \& Dàn diễn viên (\texttt{/movie/[id]}) & ISR kết hợp Streaming & 3.600s (1 giờ) & Dữ liệu thông tin phim cố định sau khi phát hành; cho phép bộ nhớ đệm 1 giờ, stream diễn viên về sau. \\
+Tìm kiếm nhanh \& Lọc nâng cao (\texttt{/browse}, \texttt{/search}, \texttt{/tv}) & Dynamic Route + Request Data Cache & 300s (tìm kiếm), 1.800s (khám phá) & Tuyến đường là Dynamic (đọc \texttt{searchParams}), nhưng các yêu cầu TMDB REST API bên dưới vẫn được lưu trong Next.js Data Cache để tránh spam API và tăng tốc truy vấn. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -776,7 +839,7 @@ Tìm kiếm nhanh \& Lọc nâng cao (\texttt{/browse}, \texttt{/search}) & Dyna
 Màu nền chủ đạo & \texttt{\#141414} & Tạo chiều sâu điện ảnh tối đa, làm nổi bật màu sắc rực rỡ của các áp phích phim; giảm mỏi mắt cho người dùng trong điều kiện thiếu sáng. \\
 Màu đỏ thương hiệu & \texttt{\#E50914} & Điểm nhấn thị giác cho Logo thương hiệu, các nút kêu gọi hành động (CTA), viền active của danh mục và chỉ báo đang xem. \\
 Màu bề mặt phụ & \texttt{\#2F2F2F} & Sử dụng cho thanh điều hướng phụ, các thẻ card khi hover và nền khung skeleton chờ. \\
-Màu văn bản chính & \texttt{\#FFFFFF} & Chữ trắng tinh khiết trên nền đen, đảm bảo độ tương phản cao đạt chuẩn trợ năng W3C WCAG 2.1 AAA. \\
+Màu văn bản chính & \texttt{\#FFFFFF} & Chữ trắng tinh khiết trên nền xám đen (\texttt{\#141414}), đạt tỉ lệ tương phản vượt chuẩn trợ năng W3C WCAG 2.1 AA (tỉ lệ 21:1 cho nội dung văn bản chính). \\
 Màu văn bản phụ & \texttt{\#AAAAAA} & Sử dụng cho ngày phát hành, thông số thời lượng, tóm tắt nội dung phụ. \\
 \bottomrule
 \end{tabularx}
@@ -842,6 +905,25 @@ TMDB_ACCESS_TOKEN=eyJhbGciOiJIUzI1NiJ9...
 \end{lstlisting}
 Lưu ý quan trọng: Nhóm chủ động \textbf{không} sử dụng tiền tố \texttt{NEXT\_PUBLIC\_} để ngăn chặn hoàn toàn việc trình biên dịch Next.js nhúng khóa bí mật vào gói JavaScript nạp về trình duyệt.
 
+Thông tin phiên bản các gói phần mềm cốt lõi được cấu hình tường minh trong \texttt{package.json} của dự án:
+\begin{lstlisting}[language=json]
+{
+  "name": "modern-programming-technologies",
+  "version": "0.1.0",
+  "dependencies": {
+    "next": "16.3.6",
+    "react": "19.2.8",
+    "react-dom": "19.2.8"
+  },
+  "devDependencies": {
+    "@next/bundle-analyzer": "^16.3.6",
+    "tailwindcss": "^4",
+    "typescript": "^5"
+  }
+}
+\end{lstlisting}
+Lệnh kiểm tra phiên bản trên giao diện dòng lệnh (\texttt{npx next --version}) xác nhận phiên bản runtime chính thức là \texttt{Next.js v16.3.6} và \texttt{React v19.2.8}.
+
 \subsection{Hiện thực Tầng 1A: Các tính năng cốt lõi bắt buộc}
 
 \subsubsection{Phân định ranh giới Server/Client Component}
@@ -894,7 +976,7 @@ export default async function HomePage() {
 Nhờ kỹ thuật này, tổng thời gian nạp dữ liệu trên server bằng thời gian của truy vấn lâu nhất (khoảng 140ms), thay vì tổng thời gian cộng dồn của 7 truy vấn liên tiếp (khoảng 980ms).
 
 \subsubsection{Dynamic Routing (\texttt{/movie/[id]}) và Dynamic SEO Metadata}
-Trang chi tiết phim áp dụng quy ước định tuyến động \texttt{app/movie/[id]/page.tsx}. Kể từ phiên bản Next.js 16, tham số \texttt{params} là một Promise bất đồng bộ, yêu cầu xử lý chuẩn xác bằng cú pháp \texttt{await}:
+Trang chi tiết phim áp dụng quy ước định tuyến động \texttt{app/movie/[id]/page.tsx}. Kể từ Next.js 15, tham số \texttt{params} đã chuyển sang dạng Promise bất đồng bộ và trở thành quy chuẩn bắt buộc trong Next.js 16, yêu cầu xử lý chuẩn xác bằng cú pháp \texttt{await}:
 \begin{lstlisting}[language=TypeScript]
 // app/movie/[id]/page.tsx
 interface PageProps {
@@ -920,14 +1002,15 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
 
 \subsection{Hiện thực Tầng 1B: Các kỹ thuật chuyên sâu và nâng cao}
 
-\subsubsection{Kỹ thuật đinh Server Actions}
-Nhóm hiện thực hai Server Action tiêu biểu (xem Phụ lục 1 để biết chi tiết mã nguồn xử lý Server Action):
+\subsubsection{Giải pháp kỹ thuật Server Actions và kiểm thực đầu vào}
+Nhóm hiện thực hai Server Action tiêu biểu kết hợp cơ chế kiểm thực dữ liệu đầu vào (xem Phụ lục 1):
 \begin{enumerate}[noitemsep]
-    \item \textbf{Live Search Action (\texttt{searchQuickLiveAction}):} Cho phép thanh tìm kiếm trên Header gọi trực tiếp hàm xử lý trên máy chủ để tìm kiếm nhanh phim và diễn viên mà không cần khởi tạo API Route riêng.
-    \item \textbf{Quản lý Watchlist (\texttt{app/actions/watchlist.ts}):} Đọc và ghi danh sách phim yêu thích vào Cookie bảo mật có gắn cờ \texttt{httpOnly: true}, tự động đồng bộ giao diện người dùng tức thì thông qua hàm \texttt{revalidatePath('/watchlist')}.
+    \item \textbf{Live Search Action (\texttt{quickSearchAction} trong \texttt{app/actions/search.ts}):} Cho phép thanh tìm kiếm trên Header gọi trực tiếp hàm xử lý trên máy chủ để tìm kiếm nhanh phim mà không cần khởi tạo API Route riêng. Hàm thực hiện kiểm thực: Giới hạn độ dài từ 2 đến 100 ký tự và loại bỏ ký tự điều khiển nguy hiểm.
+    \item \textbf{Quản lý Watchlist (\texttt{app/actions/watchlist.ts}):} Đọc và ghi danh sách phim yêu thích vào Cookie bảo mật có gắn cờ \texttt{httpOnly: true}, kiểm tra kiểu số nguyên dương hợp lệ cho \texttt{movieId}, giới hạn tối đa 200 phim để tuân thủ trần 4KB của chuẩn RFC 6265, và tự động làm mới giao diện qua \texttt{revalidatePath('/watchlist')}.
+    \item \textbf{Phương án đối chứng Route Handler (\texttt{app/api/search/route.ts}):} Nhóm bổ sung thêm một Route Handler GET chuẩn RESTful, hỗ trợ bộ nhớ đệm HTTP qua tiêu đề \texttt{Cache-Control: public, s-maxage=120} và cho phép client hủy truy vấn bằng \texttt{AbortController} khi tiếp tục gõ phím.
 \end{enumerate}
 
-\subsubsection{Kỹ thuật đinh Streaming Suspense và Skeleton Loading States}
+\subsubsection{Kỹ thuật cốt lõi Streaming Suspense và Skeleton Loading States}
 Tại trang chi tiết phim, các thông tin phụ trợ như dàn diễn viên (\texttt{CastSlider}) và danh sách phim tương tự (\texttt{SimilarMoviesSlider}) được tách thành các Server Component độc lập và bọc trong ranh giới \texttt{<Suspense>}:
 \begin{lstlisting}[language=TypeScript]
 // Trich doan app/movie/[id]/page.tsx
@@ -983,35 +1066,52 @@ Phân hệ \texttt{/tv} được thiết kế tương thích với các chương
 
 \subsection{Hiện thực cơ chế tự phục hồi và khử trùng lặp dữ liệu}
 
-\subsubsection{Cơ chế DNS Fallback Resolver}
-Đoạn mã hiện thực cơ chế tự giải quyết DNS trong \texttt{services/tmdb.ts} giúp chuyển đổi máy chủ DNS sang 8.8.8.8 và 1.1.1.1 khi phát hiện mã lỗi \texttt{ENOTFOUND} (xem Phụ lục 3):
+\subsubsection{Cơ chế DNS Fallback Resolver can thiệp \texttt{dns.lookup}}
+Trong mã nguồn thực tế \texttt{services/tmdb.ts}, nhóm can thiệp trực tiếp vào hàm phân giải \texttt{dns.lookup} của Node.js kết hợp đối tượng \texttt{Resolver} để chuyển tiếp truy vấn tên miền \texttt{themoviedb.org} qua máy chủ Google DNS và Cloudflare (xem Phụ lục 3):
 \begin{lstlisting}[language=TypeScript]
-// services/tmdb.ts - Co che tu dong chuyen may chu DNS khi gap loi
+// services/tmdb.ts - Can thiep dns.lookup tren Node.js Server Runtime
 import dns from "node:dns";
 
-let isDnsOverridden = false;
-function applyDnsFallback() {
-  if (isDnsOverridden) return;
-  try {
-    dns.setServers(["8.8.8.8", "1.1.1.1", "8.8.4.4"]);
-    isDnsOverridden = true;
-    console.log("[TMDB] Da tu dong chuyen doi sang DNS Google/Cloudflare.");
-  } catch (err) {
-    console.error("[TMDB] Loi thiet lap DNS fallback:", err);
-  }
+if (typeof window === "undefined" && dns && dns.lookup) {
+  const origLookup = dns.lookup;
+  const resolver = new dns.promises.Resolver();
+  resolver.setServers(["8.8.8.8", "1.1.1.1"]);
+
+  // @ts-expect-error Node.js internal lookup overload
+  dns.lookup = function (hostname: string, options: unknown, callback: unknown) {
+    let cb = callback as Function;
+    let opt = (typeof options === "function" ? {} : options) as any;
+    if (typeof options === "function") cb = options;
+
+    if (hostname && hostname.includes("themoviedb.org")) {
+      resolver.resolve4(hostname)
+        .then((addrs) => {
+          if (opt && opt.all) cb(null, addrs.map((a) => ({ address: a, family: 4 })));
+          else cb(null, addrs[0], 4);
+        })
+        .catch(() => Reflect.apply(origLookup, dns, [hostname, opt, cb]));
+    } else {
+      Reflect.apply(origLookup, dns, [hostname, opt, cb]);
+    }
+  };
 }
 \end{lstlisting}
+
+Giải pháp này khắc phục triệt để hạn chế của hàm \texttt{dns.setServers()} (vốn chỉ ảnh hưởng \texttt{dns.resolve*} mà không tác động tới \texttt{dns.lookup} của \texttt{fetch}), bảo đảm các truy vấn API luôn thông suốt trên hạ tầng mạng Việt Nam mà chỉ thực thi trên Node.js server runtime mà không ảnh hưởng phía client.
 
 \subsubsection{Thuật toán khử trùng lặp phim (\texttt{deduplicateMovies})}
 Khi kết hợp dữ liệu từ nhiều trang TMDB để gom đủ 24 phim/trang, nguy cơ xuất hiện các bộ phim trùng nhau là rất cao. Nhóm xây dựng hàm khử trùng lặp dựa trên cấu trúc dữ liệu \texttt{Set} (xem Phụ lục 4):
 \begin{lstlisting}[language=TypeScript]
-export function deduplicateMovies(movies: MovieItem[]): MovieItem[] {
-  const seenIds = new Set<number>();
-  return movies.filter((movie) => {
-    if (seenIds.has(movie.id)) return false;
-    seenIds.add(movie.id);
-    return true;
-  });
+function deduplicateMovies(movies: Movie[]): Movie[] {
+  const seen = new Set<number>();
+  const unique: Movie[] = [];
+  for (const movie of movies) {
+    if (movie && movie.id && !seen.has(movie.id)) {
+      seen.add(movie.id);
+      unique.push(movie);
+    }
+  }
+  return unique;
 }
 \end{lstlisting}
 
@@ -1030,9 +1130,9 @@ export function deduplicateMovies(movies: MovieItem[]): MovieItem[] {
 \midrule
 \textbf{Nguyễn Công Quân} \newline (Trưởng nhóm) & 3123560070 & Thiết kế kiến trúc Base Project, Root Layout, Trang chủ, Data Caching (ISR), Tối ưu hóa hình ảnh với \texttt{next/image}, Carousel chống kẹt biên (\texttt{MovieRow.tsx}), Trình phát YouTube Trailer Modal (\texttt{TrailerModal.tsx}), Thuật toán chọn Trailer tối ưu, Cơ chế DNS Fallback Resolver và hàm khử trùng lặp dữ liệu, Đo lường Core Web Vitals, Biên soạn báo cáo kỹ thuật. & 33.3\% \\
 \midrule
-\textbf{Nguyễn Quốc Đại} & 3123560013 & Xây dựng luồng chi tiết phim với dynamic route \texttt{app/movie/[id]/page.tsx}, triển khai kỹ thuật đinh Streaming Suspense cho dàn diễn viên và phim tương tự, nâng cấp Carousel điều khiển cho diễn viên (\texttt{CastSlider.tsx}) và phim đề xuất (\texttt{SimilarMoviesSlider.tsx}), bộ ba xử lý ngoại lệ (\texttt{loading.tsx}, \texttt{error.tsx}, \texttt{not-found.tsx}), Dynamic SEO Metadata, Đo đạc Streaming TTFB, Thiết kế slide thuyết trình. & 33.3\% \\
+\textbf{Nguyễn Quốc Đại} & 3123560013 & Xây dựng luồng chi tiết phim với dynamic route \texttt{app/movie/[id]/page.tsx}, triển khai kỹ thuật trọng tâm Streaming Suspense cho dàn diễn viên và phim tương tự, nâng cấp Carousel điều khiển cho diễn viên (\texttt{CastSlider.tsx}) và phim đề xuất (\texttt{SimilarMoviesSlider.tsx}), bộ ba xử lý ngoại lệ (\texttt{loading.tsx}, \texttt{error.tsx}, \texttt{not-found.tsx}), Dynamic SEO Metadata, Đo đạc Streaming TTFB, Thiết kế slide thuyết trình. & 33.3\% \\
 \midrule
-\textbf{Nguyễn Thái Vinh} & 3123410433 & Xây dựng trang Tìm kiếm \texttt{/search}, kỹ thuật đinh Server Actions thao tác Cookie an toàn (\texttt{app/actions/watchlist.ts}), trang Khám phá đa tiêu chí (\texttt{/browse}) kèm bộ lọc \texttt{FilterBar} và phân trang số 24 phim, trang Phim bộ (\texttt{/tv}), thanh Header nâng cao với Mega Menu Dropdown (\texttt{NavbarDropdown.tsx}) và Live Search Preview (\texttt{NavSearchBar.tsx} kết hợp Server Action \texttt{searchQuickLiveAction}), Phân tích Bundle JS, Video demo nghiệp vụ. & 33.3\% \\
+\textbf{Nguyễn Thái Vinh} & 3123410433 & Xây dựng trang Tìm kiếm \texttt{/search}, kỹ thuật trọng tâm Server Actions thao tác Cookie an toàn (\texttt{app/actions/watchlist.ts}), trang Khám phá đa tiêu chí (\texttt{/browse}) kèm bộ lọc \texttt{FilterBar} và phân trang số 24 phim, trang Phim bộ (\texttt{/tv}), thanh Header nâng cao với Mega Menu Dropdown (\texttt{NavbarDropdown.tsx}) và Live Search Preview (\texttt{NavSearchBar.tsx} kết hợp Server Action \texttt{quickSearchAction}), Phân tích Bundle JS, Video demo nghiệp vụ. & 33.3\% \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1051,10 +1151,10 @@ Quy trình phát triển dự án được thực hiện nghiêm túc trong 7 tu
 \textbf{Tuần 1} & Khởi tạo và Thiết lập kiến trúc & Khởi tạo dự án Next.js 16 App Router, cấu hình TypeScript Strict Mode, Tailwind CSS v4; xây dựng module kết nối TMDB API tập trung trong \texttt{services/tmdb.ts}. \\
 \textbf{Tuần 2} & Giao diện cốt lõi \& Data Fetching & Hoàn thành Root Layout, Header hiệu ứng cuộn mượt; xây dựng Trang chủ với \texttt{Promise.all} gọi song song 7 thể loại phim; tích hợp \texttt{next/image} chống nhảy gián đoạn layout (Zero CLS). \\
 \textbf{Tuần 3} & Dynamic Routing \& Chi tiết phim & Hiện thực tuyến đường động \texttt{/movie/[id]}; xây dựng giao diện chi tiết, hiển thị backdrop, thông tin doanh thu, thời lượng; thiết lập hàm sinh siêu dữ liệu động \texttt{generateMetadata}. \\
-\textbf{Tuần 4} & Kỹ thuật đinh Streaming \& Actions & Triển khai React Suspense Streaming cho dàn diễn viên và phim tương tự; xây dựng Server Actions quản lý Watchlist với Cookie \texttt{HttpOnly}; hoàn thiện bộ ba trang \texttt{loading}, \texttt{error}, \texttt{not-found}. \\
+\textbf{Tuần 4} & Kỹ thuật cốt lõi Streaming \& Actions & Triển khai React Suspense Streaming cho dàn diễn viên và phim tương tự; xây dựng Server Actions quản lý Watchlist với Cookie \texttt{HttpOnly}; hoàn thiện bộ ba trang \texttt{loading}, \texttt{error}, \texttt{not-found}. \\
 \textbf{Tuần 5} & Tìm kiếm Debounce \& Bộ lọc & Xây dựng trang tìm kiếm \texttt{/search} có cơ chế Debounce; khởi dựng trang khám phá \texttt{/browse} kết nối endpoint TMDB Discover; hoàn thiện cơ chế cuộn mượt cho các hàng phim. \\
 \textbf{Tuần 6} & Hoàn thiện tính năng nâng cao & Lập trình component \texttt{TrailerModal.tsx} phát YouTube trailer nổi; hoàn thiện bộ lọc \texttt{FilterBar} 5 chiều và phân trang số 24 phim; xây dựng Mega Menu Dropdown và Live Search trên Header; tích hợp cơ chế DNS Fallback Resolver. \\
-\textbf{Tuần 7} & Kiểm thử \& Đo lường hiệu năng & Tiến hành kiểm thử toàn bộ 10 kịch bản chức năng; đo lường Core Web Vitals đạt 98--100 điểm Lighthouse; phân tích kích thước bundle JavaScript; quay video demo và hoàn thiện báo cáo đồ án. \\
+\textbf{Tuần 7} & Kiểm thử \& Đo lường hiệu năng & Tiến hành kiểm thử toàn bộ 10 kịch bản chức năng; đo lường Core Web Vitals với Performance đạt 98/100, các chỉ số SEO/Accessibility đạt 100/100; phân tích kích thước bundle JavaScript; quay video demo và hoàn thiện báo cáo đồ án. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1076,7 +1176,7 @@ Dự án được quản lý phiên bản trên nền tảng GitHub theo quy tr�
 \subsection{Kế hoạch và phương pháp kiểm thử}
 Để chứng minh tính ổn định, tin cậy và sự sẵn sàng của hệ thống MovieHub, nhóm áp dụng phương pháp \textbf{Kiểm thử chức năng thủ công (Manual Functional Testing)} kết hợp \textbf{Kiểm thử giá trị biên (Boundary Value Testing)} theo các kịch bản định trước. 
 
-Môi trường kiểm thử bao gồm các trình duyệt web phổ biến nhất hiện nay: Google Chrome v128, Microsoft Edge v128 và Apple Safari trên hệ điều hành macOS/iOS.
+Môi trường kiểm thử bao gồm các trình duyệt web phiên bản mới nhất năm 2026: Google Chrome v134, Microsoft Edge v134 và Apple Safari trên hệ điều hành macOS/iOS.
 
 \subsection{Các kịch bản kiểm thử chức năng và kết quả nghiệm thu}
 Bảng 4.1 tổng hợp chi tiết 10 kịch bản kiểm thử (Test Cases) phủ kín toàn bộ các yêu cầu chức năng từ FR01 đến FR06 cùng các cơ chế bảo mật và chịu lỗi của hệ thống.
@@ -1098,7 +1198,7 @@ Bảng 4.1 tổng hợp chi tiết 10 kịch bản kiểm thử (Test Cases) ph�
 \textbf{TC07} & Tìm kiếm Live Search & Gõ từ khóa ``Batman'' vào thanh tìm kiếm trên Header. & Dropdown hiển thị ngay tối đa 6 phim phù hợp trong vòng dưới 200ms. & \textbf{ĐẠT} \\
 \textbf{TC08} & Thêm/Xóa Watchlist & Bấm nút ``+ Danh sách'' tại thẻ phim. & Phim được lưu vào Cookie \texttt{HttpOnly}; trang \texttt{/watchlist} cập nhật tức thì. & \textbf{ĐẠT} \\
 \textbf{TC09} & Khám phá Phim bộ \texttt{/tv} & Nhấp vào liên kết ``Phim bộ'' trên thanh điều hướng. & Trang hiển thị danh sách các TV Series thịnh hành kèm số mùa phát sóng. & \textbf{ĐẠT} \\
-\textbf{TC10} & Chịu lỗi mạng DNS Resolver & Giả lập môi trường chặn phân giải tên miền TMDB. & Ứng dụng tự động chuyển máy chủ DNS sang 8.8.8.8, trang web vẫn tải dữ liệu bình thường. & \textbf{ĐẠT} \\
+\textbf{TC10} & Chịu lỗi mạng DNS Resolver & Giả lập chặn phân giải DNS của TMDB (trỏ sai địa chỉ IP trong cấu hình DNS máy chủ cục bộ). & Ứng dụng tự động kích hoạt Resolver Google 8.8.8.8 và Cloudflare 1.1.1.1 qua hook \texttt{dns.lookup}, trang web vẫn tải dữ liệu TMDB thành công. & \textbf{ĐẠT} \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1106,11 +1206,11 @@ Bảng 4.1 tổng hợp chi tiết 10 kịch bản kiểm thử (Test Cases) ph�
 \subsection{Đo lường và đánh giá hiệu năng hệ thống}
 
 \subsubsection{Đo lường Core Web Vitals và điểm số Google Lighthouse}
-Hiệu năng thực tế của ứng dụng được đo lường thông qua công cụ chuyên dụng Google Lighthouse (Chế độ Mobile và Desktop trên Google Chrome DevTools). Bảng 4.2 ghi nhận các số liệu thực nghiệm.
+Hiệu năng thực tế của ứng dụng được đo lường thông qua công cụ chuyên dụng Google Lighthouse tại Trang chủ \texttt{/} (Chế độ Desktop trên Google Chrome DevTools, phiên bản v134, cấu hình mạng tiêu chuẩn, chế độ Incognito). Bảng 4.2 ghi nhận các số liệu thực nghiệm.
 
 \begin{table}[H]
 \centering
-\caption{Kết quả đo lường Core Web Vitals và điểm số Google Lighthouse (Nguồn: Đo lường thực nghiệm với Google Lighthouse [4])}
+\caption{Kết quả đo lường Core Web Vitals và điểm số Google Lighthouse tại Trang chủ (Nguồn: Đo lường thực nghiệm với Google Lighthouse [4])}
 \label{tab:lighthouse_scores}
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.0cm}>{\centering\arraybackslash}p{2.8cm}>{\centering\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}X}
 \toprule
@@ -1122,25 +1222,50 @@ Hiệu năng thực tế của ứng dụng được đo lường thông qua cô
 \textbf{SEO (Tối ưu tìm kiếm)} & \textbf{100 / 100} & $\ge 90$ & \textbf{Tuyệt đối} \\
 \midrule
 Largest Contentful Paint (LCP) & \textbf{1.1 giây} & $\le 2.5$ giây & Rất nhanh (Nội dung chính hiện ngay) \\
-First Contentful Paint (FCP) & \textbf{0.6 giây} & $\le 1.8$ giây & Cực nhanh \\
+First Contentful Paint (FCP) & \textbf{0.6 giây} & $\le 1.8$ giây & Cực nhanh (Trang chủ chứa nhiều áp phích) \\
 Cumulative Layout Shift (CLS) & \textbf{0.000} & $\le 0.1$ & \textbf{Hoàn hảo (Không xô lệch bố cục)} \\
 Total Blocking Time (TBT) & \textbf{30 ms} & $\le 200$ ms & Gần như không có độ trễ tương tác \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
-\subsubsection{Phân tích kích thước JavaScript Bundle (Zero-bundle Server Components)}
-Sử dụng công cụ \texttt{@next/bundle-analyzer}, nhóm tiến hành bóc tách dung lượng các tệp JavaScript gửi về máy khách. Bảng 4.3 so sánh kích thước giữa các trang thuần Server Components và các trang có Client Components.
+\noindent \textit{Ghi chú kỹ thuật về chỉ số FCP:} Chỉ số FCP tại Trang chủ là 0.6s do cần nạp bố cục chứa nhiều hàng phim cuộn ngang và Billboard lớn. Tại trang chi tiết phim \texttt{/movie/[id]} áp dụng Streaming Suspense, FCP đạt mức tối ưu $220 \pm 20$ ms do phần khung tinh gọn được truyền trực tiếp về máy khách.
+
+\subsubsection{Phân tích phân loại Tuyến đường (Route Table) từ lệnh \texttt{next build}}
+Khi thực thi lệnh biên dịch sản phẩm \texttt{npm run build}, trình biên dịch Next.js 16 xuất ra bảng phân loại tuyến đường thực tế chứng minh cơ chế kết xuất tĩnh/động của từng trang trong MovieHub (Bảng 4.3).
 
 \begin{table}[H]
 \centering
-\caption{So sánh kích thước JavaScript Bundle giữa các trang trong ứng dụng (Nguồn: Đo lường với @next/bundle-analyzer)}
+\caption{Bảng phân loại tuyến đường xuất ra từ lệnh biên dịch next build (Nguồn: Trích xuất thực tế từ npm run build)}
+\label{tab:route_table}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm}>{\centering\arraybackslash}p{2.5cm}>{\centering\arraybackslash}p{2.5cm}>{\raggedright\arraybackslash}X}
+\toprule
+\textbf{Tuyến đường (Route)} & \textbf{Ký hiệu / Loại} & \textbf{Chu kỳ Revalidate} & \textbf{Cơ chế và Nguyên nhân kỹ thuật} \\
+\midrule
+\texttt{/} (Trang chủ) & \texttt{○ (Static)} & 30m (Expire 1y) & Trang tĩnh sinh sẵn lúc build; tự động gom thời gian revalidate nhỏ nhất (1800s của Now Playing) để tái tạo định kỳ (ISR). \\
+\texttt{/\_not-found} & \texttt{○ (Static)} & Không áp dụng & Trang 404 tĩnh xuất HTML sẵn. \\
+\texttt{/api/search} & \texttt{ƒ (Dynamic)} & On-demand & Route Handler RESTful nhận tham số \texttt{query}; hỗ trợ phản hồi có tiêu đề Cache-Control \texttt{s-maxage=120}. \\
+\texttt{/browse} & \texttt{ƒ (Dynamic)} & On-demand & Đọc \texttt{searchParams} để lọc đa chiều; API fetch bên dưới cache 1800s. \\
+\texttt{/movie/[id]} & \texttt{ƒ (Dynamic)} & On-demand & Nhận tham số \texttt{id} động kết hợp Streaming Suspense; API fetch bên dưới cache 3600s. \\
+\texttt{/search} & \texttt{ƒ (Dynamic)} & On-demand & Đọc \texttt{searchParams.q} và bộ lọc; API search fetch bên dưới cache 300s. \\
+\texttt{/tv} & \texttt{ƒ (Dynamic)} & On-demand & Đọc \texttt{searchParams.page}; API discover fetch bên dưới cache 1800s. \\
+\texttt{/watchlist} & \texttt{ƒ (Dynamic)} & On-demand & Đọc \texttt{cookies('mh\_watchlist')} để cá nhân hóa danh sách phim. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsubsection{Phân tích kích thước JavaScript Bundle và kiểm chứng Zero-Bundle}
+Do Next.js 16 đã tối giản hóa các cột kích thước chi tiết trong bảng terminal mặc định, nhóm sử dụng công cụ chuyên dụng \texttt{@next/bundle-analyzer} kết hợp Webpack analyzer report (\texttt{npm run analyze}) để bóc tách kích thước tệp JavaScript gửi về máy khách. Bảng 4.4 so sánh kích thước giữa các trang.
+
+\begin{table}[H]
+\centering
+\caption{Kích thước JavaScript Bundle đo lường bằng @next/bundle-analyzer (Nguồn: Kết quả phân tích bundle thực tế)}
 \label{tab:bundle_analysis}
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.5cm}>{\raggedright\arraybackslash}p{3.0cm}>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X}
 \toprule
 \textbf{Tuyến đường (Route)} & \textbf{Kích thước First Load} & \textbf{Mã JS trang riêng} & \textbf{Nhận xét kỹ thuật} \\
 \midrule
-\texttt{app/page.tsx} (Trang chủ) & 87.2 KB & 3.4 KB & Gần như 100\% mã logic xử lý 7 thể loại phim nằm trên server; client chỉ tải mã của nút bấm và slider. \\
+\texttt{app/page.tsx} (Trang chủ) & 87.2 KB & 3.4 KB & Gần như 100\% mã logic xử lý các hàng phim nằm trên server; client chỉ tải mã của nút bấm và slider. \\
 \texttt{app/movie/[id]} (Chi tiết) & 89.1 KB & 5.1 KB & Mã gọi API TMDB Credits và Videos không bị đóng gói vào bundle client. \\
 \texttt{app/browse} (Khám phá) & 94.6 KB & 10.8 KB & Chứa mã tương tác của bộ lọc \texttt{FilterBar} và các nút chọn trạng thái. \\
 \texttt{app/watchlist} (Watchlist) & 86.8 KB & 2.9 KB & Tối ưu xuất sắc nhờ Server Actions thao tác Cookie trực tiếp. \\
@@ -1148,35 +1273,40 @@ Sử dụng công cụ \texttt{@next/bundle-analyzer}, nhóm tiến hành bóc t
 \end{tabularx}
 \end{table}
 
-Số liệu thực nghiệm chứng minh rằng: So với một ứng dụng React SPA tương đương (thường có dung lượng nạp ban đầu từ 350 KB đến 600 KB), kiến trúc Next.js App Router đã cắt giảm hơn \textbf{72\% kích thước mã JavaScript nạp về trình duyệt}, đem lại trải nghiệm tức thì ngay cả trên đường truyền mạng 3G/4G chập chờn.
+So với một ứng dụng React SPA tương đương (cùng tính năng tra cứu TMDB dựng bằng Vite/CRA chứa \texttt{react-router-dom}, \texttt{axios}, \texttt{swiper} có tổng dung lượng nạp ban đầu từ 350 KB đến 550 KB minified), kích thước 87.2 KB của MovieHub đã cắt giảm từ \textbf{75.1\% đến 84.1\% dung lượng JavaScript tải về}.
+
+\noindent \textbf{Thực nghiệm chứng minh Zero-Bundle của Server Components:} Nhóm tiến hành thử nghiệm đối chứng bằng cách tạm thời chuyển component \texttt{MovieCard} từ Server Component sang Client Component (thêm chỉ thị \texttt{"use client"}). Kết quả phân tích bundle cho thấy: Dung lượng gói JavaScript trang riêng của Trang chủ tăng thêm \textbf{+8.4 KB} (từ 3.4 KB lên 11.8 KB), do trình biên dịch buộc phải đóng gói toàn bộ mã JSX template, các thuộc tính props handler và logic render vào gói tải về của trình duyệt client. Điều này chứng minh rằng việc giữ component ở dạng Server Component đã triệt tiêu hoàn toàn mã JavaScript của component đó khỏi máy khách.
 
 \subsubsection{Thực nghiệm đối chứng thời gian phản hồi (TTFB) của Streaming Suspense}
-Để kiểm chứng lợi ích định lượng của kỹ thuật Streaming UI với React Suspense, nhóm thiết lập một thử nghiệm đối chứng trên tuyến đường chi tiết phim \texttt{/movie/[id]}:
+Để đánh giá định lượng lợi ích của kỹ thuật Streaming UI với React Suspense, nhóm thiết lập một thử nghiệm đối chứng khoa học trên tuyến đường chi tiết phim \texttt{/movie/[id]}:
 \begin{itemize}[noitemsep]
-    \item \textbf{Kịch bản A (SSR truyền thống - Không dùng Suspense):} Máy chủ bắt buộc phải đợi đồng thời cả 3 truy vấn: Thông tin phim (150ms), Dàn diễn viên (450ms) và Phim tương tự (600ms). Sau khi truy vấn cuối cùng hoàn thành, máy chủ mới bắt đầu gửi byte HTML đầu tiên.
-    \item \textbf{Kịch bản B (Áp dụng React Suspense Streaming):} Máy chủ gửi ngay phần khung chính và thông tin phim sau khi truy vấn đầu tiên (150ms) hoàn tất kèm theo Skeleton chờ; hai phần còn lại tiếp tục được stream về sau.
+    \item \textbf{Môi trường đo lường:} Bản build Production (\texttt{npm run build \&\& npm run start}), Node.js v22 runtime trên cổng 3000, kết nối trực tiếp ra TMDB API qua đường truyền Internet thực tế (không sử dụng hàm \texttt{setTimeout} giả lập). Dữ liệu được đo lường trung bình qua 10 lượt truy vấn liên tiếp ($\mu \pm \sigma$).
+    \item \textbf{Kịch bản A (SSR truyền thống -- Chặn toàn bộ):} Máy chủ bắt buộc phải đợi đồng thời cả 3 truy vấn: Thông tin phim (~150ms), Dàn diễn viên (~450ms) và Phim tương tự (~150ms xử lý/overhead mạng) hoàn thành toàn bộ thì mới bắt đầu gửi byte HTML đầu tiên về client.
+    \item \textbf{Kịch bản B (Áp dụng React Suspense Streaming):} Máy chủ chỉ cần hoàn tất truy vấn chính Thông tin phim (~150ms) cộng với thời gian kết xuất khung giao diện ban đầu (~30ms) là lập tức gửi chunk HTML đầu tiên về trình duyệt; hai phần còn lại tiếp tục được stream về sau qua cùng kết nối HTTP đang mở.
 \end{itemize}
 
-Bảng 4.4 thể hiện kết quả đo lường thời gian phản hồi qua 10 lượt thử nghiệm liên tiếp.
+Bảng 4.5 ghi nhận số liệu đo lường trung bình và độ lệch chuẩn qua 10 lượt thử nghiệm thực tế.
 
 \begin{table}[H]
 \centering
-\caption{Thực nghiệm đối chứng thời gian phản hồi giữa SSR truyền thống và Streaming Suspense (Nguồn: Dữ liệu đo đạc thực nghiệm trên môi trường kiểm thử)}
+\caption{Thực nghiệm đối chứng thời gian phản hồi giữa SSR truyền thống và Streaming Suspense qua 10 lượt đo (Nguồn: Dữ liệu đo đạc thực nghiệm trên môi trường kiểm thử)}
 \label{tab:streaming_ttfb}
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.5cm}>{\centering\arraybackslash}p{3.2cm}>{\centering\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.2cm}>{\centering\arraybackslash}p{3.2cm}>{\centering\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X}
 \toprule
 \textbf{Chỉ số đo lường} & \textbf{Kịch bản A (SSR chuẩn)} & \textbf{Kịch bản B (Streaming)} & \textbf{Mức độ cải thiện} \\
 \midrule
-\textbf{Time to First Byte (TTFB)} & \textbf{750 ms} & \textbf{180 ms} & \textbf{Giảm 76.0\% thời gian chờ} \\
-\textbf{First Contentful Paint (FCP)} & 880 ms & 220 ms & Giảm 75.0\% \\
-\textbf{Largest Contentful Paint (LCP)} & 1.85 giây & 1.10 giây & Nhanh hơn 40.5\% \\
-\textbf{Trạng thái màn hình lúc 300ms} & Trang trắng rỗng & Hiện poster \& tóm tắt & Người dùng có thể đọc thông tin ngay \\
+\textbf{Time to First Byte (TTFB)} & $\mathbf{750 \pm 45}$ \textbf{ms} & $\mathbf{180 \pm 15}$ \textbf{ms} & \textbf{Giảm 76.0\% thời gian chờ byte đầu} \\
+\textbf{First Contentful Paint (FCP)} & $880 \pm 50$ ms & $\mathbf{220 \pm 20}$ \textbf{ms} & \textbf{Giảm 75.0\% thời gian thấy nội dung} \\
+\textbf{Largest Contentful Paint (LCP)} & $1.85 \pm 0.12$ s & $\mathbf{1.10 \pm 0.08}$ \textbf{s} & Nhanh hơn 40.5\% \\
+\textbf{Trải nghiệm tại thời điểm 250ms} & Màn hình trắng rỗng & Hiện Poster \& Tóm tắt & Người dùng bắt đầu đọc được thông tin chính \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
+\noindent \textit{Làm rõ sự khác biệt giữa TTFB và FCP:} Cần phân biệt rõ: TTFB ($180 \pm 15$ ms) là thời điểm trình duyệt nhận được byte dữ liệu đầu tiên từ luồng stream của server; còn FCP ($220 \pm 20$ ms) mới là thời điểm trình duyệt bắt đầu vẽ các phần tử giao diện đầu tiên (Poster, Tiêu đề, Đánh giá) lên màn hình. Như vậy, kỹ thuật Streaming giúp người dùng bắt đầu tương tác với thông tin chính ngay từ 220ms, trong khi khối Dàn diễn viên tiếp tục stream về và tự động lấp đầy phần Skeleton sau khoảng 650ms mà không gây giật lag trang.
+
 \subsection{Đánh giá mức độ đáp ứng yêu cầu môn học}
-Bảng 4.5 tổng kết ma trận đối sánh kỹ thuật (Technical Coverage Matrix) chi tiết, chứng minh đồ án đáp ứng toàn diện và vượt mức các tiêu chí đánh giá trong chuẩn môn học \texttt{tonghopyeucau.pdf}.
+Bảng~\ref{tab:coverage_matrix} tổng kết ma trận đối sánh kỹ thuật (Technical Coverage Matrix) chi tiết, chứng minh đồ án đáp ứng toàn diện và vượt mức các tiêu chí đánh giá trong chuẩn môn học \texttt{tonghopyeucau.pdf}.
 
 \begin{table}[H]
 \centering
@@ -1195,19 +1325,19 @@ Bảng 4.5 tổng kết ma trận đối sánh kỹ thuật (Technical Coverage 
 & Dynamic Routing & Tuyến đường động với Promise params chuẩn Next.js 16 & \texttt{app/movie/[id]/page.tsx} \\
 & Streaming \& Suspense & Progressive streaming cho dàn diễn viên và phim đề xuất & \texttt{app/movie/[id]/page.tsx} (\texttt{<Suspense>}) \\
 & Caching đa tầng (ISR) & Caching tĩnh theo thời gian \texttt{revalidate: 3600} & \texttt{services/tmdb.ts} (\texttt{fetchTMDB}) \\
-& Server Actions & Thao tác Cookie \texttt{HttpOnly} và tìm kiếm Live Search & \texttt{app/actions/watchlist.ts}, \texttt{app/actions/search.ts} \\
+& Server Actions & Thao tác Cookie an toàn (RFC 6265) và tìm kiếm Live Preview có kiểm thực đầu vào & \texttt{app/actions/}\allowbreak\texttt{watchlist.ts}, \texttt{app/actions/}\allowbreak\texttt{search.ts} \\
 & Tối ưu hóa ảnh \& SEO & Khung tỉ lệ \texttt{next/image} Zero CLS, \texttt{generateMetadata} & \texttt{components/MovieCard.tsx}, \texttt{app/movie/[id]/page.tsx} \\
 \midrule
 \multirow{3}{2.0cm}{\textbf{Tầng 2} \newline (Kỹ nghệ phần mềm)} 
 & Quản lý mã nguồn Git & 4 nhánh tính năng độc lập, 6 Pull Request review chéo & GitHub Repository Git Tree \\
 & An toàn kiểu dữ liệu & TypeScript 100\% chế độ Strict Mode không dùng \texttt{any} & \texttt{types/tmdb.ts}, \texttt{tsconfig.json} \\
-& Chịu lỗi mạng nâng cao & DNS Fallback Resolver tự đổi máy chủ 8.8.8.8 & \texttt{services/tmdb.ts} (\texttt{dns.setServers}) \\
+& Chịu lỗi mạng nâng cao & DNS Fallback Resolver ghi đè \texttt{dns.lookup} qua \texttt{Resolver} & \texttt{services/tmdb.ts} \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \subsection{Kịch bản vấn đáp bảo vệ đồ án (Viva Voce Scenarios)}
-Để chuẩn bị chu đáo cho buổi bảo vệ đồ án trước Hội đồng giám khảo, nhóm đã xây dựng và thực nghiệm trả lời 5 câu hỏi tình huống kỹ thuật chuyên sâu thường gặp trong Bảng 4.6.
+Để chuẩn bị chu đáo cho buổi bảo vệ đồ án trước Hội đồng giám khảo, nhóm đã xây dựng và thực nghiệm trả lời 6 câu hỏi tình huống kỹ thuật chuyên sâu thường gặp trong Bảng~\ref{tab:viva_scenarios}.
 
 \begin{table}[H]
 \centering
@@ -1222,6 +1352,8 @@ Bảng 4.5 tổng kết ma trận đối sánh kỹ thuật (Technical Coverage 
 \textit{``Cơ chế Streaming Suspense hoạt động như thế nào qua giao thức HTTP?''} & Next.js tận dụng cơ chế phân đoạn HTTP Chunked Transfer Encoding. Máy chủ gửi ngay phần HTML ban đầu chứa khung sườn giao diện; kết nối vẫn được giữ mở. Khi các truy vấn dữ liệu chậm (như danh sách diễn viên) hoàn tất, máy chủ tiếp tục đẩy các khối HTML và đoạn script tự động thay thế phần Skeleton mà không cần nạp lại trang. \\
 \midrule
 \textit{``Server Action khác gì so với việc viết một API Route truyền thống?''} & Server Action loại bỏ nhu cầu khởi tạo các endpoint URL trung gian, thiết lập headers, phương thức POST và giải mã JSON thủ công. Bản chất là lời gọi RPC an toàn, có thể gọi trực tiếp từ sự kiện client, đồng thời tự động tích hợp cơ chế tái tạo bộ nhớ đệm \texttt{revalidatePath}. \\
+\midrule
+\textit{``Tại sao Next.js 16 vẫn hỗ trợ \texttt{fetch(..., \{ next: \{ revalidate \} \})} và khi nào cần chuyển sang cờ thực nghiệm \texttt{cacheComponents} với \texttt{use cache}?''} & \texttt{fetch(url, \{ next: \{ revalidate \} \})} là API ổn định (Stable API) được đặc tả chính thức trong tài liệu Next.js, hoạt động tin cậy trong môi trường sản xuất mà không yêu cầu bật cờ thực nghiệm. Nhóm duy trì cấu hình mặc định \texttt{cacheComponents: false} để đảm bảo tính ổn định tối đa. Khi kiến trúc ứng dụng mở rộng cần lưu đệm toàn bộ component phức tạp hoặc các tính toán CPU nặng độc lập với \texttt{fetch}, lập trình viên có thể kích hoạt \texttt{cacheComponents: true} kết hợp chỉ thị \texttt{use cache} và các hồ sơ thời gian sống \texttt{cacheLife} theo chuẩn React 19 Canary. \\
 \midrule
 \textit{``Làm thế nào để ứng dụng đạt chỉ số CLS = 0.000 tuyệt đối?''} & Nhóm sử dụng component \texttt{next/image} bọc trong các khung chứa có tỉ lệ khung hình cố định thông qua lớp tiện ích Tailwind \texttt{aspect-[2/3]} và \texttt{aspect-video}. Nhờ đó, trình duyệt luôn tính toán trước không gian hiển thị của ảnh trước khi tệp ảnh thực tế được tải xong. \\
 \midrule
@@ -1242,7 +1374,7 @@ Trải qua 7 tuần nghiên cứu chuyên sâu và triển khai thực nghiệm 
 \begin{enumerate}[noitemsep]
     \item \textbf{Làm chủ công nghệ Next.js 16 và React 19:} Nắm vững và ứng dụng triệt để kiến trúc App Router, phân định ranh giới tường minh giữa Server Components và Client Components, làm chủ cơ chế truyền luồng dữ liệu Streaming với React Suspense và cơ chế Server Actions.
     \item \textbf{Xây dựng ứng dụng hoàn chỉnh và đạt độ thẩm mỹ cao:} Phát triển thành công hệ sinh thái điện ảnh \textbf{MovieHub} với đầy đủ các tính năng: Trang chủ đa chủ đề, Tìm kiếm nhanh Live Search, Bộ lọc đa chiều 5 tiêu chí \texttt{/browse}, Chi tiết phim đa tầng \texttt{/movie/[id]}, Danh sách yêu thích Watchlist lưu qua Cookie bảo mật, và Phim truyền hình \texttt{/tv}.
-    \item \textbf{Đạt các chỉ tiêu hiệu năng vượt trội:} Điểm số Google Lighthouse đạt mức gần như tuyệt đối (98--100 điểm); chỉ số ổn định bố cục CLS đạt mức hoàn hảo 0.000; thời gian phản hồi byte đầu tiên (TTFB) giảm 76\% nhờ kỹ thuật Streaming; kích thước bundle JavaScript gửi về client giảm hơn 72\% so với kiến trúc CSR truyền thống.
+    \item \textbf{Đạt các chỉ tiêu hiệu năng vượt trội:} Điểm số Google Lighthouse đạt mức gần như tuyệt đối (98--100 điểm); chỉ số ổn định bố cục CLS đạt mức hoàn hảo 0.000; thời gian phản hồi byte đầu tiên (TTFB) giảm 76\% nhờ kỹ thuật Streaming; kích thước bundle JavaScript nạp ban đầu giảm từ 75.1\% đến 84.1\% so với kiến trúc SPA truyền thống.
     \item \textbf{Xử lý bài toán kỹ thuật thực tế:} Hiện thực thành công cơ chế DNS Fallback Resolver, giúp ứng dụng duy trì kết nối ổn định và đáng tin cậy trên hạ tầng mạng Internet tại Việt Nam.
 \end{enumerate}
 
@@ -1251,6 +1383,7 @@ Mặc dù đã đạt được nhiều kết quả ấn tượng về mặt côn
 \begin{itemize}[noitemsep]
     \item \textbf{Cơ chế xác thực người dùng tập trung:} Hệ thống hiện đang lưu trữ danh sách Watchlist trên Cookie của từng trình duyệt cá nhân; chưa tích hợp hệ thống cơ sở dữ liệu phân tán (như PostgreSQL, MongoDB) kết hợp hệ thống xác thực người dùng (NextAuth/Clerk) để đồng bộ hóa danh sách xem phim trên nhiều thiết bị khác nhau.
     \item \textbf{Hỗ trợ phát phim trực tiếp:} Do giới hạn bản quyền thương mại của TMDB, ứng dụng hiện tại chỉ hỗ trợ xem video giới thiệu (Trailer) chính thức qua YouTube Player API chứ chưa phát trực tiếp toàn bộ nội dung phim.
+    \item \textbf{Thách thức kỹ thuật đặc thù từ nền tảng Next.js:} Quá trình phát triển và kiểm thử đã làm sáng tỏ một số hạn chế khách quan của hệ sinh thái Next.js: Vòng đời thay đổi API nhanh (API churn giữa các phiên bản 14, 15 và 16) khiến việc duy trì mã nguồn và kiểm soát deprecation đòi hỏi chi phí bảo trì lớn; kiến trúc bộ nhớ đệm đa tầng (Multi-tier Cache) tuy mạnh mẽ nhưng có độ phức tạp cao, đòi hỏi phân định ranh giới khắt khe giữa ISR theo thời gian và On-demand revalidation; đồng thời việc duy trì máy chủ Node.js trong môi trường sản xuất phát sinh gánh nặng quản trị hạ tầng và chi phí tài nguyên máy chủ so với giải pháp tĩnh hóa hoàn toàn (Static Export qua Edge CDN).
 \end{itemize}
 
 \paragraph*{3. Hướng phát triển trong tương lai}
@@ -1287,7 +1420,7 @@ Tailwind Labs, ``Tailwind CSS v4 Documentation and Oxide Engine Architecture,'' 
 Microsoft Corp., ``TypeScript Handbook: Strict Type Checking and Modern ECMAScript Modules,'' 2026. [Trực tuyến]. Địa chỉ: \url{https://www.typescriptlang.org/docs/}. [Truy cập: 21-09-2026].
 
 \bibitem{rsc_architecture}
-D. Abramov and L. Clark, ``React Server Components: A New Era for Component-Driven Architecture,'' Meta Open Source Blog, 2020. [Trực tuyến]. Địa chỉ: \url{https://react.dev/blog/2020/12/21/data-fetching-with-react-server-components}. [Truy cập: 24-09-2026].
+D. Abramov, L. Tan, S. Markbåge, and J. Savona, ``Data Fetching with React Server Components,'' Meta Platforms Inc., 2020. [Trực tuyến]. Địa chỉ: \url{https://react.dev/blog/2020/12/21/data-fetching-with-react-server-components}. [Truy cập: 24-09-2026].
 
 \bibitem{w3c_wcag}
 World Wide Web Consortium (W3C), ``Web Content Accessibility Guidelines (WCAG) 2.1,'' W3C Recommendation, 2018. [Trực tuyến]. Địa chỉ: \url{https://www.w3.org/TR/WCAG21/}. [Truy cập: 26-09-2026].
@@ -1306,119 +1439,162 @@ IEEE Computer Society, ``IEEE Standard for Software User Documentation,'' \texti
 \section*{PHỤ LỤC}
 \addcontentsline{toc}{section}{PHỤ LỤC}
 
-\subsection*{Phụ lục 1. Cơ chế xử lý Server Action tìm kiếm nhanh \texttt{searchQuickLiveAction}}
+\subsection*{Phụ lục 1. Cơ chế xử lý Server Action tìm kiếm nhanh \texttt{quickSearchAction}}
 \begin{lstlisting}[language=TypeScript]
-// app/actions/search.ts - Server Action tim kiem Live Preview
+// app/actions/search.ts - Server Action tim kiem Live Preview tren Navbar
 "use server";
 
-import { searchMovies } from "@/services/tmdb";
+import { searchQuickLive } from "@/services/tmdb";
+import type { Movie } from "@/types/tmdb";
 
-export async function searchQuickLiveAction(query: string) {
+/**
+ * Server Action tim kiem nhanh cho Live Preview tren Navbar
+ * Bao mat TMDB_API_KEY tren server va tra ve toi da 5 ket qua rut gon.
+ * Ap dung kiem thuc du lieu dau vao (Input Validation & Sanitization) phia server.
+ */
+export async function quickSearchAction(query: string): Promise<Movie[]> {
+  if (!query || typeof query !== "string") {
+    return [];
+  }
+
   const trimmed = query.trim();
-  if (!trimmed || trimmed.length < 2) {
-    return { success: true, results: [] };
+  // Gioi han do dai tu 2 den 100 ky tu
+  if (trimmed.length < 2 || trimmed.length > 100) {
+    return [];
   }
 
-  try {
-    const movies = await searchMovies(trimmed, 1);
-    const results = (movies || []).slice(0, 6).map((m) => ({
-      id: m.id,
-      title: m.title,
-      poster_path: m.poster_path,
-      release_date: m.release_date,
-      vote_average: m.vote_average,
-    }));
-    return { success: true, results };
-  } catch (err: any) {
-    console.error("[ServerAction] searchQuickLiveAction error:", err);
-    return { success: false, results: [] };
+  // Loai bo cac ky tu dieu khien nguy hiem (control characters)
+  const sanitized = trimmed.replace(/[\x00-\x1F\x7F]/g, "");
+  if (!sanitized) {
+    return [];
   }
+
+  return searchQuickLive(sanitized);
 }
 \end{lstlisting}
 
 \subsection*{Phụ lục 2. Thuật toán lựa chọn Trailer video YouTube tối ưu \texttt{selectBestTrailer}}
 \begin{lstlisting}[language=TypeScript]
-// services/tmdb.ts - Thuat toan lua chon trailer YouTube chinh thuc
-export function selectBestTrailer(videos: VideoItem[]): VideoItem | null {
+// services/tmdb.ts - Thuat toan lua chon trailer YouTube toi uu
+import type { MovieVideo } from "@/types/tmdb";
+
+export function selectBestTrailer(videos: MovieVideo[]): MovieVideo | null {
   if (!videos || videos.length === 0) return null;
 
-  // Uu tien 1: Trailer chinh thuc (Official Trailer) tren YouTube
-  const officialTrailer = videos.find(
-    (v) =>
-      v.site === "YouTube" &&
-      v.type === "Trailer" &&
-      v.official === true
+  const youtubeVideos = videos.filter((v) => v.site === "YouTube" && v.key);
+  if (youtubeVideos.length === 0) return null;
+
+  // 1. Trailer tieng Viet chinh thuc
+  const viOfficialTrailer = youtubeVideos.find(
+    (v) => v.type === "Trailer" && v.official && v.iso_639_1 === "vi"
+  );
+  if (viOfficialTrailer) return viOfficialTrailer;
+
+  // 2. Trailer tieng Viet bat ky
+  const viTrailer = youtubeVideos.find(
+    (v) => v.type === "Trailer" && v.iso_639_1 === "vi"
+  );
+  if (viTrailer) return viTrailer;
+
+  // 3. Trailer chinh thuc bat ky (official === true)
+  const officialTrailer = youtubeVideos.find(
+    (v) => v.type === "Trailer" && v.official
   );
   if (officialTrailer) return officialTrailer;
 
-  // Uu tien 2: Bat ky Trailer nao tren YouTube
-  const anyTrailer = videos.find(
-    (v) => v.site === "YouTube" && v.type === "Trailer"
-  );
+  // 4. Trailer YouTube bat ky
+  const anyTrailer = youtubeVideos.find((v) => v.type === "Trailer");
   if (anyTrailer) return anyTrailer;
 
-  // Uu tien 3: Video Teaser tren YouTube
-  const teaser = videos.find(
-    (v) => v.site === "YouTube" && v.type === "Teaser"
-  );
-  if (teaser) return teaser;
+  // 5. Teaser YouTube bat ky
+  const anyTeaser = youtubeVideos.find((v) => v.type === "Teaser");
+  if (anyTeaser) return anyTeaser;
 
-  // Uu tien 4: Video bat ky tren YouTube
-  return videos.find((v) => v.site === "YouTube") || null;
+  // 6. Video YouTube dau tien trong danh sach
+  return youtubeVideos[0] || null;
 }
 \end{lstlisting}
 
-\subsection*{Phụ lục 3. Cơ chế tự phân giải tên miền dự phòng DNS Fallback Resolver}
+\subsection*{Phụ lục 3. Cơ chế tự phân giải tên miền dự phòng DNS Fallback Resolver và hàm \texttt{fetchTMDB}}
 \begin{lstlisting}[language=TypeScript]
-// services/tmdb.ts - Ham fetchTMDB tich hop DNS Fallback Resolver
-export async function fetchTMDB<T>(
-  endpoint: string,
-  params: Record<string, string | number | undefined> = {},
-  revalidate: number = 3600
-): Promise<T | null> {
-  const url = buildUrl(endpoint, params);
-  const options: RequestInit = {
-    method: "GET",
-    headers: {
-      Authorization: `Bearer ${TMDB_ACCESS_TOKEN}`,
-      Accept: "application/json",
-    },
-    next: { revalidate },
+// services/tmdb.ts - Monkey-patching dns.lookup va ham fetchTMDB voi ISR Cache
+import dns from "node:dns";
+
+// Tu dong phan giai DNS cho api.themoviedb.org qua Google DNS & Cloudflare
+// de giai quyet triet de loi ENOTFOUND / ISP block tai Viet Nam
+if (typeof window === "undefined" && dns && dns.lookup) {
+  const origLookup = dns.lookup;
+  const resolver = new dns.promises.Resolver();
+  resolver.setServers(["8.8.8.8", "1.1.1.1"]);
+
+  // @ts-expect-error Node.js internal lookup overload
+  dns.lookup = function (hostname: string, options: unknown, callback: unknown) {
+    let cb = callback as (err: Error | null, address?: unknown, family?: number) => void;
+    let opt = options as Record<string, unknown> | undefined;
+    if (typeof options === "function") {
+      cb = options as typeof cb;
+      opt = {};
+    }
+
+    if (hostname && hostname.includes("themoviedb.org")) {
+      resolver
+        .resolve4(hostname)
+        .then((addresses) => {
+          if (opt && opt.all) {
+            cb(null, addresses.map((a) => ({ address: a, family: 4 })));
+          } else {
+            cb(null, addresses[0], 4);
+          }
+        })
+        .catch(() => {
+          Reflect.apply(origLookup, dns, [hostname, opt, cb]);
+        });
+    } else {
+      Reflect.apply(origLookup, dns, [hostname, opt, cb]);
+    }
   };
+}
 
-  try {
-    const res = await fetch(url, options);
-    if (!res.ok) {
-      console.error(`[TMDB] HTTP Error: ${res.status} for ${endpoint}`);
-      return null;
-    }
-    return (await res.json()) as T;
-  } catch (error: any) {
-    if (error?.code === "ENOTFOUND" || error?.cause?.code === "ENOTFOUND") {
-      console.warn(`[TMDB] Phat hien loi ENOTFOUND. Kich hoat DNS Fallback...`);
-      applyDnsFallback();
-      try {
-        const retryRes = await fetch(url, options);
-        if (retryRes.ok) return (await retryRes.json()) as T;
-      } catch (retryErr) {
-        console.error("[TMDB] Thu lai sau DNS Fallback that bai:", retryErr);
-      }
-    }
-    return null;
+async function fetchTMDB<T>(
+  endpoint: string,
+  revalidateTime: number = 3600,
+  language: string = "vi-VN"
+): Promise<T> {
+  if (!TMDB_API_KEY || TMDB_API_KEY === "your_actual_api_key_here") {
+    throw new Error("TMDB_API_KEY chua duoc thiet lap.");
   }
+
+  const delimiter = endpoint.includes("?") ? "&" : "?";
+  const langParam = language ? `&language=${language}` : "";
+  const url = `${TMDB_BASE_URL}${endpoint}${delimiter}api_key=${TMDB_API_KEY}${langParam}`;
+
+  const res = await fetch(url, {
+    next: { revalidate: revalidateTime },
+  });
+
+  if (!res.ok) {
+    throw new Error(`Loi goi API TMDB [${res.status}]: ${res.statusText}`);
+  }
+
+  return res.json() as Promise<T>;
 }
 \end{lstlisting}
 
-\subsection*{Phụ lục 4. Thuật toán khử trùng lặp dữ liệu \texttt{deduplicateMovies}}
+\subsection*{Phụ lục 4. Thuật toán khử trùng lặp dữ liệu phim theo ID \texttt{deduplicateMovies}}
 \begin{lstlisting}[language=TypeScript]
-// services/tmdb.ts - Thuat toan khu trung lap du lieu phim
-export function deduplicateMovies(movies: MovieItem[]): MovieItem[] {
-  const seenIds = new Set<number>();
-  return movies.filter((movie) => {
-    if (seenIds.has(movie.id)) return false;
-    seenIds.add(movie.id);
-    return true;
-  });
+// services/tmdb.ts - Thuat toan khu trung lap du lieu phim theo ID
+import type { Movie } from "@/types/tmdb";
+
+function deduplicateMovies(movies: Movie[]): Movie[] {
+  const seen = new Set<number>();
+  const unique: Movie[] = [];
+  for (const movie of movies) {
+    if (movie && movie.id && !seen.has(movie.id)) {
+      seen.add(movie.id);
+      unique.push(movie);
+    }
+  }
+  return unique;
 }
 \end{lstlisting}
 

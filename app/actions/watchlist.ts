@@ -25,11 +25,19 @@ export async function getWatchlistIds(): Promise<number[]> {
     }
 }
 
+const MAX_WATCHLIST_ITEMS = 200; // Bảo đảm chuỗi JSON không vượt quá giới hạn 4096 bytes của HTTP Cookie (RFC 6265)
+
 /**
  * Thêm hoặc xóa phim khỏi danh sách yêu thích
  * Cập nhật Cookie an toàn phía Server và tự động revalidate trang /watchlist
+ * Thực hiện kiểm thực đầu vào (Input Validation) nghiêm ngặt phía server
  */
-export async function toggleWatchlist(movieId: number): Promise<{ isSaved: boolean }> {
+export async function toggleWatchlist(movieId: number): Promise<{ isSaved: boolean; error?: string }> {
+    // 1. Kiểm thực đầu vào nghiêm ngặt trên Server
+    if (!Number.isInteger(movieId) || movieId <= 0) {
+        throw new Error("Mã định danh phim (movieId) không hợp lệ.");
+    }
+
     const cookieStore = await cookies();
     const currentIds = await getWatchlistIds();
 
@@ -40,6 +48,13 @@ export async function toggleWatchlist(movieId: number): Promise<{ isSaved: boole
         updatedIds = currentIds.filter((id) => id !== movieId);
         isSaved = false;
     } else {
+        // 2. Kiểm soát giới hạn kích thước Cookie (~4KB RFC 6265)
+        if (currentIds.length >= MAX_WATCHLIST_ITEMS) {
+            return {
+                isSaved: false,
+                error: `Danh sách yêu thích đã đạt giới hạn tối đa (${MAX_WATCHLIST_ITEMS} phim) của bộ nhớ Cookie.`,
+            };
+        }
         updatedIds = [...currentIds, movieId];
         isSaved = true;
     }
