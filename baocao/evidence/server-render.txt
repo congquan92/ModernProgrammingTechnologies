@@ -1,0 +1,5 @@
+source: .next/server/app/index.html (production build)
+prerendered_home_exists: true
+expected_row_headings_in_html: 5/5
+images_with_alt_in_html: 107
+api_key_query_in_html: False

@@ -6,6 +6,7 @@ import {
     discoverMovies,
 } from "@/services/tmdb";
 import HeroBanner from "@/components/server/HeroBanner";
+import MovieCard from "@/components/server/MovieCard";
 import MovieRow from "@/components/client/MovieRow";
 
 /**
@@ -48,21 +49,21 @@ export default async function HomePage() {
             {/* 2. Các hàng danh mục phim cuộn ngang chuẩn Netflix (bắt đầu phủ lên chân Billboard) */}
             <div className="-mt-10 sm:-mt-16 lg:-mt-24 relative z-20 space-y-6 sm:space-y-10">
                 {/* Hàng 1: Phim Thịnh Hành Trong Tuần */}
-                <MovieRow title="Phim Thịnh Hành Trong Tuần" movies={trending} />
+                <MovieRow title="Phim Thịnh Hành Trong Tuần" cards={trending.map((movie) => <MovieCard key={movie.id} movie={movie} />)} />
 
                 {/* Hàng 2: TOP 10 Phim Được Đánh Giá Cao Nhất (Có số thứ tự khổng lồ) */}
-                <MovieRow title="Top 10 Phim Đánh Giá Cao Nhất" movies={topRated} isTop10={true} />
+                <MovieRow title="Top 10 Phim Đánh Giá Cao Nhất" cards={topRated.slice(0, 10).map((movie) => <MovieCard key={movie.id} movie={movie} />)} isTop10={true} />
 
                 {/* Hàng 3: Phim Đang Chiếu Rạp */}
-                <MovieRow title="Phim Đang Chiếu Rạp Dành Cho Bạn" movies={nowPlaying} />
+                <MovieRow title="Phim Đang Chiếu Rạp Dành Cho Bạn" cards={nowPlaying.map((movie) => <MovieCard key={movie.id} movie={movie} />)} />
 
                 {/* Hàng 4: Phim Truyền Hình Hot */}
-                <MovieRow title="Phim Truyền Hình Hot Trong Tuần" movies={tvData.results} exploreHref="/tv" />
+                <MovieRow title="Phim Truyền Hình Hot Trong Tuần" cards={tvData.results.map((movie) => <MovieCard key={movie.id} movie={movie} />)} exploreHref="/tv" />
 
                 {/* Hàng 5: Bộ Sưu Tập Phim Kinh Điển */}
                 <MovieRow
                     title="Có Thể Bạn Muốn Xem Lại"
-                    movies={classicData.results}
+                    cards={classicData.results.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
                     exploreHref="/browse?genre=classic"
                 />
             </div>

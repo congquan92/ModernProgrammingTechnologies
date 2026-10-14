@@ -1,0 +1,7 @@
+source: npm run start at localhost:3000
+/: HTTP 200; api_key_in_body=False
+/movie/1236045: HTTP 200; api_key_in_body=False
+/movie/not-a-number: HTTP 200; api_key_in_body=False
+invalid_movie_not_found_ui: True; noindex: True
+/watchlist: HTTP 200; api_key_in_body=False
+/api/search?q=a: HTTP 200; api_key_in_body=False

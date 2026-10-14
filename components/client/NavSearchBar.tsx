@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useRef, useEffect, useTransition } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import { quickSearchAction } from "@/app/actions/search";
 import type { Movie } from "@/types/tmdb";
 
 export default function NavSearchBar() {
@@ -12,11 +11,12 @@ export default function NavSearchBar() {
     const [isOpen, setIsOpen] = useState(false);
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<Movie[]>([]);
-    const [isPending, startTransition] = useTransition();
+    const [isLoading, setIsLoading] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const abortControllerRef = useRef<AbortController | null>(null);
 
     // Xử lý click ra ngoài để đóng search bar
     useEffect(() => {
@@ -29,6 +29,9 @@ export default function NavSearchBar() {
         return () => {
             document.removeEventListener("mousedown", handleClickOutside);
             if (debounceRef.current) clearTimeout(debounceRef.current);
+            if (abortControllerRef.current) {
+                abortControllerRef.current.abort();
+            }
         };
     }, []);
 
@@ -39,21 +42,53 @@ export default function NavSearchBar() {
         }
     }, [isOpen]);
 
-    // Xử lý gõ phím và debounce tìm kiếm
+    // Xử lý gõ phím, debounce và AbortController với Route Handler GET /api/search?q=...
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setQuery(val);
 
         if (debounceRef.current) clearTimeout(debounceRef.current);
 
-        if (val.trim().length >= 2) {
-            debounceRef.current = setTimeout(() => {
-                startTransition(async () => {
-                    const data = await quickSearchAction(val);
-                    setResults(data);
-                });
+        // Hủy yêu cầu mạng trước đó nếu có khi người dùng gõ tiếp
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+        }
+
+        const trimmed = val.trim();
+        if (trimmed.length >= 2) {
+            debounceRef.current = setTimeout(async () => {
+                const controller = new AbortController();
+                abortControllerRef.current = controller;
+                setIsLoading(true);
+
+                try {
+                    const res = await fetch(`/api/search?q=${encodeURIComponent(trimmed)}`, {
+                        signal: controller.signal,
+                    });
+
+                    if (res.ok) {
+                        const data: { results?: Movie[] } = await res.json();
+                        setResults(data.results || []);
+                    } else {
+                        setResults([]);
+                    }
+                } catch (error: unknown) {
+                    if (error instanceof Error && error.name === "AbortError") {
+                        // Bỏ qua lỗi abort do người dùng gõ tiếp
+                        return;
+                    }
+                    console.error("[NavSearchBar] Lỗi tìm kiếm:", error);
+                    setResults([]);
+                } finally {
+                    if (abortControllerRef.current === controller) {
+                        setIsLoading(false);
+                        abortControllerRef.current = null;
+                    }
+                }
             }, 300);
         } else {
+            setIsLoading(false);
             setResults([]);
         }
     };
@@ -70,8 +105,14 @@ export default function NavSearchBar() {
     };
 
     const handleClear = () => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        if (abortControllerRef.current) {
+            abortControllerRef.current.abort();
+            abortControllerRef.current = null;
+        }
         setQuery("");
         setResults([]);
+        setIsLoading(false);
         if (inputRef.current) inputRef.current.focus();
     };
 
@@ -110,11 +151,11 @@ export default function NavSearchBar() {
                             className="w-full bg-transparent text-white text-xs sm:text-sm pl-2 pr-1 focus:outline-none placeholder-zinc-500"
                         />
 
-                        {isPending && (
+                        {isLoading && (
                             <div className="w-3.5 h-3.5 border-2 border-[#E50914] border-t-transparent rounded-full animate-spin flex-shrink-0 mr-1" />
                         )}
 
-                        {query && !isPending && (
+                        {query && !isLoading && (
                             <button
                                 type="button"
                                 onClick={handleClear}
@@ -176,7 +217,7 @@ export default function NavSearchBar() {
                                     </Link>
                                 );
                             })
-                        ) : !isPending ? (
+                        ) : !isLoading ? (
                             <div className="p-4 text-center text-xs text-zinc-500">
                                 Không tìm thấy phim phù hợp với &ldquo;{query}&rdquo;
                             </div>

@@ -1,5 +1,6 @@
 import { getSimilarMovies } from "@/services/tmdb";
 import SimilarMoviesSlider from "@/components/client/SimilarMoviesSlider";
+import MovieCard from "@/components/server/MovieCard";
 
 interface SimilarMoviesProps {
   movieId: string;
@@ -20,5 +21,5 @@ export default async function SimilarMovies({ movieId }: SimilarMoviesProps) {
     );
   }
 
-  return <SimilarMoviesSlider movies={movies} />;
+  return <SimilarMoviesSlider cards={movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)} />;
 }
