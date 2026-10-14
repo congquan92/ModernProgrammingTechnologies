@@ -25,6 +25,7 @@ export async function generateMetadata(
   { params }: MovieDetailPageProps
 ): Promise<Metadata> {
   const { id } = await params; // Next.js 16: params là Promise
+  if (!/^[1-9]\d*$/.test(id)) notFound();
   try {
     const movie = await getMovieDetails(id);
     const year = movie.release_date ? movie.release_date.split("-")[0] : "";
@@ -61,6 +62,7 @@ export async function generateMetadata(
  */
 export default async function MovieDetailPage({ params }: MovieDetailPageProps) {
   const { id } = await params;
+  if (!/^[1-9]\d*$/.test(id)) notFound();
 
   // Lấy thông tin phim chính — nếu lỗi hoặc không tồn tại sẽ chuyển sang 404
   let movie;

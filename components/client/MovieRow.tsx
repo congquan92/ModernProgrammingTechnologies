@@ -1,13 +1,11 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, type ReactNode } from "react";
 import Link from "next/link";
-import type { Movie } from "@/types/tmdb";
-import MovieCard from "@/components/server/MovieCard";
 
 interface MovieRowProps {
     title: string;
-    movies: Movie[];
+    cards: ReactNode[];
     isTop10?: boolean;
     exploreHref?: string;
 }
@@ -21,7 +19,7 @@ interface MovieRowProps {
  */
 export default function MovieRow({
     title,
-    movies,
+    cards,
     isTop10 = false,
     exploreHref,
 }: MovieRowProps) {
@@ -40,8 +38,8 @@ export default function MovieRow({
             : "/browse");
 
     // Top 10 thì giữ 10 phim, các hàng khác hiển thị tối đa toàn bộ phim được truyền vào (20 phim)
-    const displayMovies = isTop10 ? movies.slice(0, 10) : movies;
-    if (displayMovies.length === 0) return null;
+    const displayCards = isTop10 ? cards.slice(0, 10) : cards;
+    if (displayCards.length === 0) return null;
 
     const handleScroll = (direction: "left" | "right") => {
         if (rowRef.current) {
@@ -118,16 +116,16 @@ export default function MovieRow({
                     ref={rowRef}
                     className="flex items-center gap-2.5 sm:gap-3.5 overflow-x-auto no-scrollbar px-4 sm:px-12 py-4 scroll-smooth"
                 >
-                    {displayMovies.map((movie, index) => {
+                    {displayCards.map((card, index) => {
                         if (isTop10) {
                             return (
-                                <div key={`${movie.id}-${index}`} className="flex items-center shrink-0 relative group/item">
+                                <div key={index} className="flex items-center shrink-0 relative group/item">
                                     {/* Chữ số thứ tự TOP 10 khổng lồ kiểu Netflix */}
                                     <span className="netflix-number text-7xl sm:text-8xl md:text-9xl font-black select-none -mr-4 sm:-mr-6 z-0 leading-none">
                                         {index + 1}
                                     </span>
                                     <div className="w-32 sm:w-40 md:w-48 z-10">
-                                        <MovieCard movie={movie} />
+                                        {card}
                                     </div>
                                 </div>
                             );
@@ -135,10 +133,10 @@ export default function MovieRow({
 
                         return (
                             <div
-                                key={`${movie.id}-${index}`}
+                                key={index}
                                 className="w-36 sm:w-44 md:w-52 shrink-0 transition-transform duration-300"
                             >
-                                <MovieCard movie={movie} />
+                                {card}
                             </div>
                         );
                     })}

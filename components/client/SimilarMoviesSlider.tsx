@@ -1,11 +1,9 @@
 "use client";
 
-import { useRef } from "react";
-import type { Movie } from "@/types/tmdb";
-import MovieCard from "@/components/server/MovieCard";
+import { useRef, type ReactNode } from "react";
 
 interface SimilarMoviesSliderProps {
-    movies: Movie[];
+    cards: ReactNode[];
 }
 
 /**
@@ -14,11 +12,11 @@ interface SimilarMoviesSliderProps {
  * - Tự động lặp vòng (Infinite Loop) khi cuộn hết danh sách
  * - Hiển thị đầy đủ danh sách phim tương tự
  */
-export default function SimilarMoviesSlider({ movies }: SimilarMoviesSliderProps) {
+export default function SimilarMoviesSlider({ cards }: SimilarMoviesSliderProps) {
     const rowRef = useRef<HTMLDivElement>(null);
     const lastScrollPosRef = useRef<{ left: number; time: number }>({ left: 0, time: 0 });
 
-    if (!movies || movies.length === 0) return null;
+    if (cards.length === 0) return null;
 
     const handleScroll = (direction: "left" | "right") => {
         if (rowRef.current) {
@@ -75,12 +73,12 @@ export default function SimilarMoviesSlider({ movies }: SimilarMoviesSliderProps
                 ref={rowRef}
                 className="flex items-center gap-2.5 sm:gap-3.5 overflow-x-auto no-scrollbar py-2 scroll-smooth"
             >
-                {movies.map((movie, index) => (
+                {cards.map((card, index) => (
                     <div
-                        key={`${movie.id}-${index}`}
+                        key={index}
                         className="w-36 sm:w-44 md:w-52 shrink-0 transition-transform duration-300"
                     >
-                        <MovieCard movie={movie} />
+                        {card}
                     </div>
                 ))}
             </div>

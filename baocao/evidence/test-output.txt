@@ -1,0 +1,15 @@
+
+> modern-programming-technologies@0.1.0 test
+> node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs
+
+✔ deduplicateMovies retains the first movie for each positive ID (1.8274ms)
+✔ client sliders receive rendered cards instead of importing MovieCard (1.9162ms)
+✔ fetchTMDB keeps the key in the server request and configures revalidation (49.4109ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 170.7671
