@@ -1,0 +1,13 @@
+\babel@toc {vietnamese}{}\relax 
+\contentsline {table}{\numberline {1.1}{\ignorespaces So sánh đặc trưng kỹ thuật giữa CSR, Pages Router và App Router (Nguồn: Tổng hợp từ [1], [2], [7])}}{5}{table.caption.1}%
+\contentsline {table}{\numberline {2.1}{\ignorespaces Đặc tả các yêu cầu chức năng chính của hệ thống MovieHub (Nguồn: Nhóm tác giả đề xuất)}}{10}{table.caption.3}%
+\contentsline {table}{\numberline {2.2}{\ignorespaces Phân tầng chiến lược Caching và thời gian Revalidate trong MovieHub (Nguồn: Nhóm tác giả thiết kế theo [1])}}{13}{table.caption.5}%
+\contentsline {table}{\numberline {2.3}{\ignorespaces Bảng mã màu và thông số thiết kế Netflix Dark Cinema (Nguồn: Trích xuất từ tài liệu DESIGN.md của dự án)}}{13}{table.caption.6}%
+\contentsline {table}{\numberline {3.1}{\ignorespaces Bảng phân công trách nhiệm và tỷ lệ đóng góp của các thành viên (Nguồn: Nhóm tác giả thống nhất)}}{20}{table.caption.8}%
+\contentsline {table}{\numberline {3.2}{\ignorespaces Bảng tổng kết tiến độ phát triển dự án 7 tuần theo chuẩn Agile/Scrum (Nguồn: Nhật ký phát triển dự án)}}{21}{table.caption.9}%
+\contentsline {table}{\numberline {4.1}{\ignorespaces Kế hoạch và kết quả kiểm thử chức năng hệ thống MovieHub (Nguồn: Kết quả kiểm thử thực nghiệm)}}{23}{table.caption.10}%
+\contentsline {table}{\numberline {4.2}{\ignorespaces Kết quả đo lường Core Web Vitals và điểm số Google Lighthouse (Nguồn: Đo lường thực nghiệm với Google Lighthouse [4])}}{24}{table.caption.11}%
+\contentsline {table}{\numberline {4.3}{\ignorespaces So sánh kích thước JavaScript Bundle giữa các trang trong ứng dụng (Nguồn: Đo lường với @next/bundle-analyzer)}}{25}{table.caption.12}%
+\contentsline {table}{\numberline {4.4}{\ignorespaces Thực nghiệm đối chứng thời gian phản hồi giữa SSR truyền thống và Streaming Suspense (Nguồn: Dữ liệu đo đạc thực nghiệm trên môi trường kiểm thử)}}{26}{table.caption.13}%
+\contentsline {table}{\numberline {4.5}{\ignorespaces Ma trận đáp ứng yêu cầu môn học Các Công nghệ Lập trình Hiện đại (Nguồn: Đối sánh theo chuẩn tonghopyeucau.pdf)}}{27}{table.caption.14}%
+\contentsline {table}{\numberline {4.6}{\ignorespaces Bảng kịch bản vấn đáp bảo vệ đồ án trước Hội đồng chuyên môn (Nguồn: Nhóm tác giả tổng hợp)}}{28}{table.caption.15}%

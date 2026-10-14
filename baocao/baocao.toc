@@ -1,0 +1,81 @@
+\babel@toc {vietnamese}{}\relax 
+\contentsline {section}{LỜI CAM ĐOAN}{i}{Doc-Start}%
+\contentsline {section}{LỜI CẢM ƠN}{ii}{Doc-Start}%
+\contentsline {section}{TÓM TẮT ĐỒ ÁN}{iii}{Doc-Start}%
+\contentsline {section}{DANH MỤC TỪ VIẾT TẮT VÀ THUẬT NGỮ}{vii}{Item.6}%
+\contentsline {section}{DANH MỤC BẢNG BIỂU}{viii}{table.0.1}%
+\contentsline {section}{DANH MỤC HÌNH ẢNH}{ix}{table.0.1}%
+\contentsline {section}{LỜI MỞ ĐẦU}{1}{table.0.1}%
+\contentsline {section}{\numberline {1}CƠ SỞ LÝ THUYẾT VÀ CÔNG NGHỆ SỬ DỤNG}{4}{section.1}%
+\contentsline {subsection}{\numberline {1.1.}Tổng quan về Next.js và lịch sử phát triển}{4}{subsection.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.1.}Bối cảnh ra đời và hạn chế của React Single Page Application (SPA)}{4}{subsubsection.1.1.1}%
+\contentsline {subsubsection}{\numberline {1.1.2.}Bước chuyển đổi với Pages Router (Next.js 1 -- 12)}{4}{subsubsection.1.1.2}%
+\contentsline {subsubsection}{\numberline {1.1.3.}Kỷ nguyên mới với App Router và Server-Driven UI (Next.js 13 -- 16)}{4}{subsubsection.1.1.3}%
+\contentsline {subsection}{\numberline {1.2.}Kiến trúc React Server Components (RSC) và Client Components}{5}{subsection.1.2}%
+\contentsline {subsubsection}{\numberline {1.2.1.}Bản chất và nguyên lý hoạt động của RSC}{5}{subsubsection.1.2.1}%
+\contentsline {subsubsection}{\numberline {1.2.2.}Định dạng dữ liệu RSC Payload và cây render hỗn hợp}{5}{subsubsection.1.2.2}%
+\contentsline {subsubsection}{\numberline {1.2.3.}Chỉ thị \texttt {"use client"} và quy tắc Composition Pattern}{6}{subsubsection.1.2.3}%
+\contentsline {subsection}{\numberline {1.3.}Cơ chế Caching và Data Fetching đa tầng trong Next.js}{6}{subsection.1.3}%
+\contentsline {subsubsection}{\numberline {1.3.1.}Bốn tầng bộ nhớ đệm cốt lõi}{6}{subsubsection.1.3.1}%
+\contentsline {subsubsection}{\numberline {1.3.2.}Kỹ thuật Incremental Static Regeneration (ISR)}{7}{subsubsection.1.3.2}%
+\contentsline {subsection}{\numberline {1.4.}Kỹ thuật Streaming UI và React Suspense}{7}{subsection.1.4}%
+\contentsline {subsubsection}{\numberline {1.4.1.}Hạn chế của SSR truyền thống (All-or-Nothing Problem)}{7}{subsubsection.1.4.1}%
+\contentsline {subsubsection}{\numberline {1.4.2.}Cơ chế Streaming HTML lũy tiến}{7}{subsubsection.1.4.2}%
+\contentsline {subsection}{\numberline {1.5.}Cơ chế Server Actions và xử lý Mutation dữ liệu}{8}{subsection.1.5}%
+\contentsline {subsubsection}{\numberline {1.5.1.}Kiến trúc Remote Procedure Call (RPC)}{8}{subsubsection.1.5.1}%
+\contentsline {subsubsection}{\numberline {1.5.2.}Bảo mật dữ liệu và thao tác Cookie HttpOnly}{8}{subsubsection.1.5.2}%
+\contentsline {subsection}{\numberline {1.6.}Hệ sinh thái công nghệ bổ trợ}{8}{subsection.1.6}%
+\contentsline {subsubsection}{\numberline {1.6.1.}Thư viện React 19}{8}{subsubsection.1.6.1}%
+\contentsline {subsubsection}{\numberline {1.6.2.}Framework giao diện Tailwind CSS v4}{9}{subsubsection.1.6.2}%
+\contentsline {subsubsection}{\numberline {1.6.3.}Ngôn ngữ lập trình TypeScript}{9}{subsubsection.1.6.3}%
+\contentsline {subsection}{\numberline {1.7.}Nền tảng dữ liệu mở The Movie Database (TMDB) API}{9}{subsection.1.7}%
+\contentsline {section}{\numberline {2}PHÂN TÍCH VÀ THIẾT KẾ HỆ THỐNG}{10}{section.2}%
+\contentsline {subsection}{\numberline {2.1.}Khảo sát và đặc tả yêu cầu hệ thống}{10}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1.}Yêu cầu chức năng (Functional Requirements)}{10}{subsubsection.2.1.1}%
+\contentsline {subsubsection}{\numberline {2.1.2.}Yêu cầu phi chức năng (Non-Functional Requirements)}{10}{subsubsection.2.1.2}%
+\contentsline {subsection}{\numberline {2.2.}Kiến trúc hệ thống tổng thể}{11}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1.}Mô hình kiến trúc 3 tầng phân lớp}{11}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2.}Cấu trúc thư mục dự án theo chuẩn App Router}{11}{subsubsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.3.}Thiết kế tích hợp dịch vụ và luồng dữ liệu}{12}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1.}Kiến trúc tầng dịch vụ \texttt {services/tmdb.ts}}{12}{subsubsection.2.3.1}%
+\contentsline {subsubsection}{\numberline {2.3.2.}Giải pháp kiến trúc DNS Fallback Resolver}{12}{subsubsection.2.3.2}%
+\contentsline {subsubsection}{\numberline {2.3.3.}Phân tầng chiến lược Caching và Revalidation}{12}{subsubsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.4.}Thiết kế giao diện và trải nghiệm người dùng (UI/UX)}{13}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1.}Hệ thống thiết kế chuẩn điện ảnh (Netflix Dark Cinema Design System)}{13}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2.}Sơ đồ điều hướng và luồng trải nghiệm người dùng}{13}{subsubsection.2.4.2}%
+\contentsline {subsection}{\numberline {2.5.}Môi trường và công cụ phát triển}{14}{subsection.2.5}%
+\contentsline {section}{\numberline {3}HIỆN THỰC HỆ THỐNG}{15}{section.3}%
+\contentsline {subsection}{\numberline {3.1.}Cài đặt và cấu hình dự án}{15}{subsection.3.1}%
+\contentsline {subsection}{\numberline {3.2.}Hiện thực Tầng 1A: Các tính năng cốt lõi bắt buộc}{15}{subsection.3.2}%
+\contentsline {subsubsection}{\numberline {3.2.1.}Phân định ranh giới Server/Client Component}{15}{subsubsection.3.2.1}%
+\contentsline {subsubsection}{\numberline {3.2.2.}Server-side Data Fetching và song song hóa với \texttt {Promise.all}}{15}{subsubsection.3.2.2}%
+\contentsline {subsubsection}{\numberline {3.2.3.}Dynamic Routing (\texttt {/movie/[id]}) và Dynamic SEO Metadata}{16}{subsubsection.3.2.3}%
+\contentsline {subsection}{\numberline {3.3.}Hiện thực Tầng 1B: Các kỹ thuật chuyên sâu và nâng cao}{16}{subsection.3.3}%
+\contentsline {subsubsection}{\numberline {3.3.1.}Kỹ thuật đinh Server Actions}{16}{subsubsection.3.3.1}%
+\contentsline {subsubsection}{\numberline {3.3.2.}Kỹ thuật đinh Streaming Suspense và Skeleton Loading States}{17}{subsubsection.3.3.2}%
+\contentsline {subsubsection}{\numberline {3.3.3.}Tối ưu hóa hình ảnh với \texttt {next/image} và YouTube Player API}{17}{subsubsection.3.3.3}%
+\contentsline {subsection}{\numberline {3.4.}Hiện thực các module giao diện người dùng chính}{17}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1.}Module Hero Banner \& Trailer Modal xem trailer tức thì}{17}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2.}Module MovieRow Slider \& Carousel cuộn vô tận}{17}{subsubsection.3.4.2}%
+\contentsline {subsubsection}{\numberline {3.4.3.}Module FilterBar \& Trang Khám phá \texttt {/browse}}{18}{subsubsection.3.4.3}%
+\contentsline {subsubsection}{\numberline {3.4.4.}Module Thanh điều hướng nâng cao (\texttt {NavbarDropdown}, \texttt {NavSearchBar})}{18}{subsubsection.3.4.4}%
+\contentsline {subsubsection}{\numberline {3.4.5.}Module Trang Phim bộ (\texttt {/tv}) và Khám phá diễn viên}{18}{subsubsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.5.}Hiện thực cơ chế tự phục hồi và khử trùng lặp dữ liệu}{18}{subsection.3.5}%
+\contentsline {subsubsection}{\numberline {3.5.1.}Cơ chế DNS Fallback Resolver}{18}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{\numberline {3.5.2.}Thuật toán khử trùng lặp phim (\texttt {deduplicateMovies})}{19}{subsubsection.3.5.2}%
+\contentsline {subsection}{\numberline {3.6.}Tổ chức phát triển và tiến độ thực hiện}{19}{subsection.3.6}%
+\contentsline {subsubsection}{\numberline {3.6.1.}Bảng phân công trách nhiệm nhóm}{19}{subsubsection.3.6.1}%
+\contentsline {subsubsection}{\numberline {3.6.2.}Tiến độ thực hiện theo tuần (Tóm tắt kế hoạch 7 tuần)}{20}{subsubsection.3.6.2}%
+\contentsline {subsubsection}{\numberline {3.6.3.}Quy trình làm việc nhóm với Git Flow}{21}{subsubsection.3.6.3}%
+\contentsline {section}{\numberline {4}KIỂM THỬ VÀ ĐÁNH GIÁ KẾT QUẢ}{22}{section.4}%
+\contentsline {subsection}{\numberline {4.1.}Kế hoạch và phương pháp kiểm thử}{22}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2.}Các kịch bản kiểm thử chức năng và kết quả nghiệm thu}{22}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3.}Đo lường và đánh giá hiệu năng hệ thống}{24}{subsection.4.3}%
+\contentsline {subsubsection}{\numberline {4.3.1.}Đo lường Core Web Vitals và điểm số Google Lighthouse}{24}{subsubsection.4.3.1}%
+\contentsline {subsubsection}{\numberline {4.3.2.}Phân tích kích thước JavaScript Bundle (Zero-bundle Server Components)}{24}{subsubsection.4.3.2}%
+\contentsline {subsubsection}{\numberline {4.3.3.}Thực nghiệm đối chứng thời gian phản hồi (TTFB) của Streaming Suspense}{25}{subsubsection.4.3.3}%
+\contentsline {subsection}{\numberline {4.4.}Đánh giá mức độ đáp ứng yêu cầu môn học}{26}{subsection.4.4}%
+\contentsline {subsection}{\numberline {4.5.}Kịch bản vấn đáp bảo vệ đồ án (Viva Voce Scenarios)}{27}{subsection.4.5}%
+\contentsline {section}{KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN}{29}{table.caption.15}%
+\contentsline {section}{TÀI LIỆU THAM KHẢO}{30}{Item.37}%
+\contentsline {section}{PHỤ LỤC}{31}{Item.37}%

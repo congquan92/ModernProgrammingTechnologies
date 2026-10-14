@@ -464,24 +464,25 @@ Hình 1.1 mô tả chi tiết luồng xử lý và sự tương tác giữa Serv
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[node distance=1.5cm, auto, >=Stealth]
-  \tikzstyle{block} = [rectangle, draw, fill=gray!10, text width=3.4cm, text centered, rounded corners, minimum height=1.1cm, font=\small\bfseries]
-  \tikzstyle{serverblock} = [rectangle, draw=blue!70, fill=blue!5, text width=3.4cm, text centered, rounded corners, minimum height=1.1cm, font=\small\bfseries]
-  \tikzstyle{clientblock} = [rectangle, draw=red!70, fill=red!5, text width=3.4cm, text centered, rounded corners, minimum height=1.1cm, font=\small\bfseries]
+\begin{tikzpicture}[>=Stealth]
+  \tikzstyle{block} = [rectangle, draw, fill=gray!10, text width=3.3cm, text centered, rounded corners, minimum height=1.3cm, font=\small\bfseries]
+  \tikzstyle{serverblock} = [rectangle, draw=blue!70, fill=blue!5, text width=3.6cm, text centered, rounded corners, minimum height=1.3cm, font=\small\bfseries]
+  \tikzstyle{clientblock} = [rectangle, draw=red!70, fill=red!5, text width=3.6cm, text centered, rounded corners, minimum height=1.3cm, font=\small\bfseries]
   \tikzstyle{line} = [draw, ->, thick]
 
-  \node [block] (client) {Trình duyệt Client};
-  \node [serverblock, right=2.0cm of client] (server) {Máy chủ Next.js (App Router)};
-  \node [serverblock, above right=0.3cm and 1.8cm of server] (rsc) {Server Components (RSC) \\ (Fetch TMDB API)};
-  \node [clientblock, below right=0.3cm and 1.8cm of server] (cc) {Client Components \\ (\texttt{"use client"})};
-  \node [block, below=1.8cm of server] (payload) {Sinh HTML ban đầu \\ \& RSC Payload Stream};
+  % Các khối chức năng phân bố cân đối dạng vòng lặp xử lý (Loop Pipeline)
+  \node [block, text width=3.2cm, minimum height=1.8cm] (client) at (-5.0, 0) {Trình duyệt Client \\ \footnotesize (Gửi yêu cầu, hiển thị HTML \& Hydration)};
+  \node [serverblock] (server) at (0.2, 1.8) {Máy chủ Next.js \\ \footnotesize (Tiếp nhận \& Điều phối)};
+  \node [serverblock] (rsc) at (5.0, 1.8) {Server Components (RSC) \\ \footnotesize (Fetch TMDB, Render RSC)};
+  \node [clientblock] (cc) at (5.0, -1.8) {Client Boundaries \\ \footnotesize (Chỉ thị \texttt{"use client"} / Slots)};
+  \node [block, text width=3.5cm] (payload) at (0.2, -1.8) {Bộ sinh HTML tĩnh (SSR) \\ \& RSC Payload Stream};
 
-  \path [line] (client) -- node[above, font=\footnotesize] {1. HTTP Request} (server);
-  \path [line] (server) |- (rsc);
-  \path [line] (server) |- (cc);
-  \path [line] (rsc) |- node[right, font=\footnotesize] {2. Dựng cây RSC} (payload);
-  \path [line] (cc) |- node[right, font=\footnotesize] {3. Tạo Client Slots} (payload);
-  \path [line] (payload) -| node[above, near start, font=\footnotesize] {4. HTML + RSC Payload} (client);
+  % Các luồng dữ liệu vuông góc hoàn toàn, nhãn độc lập tuyệt đối
+  \path [line] (client.north) -- ++(0, 0.9) -- node[above=3pt, midway, font=\footnotesize] {1. Yêu cầu trang (HTTP Request)} (server.west);
+  \path [line] (server) -- node[above=3pt, midway, font=\footnotesize] {2. Dựng cây RSC} (rsc);
+  \path [line] (rsc) -- node[right=4pt, midway, font=\footnotesize] {3. Tạo Client Slots} (cc);
+  \path [line] (cc) -- node[below=3pt, midway, font=\footnotesize] {4. Đóng gói dữ liệu} (payload);
+  \path [line] (payload.west) -- node[below=4pt, midway, align=center, font=\footnotesize] {5. Phản hồi luồng \\ HTML + RSC Payload} ++(-3.4, 0) |- (client.south);
 \end{tikzpicture}
 \caption{Sơ đồ luồng kết xuất React Server Components và đóng gói RSC Payload (Nguồn: Xây dựng dựa trên đặc tả kỹ thuật RSC [7])}
 \label{fig:rsc_flow}
@@ -787,26 +788,27 @@ Hình 2.2 thể hiện sơ đồ luồng người dùng (User Navigation Flow) k
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[node distance=1.6cm, auto, >=Stealth]
-  \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=2.8cm, minimum height=1.0cm, text centered, draw=red!80, fill=red!10, font=\small\bfseries]
-  \tikzstyle{process} = [rectangle, minimum width=2.8cm, minimum height=1.0cm, text centered, draw=blue!80, fill=blue!10, rounded corners, font=\small\bfseries]
-  \tikzstyle{decision} = [diamond, minimum width=2.8cm, minimum height=1.0cm, text centered, draw=orange!80, fill=orange!10, font=\footnotesize\bfseries]
+\begin{tikzpicture}[>=Stealth]
+  \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=3.0cm, minimum height=1.0cm, text centered, draw=red!80, fill=red!10, font=\small\bfseries]
+  \tikzstyle{process} = [rectangle, minimum width=3.0cm, minimum height=1.0cm, text centered, draw=blue!80, fill=blue!10, rounded corners, font=\small\bfseries]
   \tikzstyle{line} = [draw, ->, thick]
 
-  \node [startstop] (home) {Trang chủ (Home)};
-  \node [process, right=1.6cm of home] (trailer) {Xem Trailer Modal};
-  \node [process, below=1.2cm of home] (detail) {Chi tiết phim \texttt{/movie/[id]}};
-  \node [process, left=1.6cm of home] (browse) {Khám phá bộ lọc \texttt{/browse}};
-  \node [process, below=1.2cm of browse] (search) {Tìm kiếm Live \texttt{/search}};
-  \node [process, below=1.2cm of detail] (watch) {Danh sách Watchlist};
+  % Phân bố các nút chức năng đối xứng, thông thoáng
+  \node [startstop] (home) at (0, 2.2) {Trang chủ (Home)};
+  \node [process] (trailer) at (5.0, 2.2) {Xem Trailer Modal};
+  \node [process] (browse) at (-5.0, 2.2) {Khám phá bộ lọc \texttt{/browse}};
+  \node [process] (detail) at (0, 0) {Chi tiết phim \texttt{/movie/[id]}};
+  \node [process] (search) at (5.0, 0) {Tìm kiếm Live \texttt{/search}};
+  \node [process] (watch) at (0, -2.0) {Danh sách Watchlist};
 
-  \path [line] (home) -- node[above, font=\footnotesize] {Bấm xem} (trailer);
-  \path [line] (home) -- node[right, font=\footnotesize] {Chọn phim} (detail);
-  \path [line] (home) -- node[above, font=\footnotesize] {Menu Lọc} (browse);
-  \path [line] (browse) |- (detail);
-  \path [line] (home) -| node[near start, above, font=\footnotesize] {Gõ Header} (search);
-  \path [line] (search) -- (detail);
-  \path [line] (detail) -- node[right, font=\footnotesize] {Thêm/Xóa} (watch);
+  % Các đường liên kết phân định rõ ràng, không trùng lắp hoặc đè chữ
+  \path [line] (home) -- node[above=2pt, midway, font=\footnotesize] {Bấm xem} (trailer);
+  \path [line] (home) -- node[above=2pt, midway, font=\footnotesize] {Menu Lọc} (browse);
+  \path [line] (home) -- node[right=2pt, midway, font=\footnotesize] {Chọn phim} (detail);
+  \path [line] (home.south east) -- node[above=2pt, sloped, midway, font=\footnotesize] {Gõ Header} (search.north west);
+  \path [line] (browse.south) |- node[below=2pt, near end, font=\footnotesize] {Chọn phim lọc} (detail.west);
+  \path [line] (search) -- node[below=4pt, midway, font=\footnotesize] {Chọn kết quả} (detail);
+  \path [line] (detail) -- node[right=2pt, midway, font=\footnotesize] {Thêm/Xóa} (watch);
 \end{tikzpicture}
 \caption{Sơ đồ luồng điều hướng trải nghiệm người dùng trong hệ thống MovieHub (Nguồn: Nhóm tác giả thiết kế)}
 \label{fig:user_flow}
