@@ -32,7 +32,7 @@
 
 ### Yêu Cầu Hệ Thống:
 
-- **Node.js:** `>= 20.x`
+- **Node.js:** `>= 20.9` (CI dùng Node.js 24)
 - **Trình quản lý gói:** `npm` (khuyến nghị) hoặc `pnpm`/`yarn`
 
 ### Các Bước Cài Đặt:
@@ -89,9 +89,13 @@
 
 ## 📊 5. Bằng chứng hiện có và số đo cần bổ sung
 
+Để tự tạo lại log trên máy của bạn, chạy `powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1`. Sau đó mở terminal khác chạy `npm run start`, rồi chạy `powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1 -RuntimeOnly`. Script ghi lệnh, thời điểm, commit và exit code vào từng log; hãy chụp terminal sau khi lệnh chạy xong.
+
 - `baocao/evidence/build-output.txt`: production build, phân loại route và revalidate 30 phút của trang chủ.
+- `baocao/evidence/lint-output.txt`, `typecheck-output.txt`, `test-output.txt`: kết quả kiểm tra mã có lệnh và exit code.
 - `baocao/evidence/server-render.txt`: HTML build có năm tiêu đề hàng phim và không chứa chuỗi `api_key=`.
 - `baocao/evidence/runtime-http.txt`: route phim hợp lệ và giao diện không tìm thấy cho ID sai.
+- `baocao/HUONG_DAN_THU_MINH_CHUNG.md`: các bước tự ghi video Watchlist, streaming và bộ đếm cache.
 - Chưa có báo cáo Lighthouse hay phép so sánh `<Image />` với `<img>` trên cùng route và thiết bị. Muốn công bố LCP/CLS/FCP, hãy lưu tệp kết quả gốc, cấu hình thiết bị và URL đo.
 
 ---

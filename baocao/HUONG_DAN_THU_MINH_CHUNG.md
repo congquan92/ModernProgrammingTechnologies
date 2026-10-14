@@ -2,6 +2,22 @@
 
 Chạy các lệnh bên dưới bằng PowerShell tại thư mục gốc dự án. Ghi rõ trong bài nộp rằng dữ liệu TMDB của phần streaming/cache là **giả lập có kiểm soát**; độ trễ 2,5 giây và 4 giây được thêm để thấy thứ tự hiển thị, không phải số đo hiệu năng thật.
 
+## Tạo lại các log kiểm tra bằng TMDB thật
+
+Mở PowerShell mới để không giữ các biến môi trường mock, cấu hình `.env.local` với khóa TMDB của bạn rồi chạy:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1
+```
+
+Script chạy lint, type-check, test, production build và kiểm tra HTML; các tệp `.txt` tương ứng được ghi vào `baocao/evidence`. Chụp terminal sau khi thấy `Saved:`; mỗi log phải kết thúc bằng `exit_code: 0`. Sau đó mở terminal khác chạy `npm run start`, trở lại terminal đầu và chạy:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1 -RuntimeOnly
+```
+
+Lệnh thứ hai gọi các route localhost để tạo lại `runtime-http.txt`. Kiểm tra log trước khi chia sẻ để không lộ khóa hoặc thông tin riêng. Dừng production server bằng `Ctrl+C` sau khi chụp ảnh.
+
 ## 1. Khởi động môi trường thử nghiệm
 
 Terminal A:

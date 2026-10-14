@@ -1,3 +1,7 @@
+﻿generated_at: 2026-10-14T21:19:28.3185178+07:00
+git_head: 9be1f28
+working_tree_dirty: True
+command: python scripts/verify-runtime-http.py
 source: npm run start at localhost:3000
 /: HTTP 200; api_key_in_body=False
 /movie/1236045: HTTP 200; api_key_in_body=False
@@ -5,3 +9,4 @@ source: npm run start at localhost:3000
 invalid_movie_not_found_ui: True; noindex: True
 /watchlist: HTTP 200; api_key_in_body=False
 /api/search?q=a: HTTP 200; api_key_in_body=False
+exit_code: 0

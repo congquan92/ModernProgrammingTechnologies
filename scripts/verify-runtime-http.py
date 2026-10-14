@@ -27,7 +27,10 @@ for route, expected in routes:
     except HTTPError as error:
         status = error.code
         body = error.read().decode("utf-8", "replace")
-    print(f"{route}: HTTP {status}; api_key_in_body={'api_key=' in body.lower()}")
+    key_exposed = "api_key=" in body.lower()
+    print(f"{route}: HTTP {status}; api_key_in_body={key_exposed}")
+    if key_exposed:
+        raise SystemExit(f"API key query appeared in the response body for {route}.")
     if route == "/movie/not-a-number":
         not_found_ui = "Không Tìm Thấy Bộ Phim Này" in body
         noindex = '<meta name="robots" content="noindex"' in body

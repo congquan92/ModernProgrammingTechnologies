@@ -21,6 +21,7 @@ docs
 # production
 /build
 build*
+!/baocao/evidence/build-output.txt
 
 # misc
 .DS_Store

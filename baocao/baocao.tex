@@ -467,7 +467,7 @@ Bảng 1.1 tổng hợp sự so sánh toàn diện giữa ba thế hệ kiến t
 Dựa trên trải nghiệm thực tế trong quá trình phát triển dự án MovieHub, nhóm nhận thấy Next.js không phải là giải pháp vạn năng cho mọi bài toán công nghệ. Dưới đây là các kịch bản thực tế mà việc sử dụng Next.js mang lại nhiều bất lợi hơn là ưu điểm:
 \begin{enumerate}[noitemsep]
     \item \textbf{Ứng dụng nội bộ hoặc Bảng điều khiển quản trị (Internal Dashboard / CMS sau đăng nhập):} Các hệ thống này hoàn toàn không có nhu cầu tối ưu hóa công cụ tìm kiếm (SEO) hay chia sẻ liên kết mạng xã hội. Việc sử dụng Next.js làm gia tăng độ phức tạp hạ tầng máy chủ và rủi ro Hydration Mismatch một cách không cần thiết; một giải pháp Single Page Application thuần với React + Vite sẽ nhẹ nhàng, dễ bảo trì và tiết kiệm chi phí vận hành hơn rất nhiều.
-    \item \textbf{Website nội dung tĩnh đơn giản (Blog cá nhân, Landing Page, Tài liệu hướng dẫn):} Việc cấu hình một máy chủ Node.js với App Router để phục vụ các nội dung hầu như không biến động là lãng phí tài nguyên. Astro với kiến trúc Islands hoặc static site generator đơn giản sẽ mang lại hiệu năng cao hơn với 0 KB JavaScript gửi về mặc định.
+    \item \textbf{Website nội dung tĩnh đơn giản (Blog cá nhân, Landing Page, Tài liệu hướng dẫn):} Nếu không cần tương tác phía client, một static site generator như Astro có thể tạo trang tĩnh với ít JavaScript hơn; không cần vận hành máy chủ Node.js chỉ để phục vụ nội dung hầu như không biến động.
     \item \textbf{Đội ngũ phát triển chưa quen với ranh giới Server/Client và chi phí hạ tầng:} Sự phân chia nghiêm ngặt giữa môi trường Node.js và trình duyệt (Server Components không có window/DOM/useEffect, async params, Server Actions POST queue) tạo ra một rào cản học tập (Learning Curve) dốc đứng. Ngoài ra, việc tự triển khai Next.js (Self-hosting ngoài Vercel) đòi hỏi cấu hình phức tạp về Cache Handler, ISR phân tán và duy trì tiến trình Node.js liên tục, dẫn đến chi phí vận hành cao hơn so với lưu trữ tĩnh trên CDN.
 \end{enumerate}
 
@@ -592,7 +592,7 @@ Kỹ thuật truyền luồng (Streaming với React Suspense) và Caching dữ 
 \begin{itemize}[noitemsep]
     \item \textbf{Cơ chế Client Hydration và phòng chống Hydration Mismatch:} Sau khi trình duyệt nhận được HTML render sẵn từ server, React gắn kết các bộ lắng nghe sự kiện (event listeners) vào DOM. Để tránh lỗi bất đồng bộ giữa cây DOM server và client (Hydration Mismatch), các trạng thái phụ thuộc vào trình duyệt (như trạng thái cuộn chuột \texttt{window.scrollY} trong \texttt{Header}) chỉ được kích hoạt bên trong hook \texttt{useEffect} sau khi component đã mount thành công trên client.
     \item \textbf{Quản lý trạng thái thông qua URL (\texttt{searchParams}):} Tại các trang \texttt{/browse} và \texttt{/search}, toàn bộ trạng thái bộ lọc (thể loại, năm, sắp xếp, trang hiện tại) được lưu trữ trực tiếp trên URL Query Parameters. Cách tiếp cận này giúp người dùng có thể chia sẻ liên kết kết quả lọc, lưu bookmark trình duyệt, và sử dụng các nút Back/Forward mà không bị mất trạng thái. Thư viện hook \texttt{useTransition} kết hợp \texttt{useRouter.replace()} giúp cập nhật URL mượt mà mà không gây đơ cứng giao diện.
-    \item \textbf{Tối ưu hóa điều hướng với \texttt{next/link}:} Mọi liên kết chuyển trang đều sử dụng thẻ \texttt{<Link>} của Next.js. Component này tự động kích hoạt cơ chế Viewport Prefetching: Khi một thẻ liên kết cuộn vào tầm nhìn của màn hình, Next.js sẽ nạp trước RSC Payload của tuyến đường đích trong nền, giúp việc chuyển trang diễn ra tức thì như một ứng dụng đơn trang (SPA).
+    \item \textbf{Điều hướng với \texttt{next/link}:} Các liên kết nội bộ như thẻ phim dùng \texttt{<Link>} của Next.js để điều hướng phía client. Next.js có thể prefetch tuyến đường đích tùy loại route và cấu hình; thời gian chuyển trang thực tế còn phụ thuộc dữ liệu và mạng.
 \end{itemize}
 
 \subsection{Kỹ thuật Streaming UI và React Suspense}
@@ -845,7 +845,7 @@ Khám phá / tìm kiếm & \texttt{fetch} Data Cache & 1.800s / 300s / 120s & Kh
 Màu nền chủ đạo & \texttt{\#141414} & Tạo chiều sâu điện ảnh tối đa, làm nổi bật màu sắc rực rỡ của các áp phích phim; giảm mỏi mắt cho người dùng trong điều kiện thiếu sáng. \\
 Màu đỏ thương hiệu & \texttt{\#E50914} & Điểm nhấn thị giác cho Logo thương hiệu, các nút kêu gọi hành động (CTA), viền active của danh mục và chỉ báo đang xem. \\
 Màu bề mặt phụ & \texttt{\#2F2F2F} & Sử dụng cho thanh điều hướng phụ, các thẻ card khi hover và nền khung skeleton chờ. \\
-Màu văn bản chính & \texttt{\#FFFFFF} & Chữ trắng tinh khiết trên nền xám đen (\texttt{\#141414}), đạt tỉ lệ tương phản vượt chuẩn trợ năng W3C WCAG 2.1 AA (tỉ lệ 21:1 cho nội dung văn bản chính). \\
+Màu văn bản chính & \texttt{\#FFFFFF} & Chữ trắng trên nền xám đen (\texttt{\#141414}) có tỉ lệ tương phản khoảng 18,7:1 theo công thức WCAG; đây chỉ là kiểm tra cặp màu, không phải chứng nhận toàn trang đạt WCAG. \\
 Màu văn bản phụ & \texttt{\#AAAAAA} & Sử dụng cho ngày phát hành, thông số thời lượng, tóm tắt nội dung phụ. \\
 \bottomrule
 \end{tabularx}
@@ -934,7 +934,7 @@ Thông tin phiên bản các gói phần mềm cốt lõi được cấu hình t
   }
 }
 \end{lstlisting}
-Lệnh kiểm tra phiên bản trên giao diện dòng lệnh (\texttt{npx next --version}) xác nhận phiên bản runtime chính thức là \texttt{Next.js v16.3.6} và \texttt{React v19.2.8}.
+Lệnh \texttt{npx next --version} xác nhận phiên bản \texttt{Next.js v16.3.6}; phiên bản \texttt{React v19.2.8} được xác nhận từ \texttt{package.json} và \texttt{npm ls react --depth=0}.
 
 \subsection{Hiện thực Tầng 1A: Các tính năng cốt lõi bắt buộc}
 
@@ -1121,7 +1121,7 @@ Dự án dùng Git và có lịch sử tích hợp qua Pull Request:
 \begin{itemize}[noitemsep]
     \item Bản mã nguồn đang kiểm tra đã chạy production build. Chưa có bằng chứng trong repo về cấu hình bảo vệ nhánh \texttt{main} trên GitHub.
     \item Các nhánh tính năng trong lịch sử gồm nhóm trang chủ, trang chi tiết, tìm kiếm/Watchlist và Browse/Filter.
-    \item Lịch sử Git cục bộ có 6 merge commit ghi ``Merge pull request''. Repo hiện có workflow CI cho lint, type-check, test và build; báo cáo chưa xác minh quy tắc review bắt buộc của từng PR trên GitHub.
+    \item Lịch sử Git cục bộ có 7 merge commit ghi ``Merge pull request''. Repo hiện có workflow CI cho lint, type-check, test và build; báo cáo chưa xác minh quy tắc review bắt buộc của từng PR trên GitHub.
 \end{itemize}
 
 % ==============================================================================
@@ -1152,7 +1152,7 @@ Bản báo cáo này chưa có tệp xuất Lighthouse, trace trình duyệt, k�
 \end{tabularx}
 \end{table}
 
-Tệp \path{.github/workflows/check.yml} chạy các lệnh trên khi push hoặc mở Pull Request; \texttt{README.md} và \texttt{.env.example} hướng dẫn cấu hình khóa TMDB. Trong CI, build dùng placeholder cho API key nên kiểm tra khả năng biên dịch và route, \textbf{không} chứng minh TMDB đang trả dữ liệu thật. Ba test xác minh logic, ranh giới module và cấu hình server fetch bằng khóa giả; chúng không thay thế kiểm thử giao diện trên trình duyệt. Log GET production tại localhost nằm ở \path{baocao/evidence/runtime-http.txt}.
+Tệp \path{.github/workflows/check.yml} cấu hình chạy các lệnh trên khi push hoặc mở Pull Request; \texttt{README.md} và \texttt{.env.example} hướng dẫn cấu hình khóa TMDB. Workflow đọc \texttt{TMDB\_API\_KEY} từ GitHub secret; báo cáo chưa có log một lượt chạy CI để xác nhận kết quả trên GitHub. Ba test cục bộ dùng khóa giả để xác minh logic, ranh giới module và cấu hình server fetch; chúng không thay thế kiểm thử giao diện trên trình duyệt. Log GET production tại localhost nằm ở \path{baocao/evidence/runtime-http.txt}.
 
 \subsection{Bằng chứng về mô hình render và cache}
 \begin{table}[H]
@@ -1203,7 +1203,7 @@ Tệp \path{.github/workflows/check.yml} chạy các lệnh trên khi push hoặ
 1B & Cache, revalidation & \texttt{services/client.ts} với \texttt{next.revalidate}; \path{baocao/evidence/build-output.txt} xác nhận \texttt{/} tĩnh, 30 phút. Chưa có đo cache hit/miss. \\
 1B & Server Action và Route Handler & \texttt{app/actions/watchlist.ts} xử lý ghi cookie; \texttt{app/api/search/route.ts} xử lý GET. \\
 1B & Suspense, image, font, metadata & \texttt{app/movie/[id]/page.tsx}; \texttt{MovieCard.tsx} dùng \texttt{next/image}; \texttt{app/layout.tsx} dùng \texttt{next/font}; \texttt{next.config.ts} có \texttt{remotePatterns}; \texttt{generateMetadata} theo phim. \\
-2 & Git, chạy lại, cấu hình bí mật & Lịch sử 6 merge PR trong Git; \texttt{README.md}, \texttt{.env.example}, \texttt{package.json}. Không đưa khóa thật vào báo cáo. \\
+2 & Git, chạy lại, cấu hình bí mật & Lịch sử 7 merge PR trong Git; \texttt{README.md}, \texttt{.env.example}, \texttt{package.json}. Không đưa khóa thật vào báo cáo. \\
 2 & Test và CI & \texttt{tests/*.test.mjs}, script \texttt{npm test}, \path{.github/workflows/check.yml}; log \path{baocao/evidence/test-output.txt}. \\
 2 & Bảo mật và xử lý lỗi & Xác thực đầu vào ở Route Handler/Server Action; \texttt{app/movie/[id]/error.tsx} và \texttt{not-found.tsx}; giới hạn của DNS fallback được nêu ở Chương 3. \\
 3 & Đo hiệu năng nâng cao & Chưa đủ dữ liệu gốc cho Lighthouse, bundle hoặc TTFB đối chứng; không đăng ký các chỉ số đó là kết quả đã nghiệm thu. \\

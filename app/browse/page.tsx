@@ -117,29 +117,23 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                 {/* Header Tiêu Đề */}
                 <div className="mb-6 flex flex-col sm:flex-row sm:items-end justify-between gap-2 border-b border-[#2E2E2E] pb-4">
                     <div>
-                        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">
-                            {pageTitle}
-                        </h1>
+                        <h1 className="text-2xl sm:text-3xl font-black text-white tracking-tight">{pageTitle}</h1>
                         <p className="text-zinc-400 text-xs sm:text-sm mt-1 flex items-center gap-2 flex-wrap">
                             <span>Tổng cộng</span>
                             <span className="text-[#E50914] font-bold text-base">{totalResults.toLocaleString("vi-VN")}</span>
                             <span>tác phẩm phù hợp</span>
                             <span className="text-zinc-600">·</span>
-                            <span>Trang <strong className="text-white">{currentPage}</strong> / {totalPages}</span>
+                            <span>
+                                Trang <strong className="text-white">{currentPage}</strong> / {totalPages}
+                            </span>
                         </p>
                     </div>
 
-                    <div className="text-xs text-zinc-500 font-medium">
-                        Hiển thị {results.length} phim / trang
-                    </div>
+                    <div className="text-xs text-zinc-500 font-medium">Hiển thị {results.length} phim / trang</div>
                 </div>
 
                 {/* Bộ Lọc Đa Tiêu Chí */}
-                <Suspense
-                    fallback={
-                        <div className="w-full h-24 bg-[#181818] rounded-lg animate-pulse mb-8" />
-                    }
-                >
+                <Suspense fallback={<div className="w-full h-24 bg-[#181818] rounded-lg animate-pulse mb-8" />}>
                     <FilterBar />
                 </Suspense>
 
@@ -152,13 +146,8 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                             </svg>
                         </div>
                         <h2 className="text-zinc-200 text-lg font-bold">Không tìm thấy phim phù hợp</h2>
-                        <p className="text-zinc-500 text-sm max-w-md">
-                            Rất tiếc, không có bộ phim nào đáp ứng tất cả các tiêu chí lọc hiện tại. Hãy thử chọn thể loại khác hoặc đặt lại bộ lọc.
-                        </p>
-                        <Link
-                            href="/browse"
-                            className="bg-[#E50914] hover:bg-[#B80710] text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded transition-colors"
-                        >
+                        <p className="text-zinc-500 text-sm max-w-md">Rất tiếc, không có bộ phim nào đáp ứng tất cả các tiêu chí lọc hiện tại. Hãy thử chọn thể loại khác hoặc đặt lại bộ lọc.</p>
+                        <Link href="/browse" className="bg-[#E50914] hover:bg-[#B80710] text-white text-xs sm:text-sm font-bold px-5 py-2.5 rounded transition-colors">
                             Đặt lại toàn bộ bộ lọc
                         </Link>
                     </div>
@@ -175,28 +164,18 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                             <div className="flex items-center justify-center gap-1.5 pt-8 border-t border-[#2E2E2E] flex-wrap">
                                 {/* Nút Đầu Trang */}
                                 {currentPage > 2 && (
-                                    <Link
-                                        href={buildPaginationUrl(1)}
-                                        className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
-                                        title="Về trang đầu"
-                                    >
+                                    <Link href={buildPaginationUrl(1)} className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors" title="Về trang đầu">
                                         ««
                                     </Link>
                                 )}
 
                                 {/* Nút Trang Trước */}
                                 {currentPage > 1 ? (
-                                    <Link
-                                        href={buildPaginationUrl(currentPage - 1)}
-                                        className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
-                                        title="Trang trước"
-                                    >
+                                    <Link href={buildPaginationUrl(currentPage - 1)} className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors" title="Trang trước">
                                         ‹ Trước
                                     </Link>
                                 ) : (
-                                    <span className="px-3 py-1.5 rounded bg-zinc-900 text-zinc-600 text-xs sm:text-sm cursor-not-allowed">
-                                        ‹ Trước
-                                    </span>
+                                    <span className="px-3 py-1.5 rounded bg-zinc-900 text-zinc-600 text-xs sm:text-sm cursor-not-allowed">‹ Trước</span>
                                 )}
 
                                 {/* Danh Sách Số Trang */}
@@ -210,38 +189,26 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
                                             key={`page-${page}`}
                                             href={buildPaginationUrl(page)}
                                             className={`px-3 py-1.5 rounded text-xs sm:text-sm font-bold transition-colors ${
-                                                page === currentPage
-                                                    ? "bg-[#E50914] text-white shadow-lg shadow-red-900/40"
-                                                    : "bg-[#202020] hover:bg-zinc-700 text-zinc-300 hover:text-white"
+                                                page === currentPage ? "bg-[#E50914] text-white shadow-lg shadow-red-900/40" : "bg-[#202020] hover:bg-zinc-700 text-zinc-300 hover:text-white"
                                             }`}
                                         >
                                             {page}
                                         </Link>
-                                    )
+                                    ),
                                 )}
 
                                 {/* Nút Trang Kế Tiếp */}
                                 {currentPage < totalPages ? (
-                                    <Link
-                                        href={buildPaginationUrl(currentPage + 1)}
-                                        className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
-                                        title="Trang kế tiếp"
-                                    >
+                                    <Link href={buildPaginationUrl(currentPage + 1)} className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors" title="Trang kế tiếp">
                                         Tiếp ›
                                     </Link>
                                 ) : (
-                                    <span className="px-3 py-1.5 rounded bg-zinc-900 text-zinc-600 text-xs sm:text-sm cursor-not-allowed">
-                                        Tiếp ›
-                                    </span>
+                                    <span className="px-3 py-1.5 rounded bg-zinc-900 text-zinc-600 text-xs sm:text-sm cursor-not-allowed">Tiếp ›</span>
                                 )}
 
                                 {/* Nút Về Trang Cuối */}
                                 {currentPage < totalPages - 1 && (
-                                    <Link
-                                        href={buildPaginationUrl(totalPages)}
-                                        className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors"
-                                        title="Trang cuối cùng"
-                                    >
+                                    <Link href={buildPaginationUrl(totalPages)} className="px-3 py-1.5 rounded bg-[#202020] hover:bg-[#E50914] text-white text-xs sm:text-sm font-semibold transition-colors" title="Trang cuối cùng">
                                         »»
                                     </Link>
                                 )}

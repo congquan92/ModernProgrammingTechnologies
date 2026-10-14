@@ -43,6 +43,9 @@ expected = (
 
 print("source: .next/server/app/index.html (production build)")
 print("prerendered_home_exists: true")
-print(f"expected_row_headings_in_html: {sum(any(title in h for h in parser.headings) for title in expected)}/{len(expected)}")
+heading_count = sum(any(title in h for h in parser.headings) for title in expected)
+print(f"expected_row_headings_in_html: {heading_count}/{len(expected)}")
 print(f"images_with_alt_in_html: {parser.image_alts}")
 print(f"api_key_query_in_html: {'api_key=' in source.lower()}")
+if heading_count != len(expected) or parser.image_alts == 0 or "api_key=" in source.lower():
+    raise SystemExit("Production HTML did not pass the expected server-render checks.")
