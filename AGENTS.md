@@ -8,7 +8,7 @@ This block is written and re-added by `next dev` — verify at `node_modules/nex
 
 <!-- END:nextjs-agent-rules -->
 
-# 🎬 UI & DESIGN SYSTEM CONTRACT (MANDATORY FOR ALL AGENTS)
+# UI & DESIGN SYSTEM CONTRACT (MANDATORY FOR ALL AGENTS)
 
 When developing or modifying any user interface, layout, component, or route in this repository, you **MUST ALWAYS** read and strictly follow [`DESIGN.md`](./DESIGN.md) (and [`DESIGN_SYSTEM.md`](./DESIGN_SYSTEM.md)).
 
@@ -16,3 +16,9 @@ When developing or modifying any user interface, layout, component, or route in 
 - **Component Contracts:** Follow exact button variants, badges, horizontal `MovieRow` sliders, and `MovieCard` specifications defined in `DESIGN.md`.
 - **Navbar Rule:** Header must start transparent and smoothly transition to `#141414` on scroll.
 - **Architectural Rules:** Default to Server Components, keep `TMDB_API_KEY` on the server, use ISR caching with `next: { revalidate }`, and ensure zero CLS with `next/image`.
+
+## Git & Version Control
+
+- **DO NOT run `git commit` or `git push` automatically.**
+- Always leave changes uncommitted in the working tree for the user to review, verify, and commit manually.
+- When creating implementation plans or executing tasks, skip any automatic git commit steps.
