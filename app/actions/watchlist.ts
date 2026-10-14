@@ -17,7 +17,9 @@ export async function getWatchlistIds(): Promise<number[]> {
     try {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-            return parsed.map((item) => Number(item)).filter((id) => !isNaN(id));
+            return parsed
+                .map((item) => Number(item))
+                .filter((id) => Number.isInteger(id) && id > 0);
         }
         return [];
     } catch {

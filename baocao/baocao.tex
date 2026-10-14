@@ -1,5 +1,7 @@
 \documentclass[13pt,a4paper]{extarticle}
 \usepackage[utf8]{inputenc}
+\DeclareUnicodeCharacter{25CB}{\ensuremath{\circ}}
+\DeclareUnicodeCharacter{0192}{\textit{f}}
 \usepackage[vietnamese]{babel}
 \usepackage[T5]{fontenc}
 \usepackage{mathptmx}
@@ -82,6 +84,12 @@
   morestring=[b]',
   morestring=[b]",
   morestring=[b]`
+}
+
+\lstdefinelanguage{json}{
+  sensitive=true,
+  morestring=[b]",
+  comment=[l]{//}
 }
 
 \lstset{
@@ -492,23 +500,32 @@ Hình 1.1 mô tả chi tiết luồng xử lý và sự tương tác giữa Serv
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[node distance=1.5cm, auto, >=Stealth]
-  \tikzstyle{block} = [rectangle, draw, fill=gray!10, text width=3.4cm, text centered, rounded corners, minimum height=1.1cm, font=\small\bfseries]
-  \tikzstyle{serverblock} = [rectangle, draw=blue!70, fill=blue!5, text width=3.4cm, text centered, rounded corners, minimum height=1.1cm, font=\small\bfseries]
-  \tikzstyle{clientblock} = [rectangle, draw=red!70, fill=red!5, text width=3.4cm, text centered, rounded corners, minimum height=1.1cm, font=\small\bfseries]
+\begin{tikzpicture}[>=Stealth]
+  \tikzstyle{block} = [rectangle, draw, fill=gray!10, text width=2.9cm, align=center, rounded corners=4pt, minimum height=1.1cm, font=\small\bfseries]
+  \tikzstyle{serverblock} = [rectangle, draw=blue!70, fill=blue!5, text width=3.2cm, align=center, rounded corners=4pt, minimum height=1.1cm, font=\small\bfseries]
+  \tikzstyle{clientblock} = [rectangle, draw=red!70, fill=red!5, text width=3.2cm, align=center, rounded corners=4pt, minimum height=1.1cm, font=\small\bfseries]
   \tikzstyle{line} = [draw, ->, thick]
 
   \node [block] (client) {Trình duyệt Client};
-  \node [serverblock, right=2.0cm of client] (server) {Máy chủ Next.js (App Router)};
-  \node [serverblock, above right=0.3cm and 1.8cm of server] (rsc) {Server Components (RSC) \\ (Fetch TMDB API)};
-  \node [clientblock, below right=0.3cm and 1.8cm of server] (cc) {Client Components \\ (\texttt{"use client"})};
-  \node [block, below=1.8cm of server] (payload) {Sinh HTML ban đầu \\ \& RSC Payload Stream};
+  \node [serverblock, right=1.2cm of client] (server) {Máy chủ Next.js \\ (App Router)};
+  \node [serverblock, above right=0.5cm and 1.2cm of server] (rsc) {Server Components \\ (TMDB API Fetch)};
+  \node [clientblock, below=0.9cm of rsc] (cc) {Client Components \\ (\texttt{"use client"})};
+  \node [block, below=2.2cm of server] (payload) {Sinh HTML ban đầu \\ \& RSC Payload Stream};
 
+  % 1. Client gửi request
   \path [line] (client) -- node[above, font=\footnotesize] {1. HTTP Request} (server);
-  \path [line] (server) |- (rsc);
-  \path [line] (server) |- (cc);
-  \path [line] (rsc) |- node[right, font=\footnotesize] {2. Dựng cây RSC} (payload);
-  \path [line] (cc) |- node[right, font=\footnotesize] {3. Tạo Client Slots} (payload);
+  
+  % Phân nhánh sang RSC và CC
+  \path [line] (server.north) |- (rsc.west);
+  \path [line] (server.east) -- (cc.west);
+  
+  % 2. RSC dựng cây và chuyển về payload (vòng sang mép phải để không đè vào cc)
+  \draw [line] (rsc.east) -- ++(0.5,0) |- node[pos=0.25, right, font=\footnotesize] {2. Dựng cây RSC} ([yshift=-2mm]payload.east);
+  
+  % 3. CC tạo các vị trí nhúng Client Slots
+  \draw [line] (cc.south) |- node[pos=0.55, above, font=\footnotesize] {3. Tạo Client Slots} ([yshift=3mm]payload.east);
+  
+  % 4. Stream HTML và RSC Payload về trình duyệt
   \path [line] (payload) -| node[above, near start, font=\footnotesize] {4. HTML + RSC Payload} (client);
 \end{tikzpicture}
 \caption{Sơ đồ luồng kết xuất React Server Components và đóng gói RSC Payload (Nguồn: Xây dựng dựa trên đặc tả kỹ thuật RSC [7])}
@@ -691,8 +708,8 @@ Hệ thống MovieHub được thiết kế để mang đến trải nghiệm kh
 \textbf{Mã YC} & \textbf{Tên chức năng} & \textbf{Mô tả chi tiết yêu cầu nghiệp vụ} \\
 \midrule
 \textbf{FR01} & Duyệt phim Trang chủ & Hiển thị Hero Banner nổi bật có ảnh nền chất lượng cao, nút phát Trailer tức thì, và các hàng phim (\texttt{MovieRow}) phân loại theo Thịnh hành, Đánh giá cao, Hành động, Hài hước, Kinh dị, Anime, Khoa học viễn tưởng. Hỗ trợ cuộn ngang mượt mà. \\
-\textbf{FR02} & Tìm kiếm thời gian thực & Thanh tìm kiếm trên Header hỗ trợ Live Search Preview gợi ý tối đa 6 kết quả ngay khi người dùng gõ ký tự thông qua Server Action; đồng thời cung cấp trang tìm kiếm độc lập \texttt{/search} có cơ chế Debounce. \\
-\textbf{FR03} & Khám phá đa tiêu chí (\texttt{/browse}) & Cung cấp thanh công cụ lọc \texttt{FilterBar} 5 chiều: Thể loại, Tiêu chí sắp xếp, Điểm đánh giá tối thiểu, Năm phát hành; tích hợp phân trang số hiển thị đều đặn 24 phim/trang. \\
+\textbf{FR02} & Tìm kiếm thời gian thực & Thanh tìm kiếm trên Header hỗ trợ Live Search Preview gợi ý tối đa 5 kết quả rút gọn ngay khi người dùng gõ ký tự thông qua Route Handler / Server Action; đồng thời cung cấp trang tìm kiếm độc lập \texttt{/search} có cơ chế Debounce. \\
+\textbf{FR03} & Khám phá đa tiêu chí (\texttt{/browse}) & Cung cấp thanh công cụ lọc \texttt{FilterBar} 5 tiêu chí độc lập: (1) Định dạng nội dung (phim lẻ / phim bộ / tất cả), (2) Thể loại (19 thể loại TMDB), (3) Quốc gia sản xuất (7 quốc gia chọn lọc), (4) Năm phát hành (từ 2026 trở về trước), và (5) Sắp xếp (độ phổ biến, điểm đánh giá, ngày phát hành, doanh thu); tích hợp phân trang số hiển thị đều đặn 24 phim/trang. \\
 \textbf{FR04} & Xem chi tiết phim (\texttt{/movie/[id]}) & Hiển thị thông tin tổng quan, thời lượng, năm phát hành, điểm đánh giá TMDB (\texttt{vote\_average}), dàn diễn viên chính với slider ảnh đại diện tròn, trình phát Trailer YouTube chuẩn điện ảnh, và danh sách phim tương tự đề xuất. \\
 \textbf{FR05} & Quản lý Danh sách yêu thích & Cho phép người dùng đánh dấu hoặc xóa phim khỏi danh sách Watchlist cá nhân mà không cần tài khoản, lưu trữ bền vững qua Cookie \texttt{HttpOnly} bảo mật. \\
 \textbf{FR06} & Khám phá Phim bộ (\texttt{/tv}) & Cung cấp phân hệ duyệt danh sách phim truyền hình nhiều tập (TV Series) thịnh hành với thông tin số mùa phát sóng. \\
@@ -752,7 +769,7 @@ Hệ thống MovieHub được thiết kế theo kiến trúc 3 tầng phân l�
   };
 
   \draw [<->, very thick] (t1) -- node[right, font=\footnotesize] {HTTP Request / RSC Payload Stream \& Server Actions} (t2);
-  \draw [<->, very thick] (t2) -- node[right, font=\footnotesize] {Secure HTTPS (Custom DNS Resolver) + Bearer Token} (t3);
+  \draw [<->, very thick] (t2) -- node[right, font=\footnotesize] {Secure HTTPS (Custom DNS Resolver) + Server-side api\_key} (t3);
 \end{tikzpicture}
 \caption{Sơ đồ kiến trúc 3 tầng phân lớp hệ thống MovieHub (Nguồn: Nhóm tác giả thiết kế)}
 \label{fig:system_arch}
@@ -790,7 +807,7 @@ Mã nguồn dự án được tổ chức khoa học, tách bạch rõ ràng gi�
 Tất cả các lời gọi mạng ra ngoài TMDB đều được tập trung vào hàm cốt lõi \texttt{fetchTMDB<T>()}. Hàm này chịu trách nhiệm:
 \begin{enumerate}[noitemsep]
     \item Tự động gắn tiền tố địa chỉ máy chủ \texttt{https://api.themoviedb.org/3}.
-    \item Tự động đính kèm mã xác thực bí mật thông qua HTTP Header \texttt{Authorization: Bearer <TOKEN>}.
+    \item Tự động đính kèm mã xác thực bí mật thông qua tham số truy vấn an toàn phía server \texttt{api\_key=\$\{TMDB\_API\_KEY\}}. Phương thức này chạy 100\% trên môi trường máy chủ Node.js, không bao giờ để lộ khóa API ra phía trình duyệt client.
     \item Kiểm soát lỗi mạng và mã trạng thái HTTP, trả về thông báo lỗi chuẩn xác hoặc kích hoạt cơ chế dự phòng khi có sự cố.
 \end{enumerate}
 
@@ -850,25 +867,30 @@ Hình 2.2 thể hiện sơ đồ luồng người dùng (User Navigation Flow) k
 
 \begin{figure}[H]
 \centering
-\begin{tikzpicture}[node distance=1.6cm, auto, >=Stealth]
-  \tikzstyle{startstop} = [rectangle, rounded corners, minimum width=2.8cm, minimum height=1.0cm, text centered, draw=red!80, fill=red!10, font=\small\bfseries]
-  \tikzstyle{process} = [rectangle, minimum width=2.8cm, minimum height=1.0cm, text centered, draw=blue!80, fill=blue!10, rounded corners, font=\small\bfseries]
-  \tikzstyle{decision} = [diamond, minimum width=2.8cm, minimum height=1.0cm, text centered, draw=orange!80, fill=orange!10, font=\footnotesize\bfseries]
+\begin{tikzpicture}[>=Stealth]
+  \tikzstyle{startstop} = [rectangle, rounded corners=4pt, text width=2.9cm, align=center, minimum height=1.0cm, draw=red!80, fill=red!10, font=\small\bfseries]
+  \tikzstyle{process} = [rectangle, text width=2.9cm, align=center, minimum height=1.0cm, draw=blue!80, fill=blue!10, rounded corners=4pt, font=\small\bfseries]
   \tikzstyle{line} = [draw, ->, thick]
 
-  \node [startstop] (home) {Trang chủ (Home)};
-  \node [process, right=1.6cm of home] (trailer) {Xem Trailer Modal};
-  \node [process, below=1.2cm of home] (detail) {Chi tiết phim \texttt{/movie/[id]}};
-  \node [process, left=1.6cm of home] (browse) {Khám phá bộ lọc \texttt{/browse}};
-  \node [process, below=1.2cm of browse] (search) {Tìm kiếm Live \texttt{/search}};
-  \node [process, below=1.2cm of detail] (watch) {Danh sách Watchlist};
+  % Cột giữa: Trang chủ -> Chi tiết -> Watchlist
+  \node [startstop] (home) at (0, 0) {Trang chủ (Home)};
+  \node [process] (detail) at (0, -2.2) {Chi tiết phim \\ \texttt{/movie/[id]}};
+  \node [process] (watch) at (0, -4.2) {Danh sách Watchlist \\ \texttt{/watchlist}};
 
+  % Cột trái: Khám phá /browse
+  \node [process] (browse) at (-4.5, 0) {Khám phá bộ lọc \\ \texttt{/browse}};
+
+  % Cột phải: Xem Trailer Modal & Tìm kiếm Live
+  \node [process] (trailer) at (4.5, 0) {Xem Trailer Modal};
+  \node [process] (search) at (4.5, -2.2) {Tìm kiếm Live \\ \texttt{/search}};
+
+  % Các đường kết nối luồng
+  \path [line] (home) -- node[above, font=\footnotesize] {Menu Lọc} (browse);
   \path [line] (home) -- node[above, font=\footnotesize] {Bấm xem} (trailer);
   \path [line] (home) -- node[right, font=\footnotesize] {Chọn phim} (detail);
-  \path [line] (home) -- node[above, font=\footnotesize] {Menu Lọc} (browse);
-  \path [line] (browse) |- (detail);
-  \path [line] (home) -| node[near start, above, font=\footnotesize] {Gõ Header} (search);
-  \path [line] (search) -- (detail);
+  \path [line] (home.south east) -- node[above, sloped, font=\footnotesize] {Gõ Header} (search.north west);
+  \path [line] (browse.south) |- node[below, near end, font=\footnotesize] {Chọn phim} (detail.west);
+  \path [line] (search) -- node[above, font=\footnotesize] {Chọn phim} (detail);
   \path [line] (detail) -- node[right, font=\footnotesize] {Thêm/Xóa} (watch);
 \end{tikzpicture}
 \caption{Sơ đồ luồng điều hướng trải nghiệm người dùng trong hệ thống MovieHub (Nguồn: Nhóm tác giả thiết kế)}
@@ -900,8 +922,9 @@ npx create-next-app@latest moviehub --typescript --tailwind --app --eslint
 
 Để bảo mật các khóa truy cập dữ liệu, tệp cấu hình môi trường \texttt{.env.local} được thiết lập độc quyền trên máy chủ:
 \begin{lstlisting}[language=bash]
-TMDB_API_KEY=da3108c90b63b27b53874052f75a68d0
-TMDB_ACCESS_TOKEN=eyJhbGciOiJIUzI1NiJ9...
+TMDB_API_KEY=your_tmdb_api_key_here
+TMDB_BASE_URL=https://api.themoviedb.org/3
+TMDB_IMAGE_BASE_URL=https://image.tmdb.org/t/p
 \end{lstlisting}
 Lưu ý quan trọng: Nhóm chủ động \textbf{không} sử dụng tiền tố \texttt{NEXT\_PUBLIC\_} để ngăn chặn hoàn toàn việc trình biên dịch Next.js nhúng khóa bí mật vào gói JavaScript nạp về trình duyệt.
 
@@ -1049,7 +1072,7 @@ Component \texttt{MovieRow.tsx} mang lại trải nghiệm cuộn phim đặc tr
 \subsubsection{Module FilterBar \& Trang Khám phá \texttt{/browse}}
 Trang \texttt{/browse} cung cấp bộ công cụ tìm kiếm điện ảnh chuyên sâu:
 \begin{itemize}[noitemsep]
-    \item Thanh công cụ \texttt{FilterBar} cho phép kết hợp đồng thời 5 tiêu chí: Thể loại (Genre), Sắp xếp theo độ phổ biến / điểm số / ngày ra mắt, Điểm đánh giá tối thiểu (từ 1 đến 9 sao), và Năm phát hành.
+    \item Thanh công cụ \texttt{FilterBar} cho phép kết hợp đồng thời 5 tiêu chí độc lập: (1) Định dạng nội dung (\texttt{type}: Phim lẻ, Phim bộ, Tất cả), (2) Thể loại (\texttt{genre}: 19 thể loại phim TMDB), (3) Quốc gia (\texttt{country}: 7 quốc gia chọn lọc), (4) Năm phát hành (\texttt{year}: từ 2026 trở về trước), và (5) Sắp xếp (\texttt{sortBy}: độ phổ biến, điểm số, ngày ra mắt, doanh thu).
     \item \textbf{Thuật toán phân trang số (Numeric Pagination) bù trang:} Do TMDB API cố định trả về 20 phim trên mỗi trang, nhóm xây dựng thuật toán bù trừ trong \texttt{services/tmdb.ts} để luôn gom đủ chính xác 24 phim/trang, đảm bảo lưới hiển thị luôn lấp đầy các hàng 6 cột trên màn hình lớn.
 \end{itemize}
 
@@ -1079,9 +1102,12 @@ if (typeof window === "undefined" && dns && dns.lookup) {
 
   // @ts-expect-error Node.js internal lookup overload
   dns.lookup = function (hostname: string, options: unknown, callback: unknown) {
-    let cb = callback as Function;
-    let opt = (typeof options === "function" ? {} : options) as any;
-    if (typeof options === "function") cb = options;
+    let cb = callback as (err: Error | null, address?: unknown, family?: number) => void;
+    let opt = options as Record<string, unknown> | undefined;
+    if (typeof options === "function") {
+      cb = options as typeof cb;
+      opt = {};
+    }
 
     if (hostname && hostname.includes("themoviedb.org")) {
       resolver.resolve4(hostname)
@@ -1189,13 +1215,13 @@ Bảng 4.1 tổng hợp chi tiết 10 kịch bản kiểm thử (Test Cases) ph�
 \toprule
 \textbf{Mã} & \textbf{Chức năng kiểm thử} & \textbf{Kịch bản thực hiện} & \textbf{Kết quả kỳ vọng} & \textbf{Kết quả} \\
 \midrule
-\textbf{TC01} & Điều hướng Trang chủ & Truy cập đường dẫn gốc \texttt{/}. & Hiển thị Hero Banner đầy đủ ảnh nền chất lượng cao và 7 hàng phim cuộn ngang. & \textbf{ĐẠT} \\
+\textbf{TC01} & Điều hướng Trang chủ & Truy cập đường dẫn gốc \texttt{/}. & Hiển thị Hero Banner đầy đủ ảnh nền chất lượng cao và 5 hàng phim cuộn ngang chuẩn Netflix (trong đó có hàng TOP 10 với số thứ tự lớn). & \textbf{ĐẠT} \\
 \textbf{TC02} & Phát Trailer tức thì & Nhấp nút ``Xem Trailer'' tại Hero Banner. & Mở TrailerModal nổi giữa màn hình, tự động phát video YouTube trailer chuẩn. & \textbf{ĐẠT} \\
 \textbf{TC03} & Cuộn hàng phim MovieRow & Nhấp nút mũi tên phải trên thanh cuộn phim. & Hàng phim cuộn mượt mà sang phải; đến cuối hàng tự xử lý biên dính không giật. & \textbf{ĐẠT} \\
 \textbf{TC04} & Chi tiết phim \& Streaming & Truy cập trang \texttt{/movie/550} (Fight Club). & Hiển thị ngay thông tin chính; danh sách diễn viên và phim tương tự hiện Skeleton rồi stream về đầy đủ. & \textbf{ĐẠT} \\
 \textbf{TC05} & Bộ lọc đa chiều \texttt{/browse} & Chọn Thể loại ``Hành động'' và Sắp xếp theo ``Điểm đánh giá''. & Danh sách lọc cập nhật chính xác danh sách phim thỏa mãn cả hai tiêu chí. & \textbf{ĐẠT} \\
 \textbf{TC06} & Phân trang số bù trừ & Nhấp chuyển sang trang 2 tại trang \texttt{/browse}. & Hiển thị đều đặn chính xác 24 phim/trang; thanh URL cập nhật \texttt{page=2}. & \textbf{ĐẠT} \\
-\textbf{TC07} & Tìm kiếm Live Search & Gõ từ khóa ``Batman'' vào thanh tìm kiếm trên Header. & Dropdown hiển thị ngay tối đa 6 phim phù hợp trong vòng dưới 200ms. & \textbf{ĐẠT} \\
+\textbf{TC07} & Tìm kiếm Live Search & Gõ từ khóa ``Batman'' vào thanh tìm kiếm trên Header. & Dropdown hiển thị ngay tối đa 5 phim phù hợp trong vòng dưới 200ms. & \textbf{ĐẠT} \\
 \textbf{TC08} & Thêm/Xóa Watchlist & Bấm nút ``+ Danh sách'' tại thẻ phim. & Phim được lưu vào Cookie \texttt{HttpOnly}; trang \texttt{/watchlist} cập nhật tức thì. & \textbf{ĐẠT} \\
 \textbf{TC09} & Khám phá Phim bộ \texttt{/tv} & Nhấp vào liên kết ``Phim bộ'' trên thanh điều hướng. & Trang hiển thị danh sách các TV Series thịnh hành kèm số mùa phát sóng. & \textbf{ĐẠT} \\
 \textbf{TC10} & Chịu lỗi mạng DNS Resolver & Giả lập chặn phân giải DNS của TMDB (trỏ sai địa chỉ IP trong cấu hình DNS máy chủ cục bộ). & Ứng dụng tự động kích hoạt Resolver Google 8.8.8.8 và Cloudflare 1.1.1.1 qua hook \texttt{dns.lookup}, trang web vẫn tải dữ liệu TMDB thành công. & \textbf{ĐẠT} \\
@@ -1242,14 +1268,14 @@ Khi thực thi lệnh biên dịch sản phẩm \texttt{npm run build}, trình b
 \toprule
 \textbf{Tuyến đường (Route)} & \textbf{Ký hiệu / Loại} & \textbf{Chu kỳ Revalidate} & \textbf{Cơ chế và Nguyên nhân kỹ thuật} \\
 \midrule
-\texttt{/} (Trang chủ) & \texttt{○ (Static)} & 30m (Expire 1y) & Trang tĩnh sinh sẵn lúc build; tự động gom thời gian revalidate nhỏ nhất (1800s của Now Playing) để tái tạo định kỳ (ISR). \\
-\texttt{/\_not-found} & \texttt{○ (Static)} & Không áp dụng & Trang 404 tĩnh xuất HTML sẵn. \\
-\texttt{/api/search} & \texttt{ƒ (Dynamic)} & On-demand & Route Handler RESTful nhận tham số \texttt{query}; hỗ trợ phản hồi có tiêu đề Cache-Control \texttt{s-maxage=120}. \\
-\texttt{/browse} & \texttt{ƒ (Dynamic)} & On-demand & Đọc \texttt{searchParams} để lọc đa chiều; API fetch bên dưới cache 1800s. \\
-\texttt{/movie/[id]} & \texttt{ƒ (Dynamic)} & On-demand & Nhận tham số \texttt{id} động kết hợp Streaming Suspense; API fetch bên dưới cache 3600s. \\
-\texttt{/search} & \texttt{ƒ (Dynamic)} & On-demand & Đọc \texttt{searchParams.q} và bộ lọc; API search fetch bên dưới cache 300s. \\
-\texttt{/tv} & \texttt{ƒ (Dynamic)} & On-demand & Đọc \texttt{searchParams.page}; API discover fetch bên dưới cache 1800s. \\
-\texttt{/watchlist} & \texttt{ƒ (Dynamic)} & On-demand & Đọc \texttt{cookies('mh\_watchlist')} để cá nhân hóa danh sách phim. \\
+\texttt{/} (Trang chủ) & $\circ$ \texttt{(Static)} & 30m (Expire 1y) & Trang tĩnh sinh sẵn lúc build; tự động gom thời gian revalidate nhỏ nhất (1800s của Now Playing) để tái tạo định kỳ (ISR). \\
+\texttt{/\_not-found} & $\circ$ \texttt{(Static)} & Không áp dụng & Trang 404 tĩnh xuất HTML sẵn. \\
+\texttt{/api/search} & $f$ \texttt{(Dynamic)} & On-demand & Route Handler RESTful nhận tham số \texttt{query}; hỗ trợ phản hồi có tiêu đề Cache-Control \texttt{s-maxage=120}. \\
+\texttt{/browse} & $f$ \texttt{(Dynamic)} & On-demand & Đọc \texttt{searchParams} để lọc đa chiều; API fetch bên dưới cache 1800s. \\
+\texttt{/movie/[id]} & $f$ \texttt{(Dynamic)} & On-demand & Nhận tham số \texttt{id} động kết hợp Streaming Suspense; API fetch bên dưới cache 3600s. \\
+\texttt{/search} & $f$ \texttt{(Dynamic)} & On-demand & Đọc \texttt{searchParams.q} và bộ lọc; API search fetch bên dưới cache 300s. \\
+\texttt{/tv} & $f$ \texttt{(Dynamic)} & On-demand & Đọc \texttt{searchParams.page}; API discover fetch bên dưới cache 1800s. \\
+\texttt{/watchlist} & $f$ \texttt{(Dynamic)} & On-demand & Đọc \texttt{cookies('mh\_watchlist')} để cá nhân hóa danh sách phim. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1330,34 +1356,8 @@ Bảng~\ref{tab:coverage_matrix} tổng kết ma trận đối sánh kỹ thuậ
 \midrule
 \multirow{3}{2.0cm}{\textbf{Tầng 2} \newline (Kỹ nghệ phần mềm)} 
 & Quản lý mã nguồn Git & 4 nhánh tính năng độc lập, 6 Pull Request review chéo & GitHub Repository Git Tree \\
-& An toàn kiểu dữ liệu & TypeScript 100\% chế độ Strict Mode không dùng \texttt{any} & \texttt{types/tmdb.ts}, \texttt{tsconfig.json} \\
+& An toàn kiểu dữ liệu & TypeScript chế độ Strict Mode, kiểm soát chặt chẽ kiểu dữ liệu, loại bỏ \texttt{any} trong mã nguồn ứng dụng (sử dụng \texttt{unknown} và type assertions an toàn) & \texttt{types/tmdb.d.ts}, \texttt{tsconfig.json} \\
 & Chịu lỗi mạng nâng cao & DNS Fallback Resolver ghi đè \texttt{dns.lookup} qua \texttt{Resolver} & \texttt{services/tmdb.ts} \\
-\bottomrule
-\end{tabularx}
-\end{table}
-
-\subsection{Kịch bản vấn đáp bảo vệ đồ án (Viva Voce Scenarios)}
-Để chuẩn bị chu đáo cho buổi bảo vệ đồ án trước Hội đồng giám khảo, nhóm đã xây dựng và thực nghiệm trả lời 6 câu hỏi tình huống kỹ thuật chuyên sâu thường gặp trong Bảng~\ref{tab:viva_scenarios}.
-
-\begin{table}[H]
-\centering
-\caption{Bảng kịch bản vấn đáp bảo vệ đồ án trước Hội đồng chuyên môn (Nguồn: Nhóm tác giả tổng hợp)}
-\label{tab:viva_scenarios}
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{4.2cm}>{\raggedright\arraybackslash}X}
-\toprule
-\textbf{Câu hỏi tình huống của GVHD} & \textbf{Câu trả lời bảo vệ của nhóm sinh viên} \\
-\midrule
-\textit{``Tại sao nhóm lại sử dụng Server Component làm mặc định mà không dùng Client Component cho toàn bộ trang web?''} & Server Component giúp loại bỏ hoàn toàn mã JavaScript của component khỏi gói tải về trình duyệt (Zero-bundle), cho phép truy xuất trực tiếp các bí mật máy chủ mà không sợ lộ khóa API, đồng thời tạo ra tài liệu HTML hoàn chỉnh giúp tăng tốc độ hiển thị và tối ưu hóa SEO tối đa. \\
-\midrule
-\textit{``Cơ chế Streaming Suspense hoạt động như thế nào qua giao thức HTTP?''} & Next.js tận dụng cơ chế phân đoạn HTTP Chunked Transfer Encoding. Máy chủ gửi ngay phần HTML ban đầu chứa khung sườn giao diện; kết nối vẫn được giữ mở. Khi các truy vấn dữ liệu chậm (như danh sách diễn viên) hoàn tất, máy chủ tiếp tục đẩy các khối HTML và đoạn script tự động thay thế phần Skeleton mà không cần nạp lại trang. \\
-\midrule
-\textit{``Server Action khác gì so với việc viết một API Route truyền thống?''} & Server Action loại bỏ nhu cầu khởi tạo các endpoint URL trung gian, thiết lập headers, phương thức POST và giải mã JSON thủ công. Bản chất là lời gọi RPC an toàn, có thể gọi trực tiếp từ sự kiện client, đồng thời tự động tích hợp cơ chế tái tạo bộ nhớ đệm \texttt{revalidatePath}. \\
-\midrule
-\textit{``Tại sao Next.js 16 vẫn hỗ trợ \texttt{fetch(..., \{ next: \{ revalidate \} \})} và khi nào cần chuyển sang cờ thực nghiệm \texttt{cacheComponents} với \texttt{use cache}?''} & \texttt{fetch(url, \{ next: \{ revalidate \} \})} là API ổn định (Stable API) được đặc tả chính thức trong tài liệu Next.js, hoạt động tin cậy trong môi trường sản xuất mà không yêu cầu bật cờ thực nghiệm. Nhóm duy trì cấu hình mặc định \texttt{cacheComponents: false} để đảm bảo tính ổn định tối đa. Khi kiến trúc ứng dụng mở rộng cần lưu đệm toàn bộ component phức tạp hoặc các tính toán CPU nặng độc lập với \texttt{fetch}, lập trình viên có thể kích hoạt \texttt{cacheComponents: true} kết hợp chỉ thị \texttt{use cache} và các hồ sơ thời gian sống \texttt{cacheLife} theo chuẩn React 19 Canary. \\
-\midrule
-\textit{``Làm thế nào để ứng dụng đạt chỉ số CLS = 0.000 tuyệt đối?''} & Nhóm sử dụng component \texttt{next/image} bọc trong các khung chứa có tỉ lệ khung hình cố định thông qua lớp tiện ích Tailwind \texttt{aspect-[2/3]} và \texttt{aspect-video}. Nhờ đó, trình duyệt luôn tính toán trước không gian hiển thị của ảnh trước khi tệp ảnh thực tế được tải xong. \\
-\midrule
-\textit{``Giải pháp DNS Fallback Resolver giải quyết bài toán gì trong thực tế?''} & Một số nhà mạng tại Việt Nam thỉnh thoảng gặp lỗi phân giải tên miền đối với máy chủ \texttt{api.themoviedb.org}. Cơ chế này can thiệp vào tầng socket mạng của Node.js, tự động chuyển hướng sang DNS công cộng của Google (\texttt{8.8.8.8}) và Cloudflare (\texttt{1.1.1.1}) khi phát hiện mã lỗi \texttt{ENOTFOUND}, đảm bảo ứng dụng không bao giờ bị gián đoạn dữ liệu. \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1597,5 +1597,42 @@ function deduplicateMovies(movies: Movie[]): Movie[] {
   return unique;
 }
 \end{lstlisting}
+
+\subsection*{Phụ lục 5. Khai báo sử dụng Trí tuệ Nhân tạo (AI Disclosure)}
+Tuân thủ chuẩn mực liêm chính học thuật và rubric đánh giá đồ án môn học, nhóm sinh viên công khai minh bạch toàn bộ quá trình sử dụng các công cụ Trí tuệ Nhân tạo (AI) trong quá trình thực hiện đề tài:
+
+\paragraph*{1. Mục đích và phạm vi sử dụng AI:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Công cụ sử dụng:} Claude 3.5 Sonnet (Anthropic) và Gemini 1.5 Pro / Antigravity Assistant.
+    \item \textbf{Mục đích hỗ trợ:} Tra cứu nhanh các tài liệu kỹ thuật cập nhật của Next.js 16 và React 19; gợi ý cấu trúc cú pháp tiện ích Tailwind CSS v4; hỗ trợ rà soát chính tả, cấu trúc bảng biểu và định dạng câu lệnh LaTeX theo quy chuẩn học thuật.
+\end{itemize}
+
+\paragraph*{2. Trách nhiệm và phạm vi kiểm chứng của nhóm sinh viên:}
+Toàn bộ mã nguồn thực thi, kiến trúc phân tầng hệ thống, việc lựa chọn ranh giới Server/Client Components, cơ chế kiểm soát bộ nhớ đệm Caching/ISR, giải pháp hạ tầng DNS Fallback Resolver, và toàn bộ 10 kịch bản kiểm thử (TC01--TC10) cùng các phép đo hiệu năng đều do các thành viên trong nhóm trực tiếp lập trình, thực thi lệnh trên môi trường máy chủ cục bộ và tự chịu trách nhiệm về tính chính xác kỹ thuật. Nhóm không sao chép mã nguồn nguyên khối từ AI mà không qua phân tích bản chất.
+
+\paragraph*{3. Các tình huống cụ thể AI đưa ra thông tin không chính xác và cách nhóm khắc phục:}
+Trong quá trình phát triển dự án, nhóm đã phát hiện và xử lý ít nhất 3 tình huống kỹ thuật mà các mô hình AI cung cấp câu trả lời sai lệch hoặc không phù hợp với thực tế:
+\begin{enumerate}
+    \item \textbf{Tình huống 1: Nhầm lẫn về cơ chế hoạt động của DNS trong Node.js runtime.}
+    \begin{itemize}[noitemsep]
+        \item \textit{Phát biểu sai của AI:} Khi gặp vấn đề ISP tại Việt Nam chặn tên miền \texttt{api.themoviedb.org}, AI đề xuất dùng lệnh \texttt{dns.setServers(["8.8.8.8"])} ở đầu tệp dịch vụ để ép ứng dụng sử dụng Google DNS.
+        \item \textit{Cách phát hiện:} Khi chạy thử nghiệm, ứng dụng vẫn ném ra lỗi mạng \texttt{ENOTFOUND}. Nhóm tra cứu tài liệu kỹ thuật chính thức của Node.js (\cite{nodejs_dns}) và phát hiện: \texttt{dns.setServers()} chỉ có tác dụng đối với nhóm hàm \texttt{dns.resolve*}, hoàn toàn không tác động đến hàm \texttt{dns.lookup} mà API \texttt{fetch()} mặc định sử dụng để mở socket kết nối.
+        \item \textit{Cách khắc phục của nhóm:} Nhóm loại bỏ đề xuất của AI và tự triển khai kỹ thuật monkey-patching ghi đè trực tiếp hàm \texttt{dns.lookup} của Node.js thông qua đối tượng \texttt{dns.promises.Resolver}, chuyển hướng truy vấn domain sang Google DNS (\texttt{8.8.8.8}) và Cloudflare (\texttt{1.1.1.1}) thành công.
+    \end{itemize}
+
+    \item \textbf{Tình huống 2: Đề xuất cú pháp đồng bộ cũ của Next.js 14 cho Dynamic Route params.}
+    \begin{itemize}[noitemsep]
+        \item \textit{Phát biểu sai của AI:} AI sinh mã nguồn component trang chi tiết \texttt{app/movie/[id]/page.tsx} và hàm \texttt{generateMetadata} với cách bóc tách đồng bộ truyền thống: \texttt{const \{ id \} = params;}.
+        \item \textit{Cách phát hiện:} Khi biên dịch dự án bằng lệnh \texttt{npm run build} trên Next.js 16.3.6, trình biên dịch báo lỗi nghiêm trọng yêu cầu \texttt{params} bắt buộc phải được xử lý như một Promise (\textit{``params should be awaited before using its properties in Next.js 15+''}).
+        \item \textit{Cách khắc phục của nhóm:} Nhóm định nghĩa lại kiểu dữ liệu \texttt{params: Promise<\{ id: string \}>} và bổ sung từ khóa \texttt{await params} trước khi truy xuất giá trị \texttt{id}, đảm bảo tương thích tuyệt đối với quy chuẩn bất đồng bộ mới của Next.js 16.
+    \end{itemize}
+
+    \item \textbf{Tình huống 3: Lạm dụng Server Action cho tính năng tìm kiếm gõ phím trực tiếp (Live Search).}
+    \begin{itemize}[noitemsep]
+        \item \textit{Phát biểu sai của AI:} AI gợi ý gắn trực tiếp Server Action \texttt{quickSearchAction} vào sự kiện \texttt{onChange} của ô nhập tìm kiếm trên thanh điều hướng.
+        \item \textit{Cách phát hiện:} Phân tích kiến trúc cho thấy Server Actions sử dụng phương thức HTTP POST, thực thi tuần tự trong hàng đợi xử lý của React (action queue), không hỗ trợ lưu đệm HTTP Cache của trình duyệt/CDN, và không thể hủy bỏ bằng \texttt{AbortController} khi người dùng gõ phím liên tục, dẫn đến nguy cơ xung đột kết quả (race condition) và lãng phí tài nguyên máy chủ.
+        \item \textit{Cách khắc phục của nhóm:} Nhóm quyết định phân tách ranh giới rõ ràng: Server Action chỉ dùng cho các thao tác biến đổi dữ liệu (Mutations) như thêm/xóa Watchlist; còn đối với Live Search, nhóm xây dựng thêm Route Handler chuẩn RESTful \texttt{GET /api/search?q=...} hỗ trợ tiêu đề \texttt{Cache-Control} và tích hợp \texttt{AbortController} ở phía Client Component \texttt{NavSearchBar.tsx} để tự động hủy các yêu cầu cũ khi người dùng gõ phím tiếp.
+    \end{itemize}
+\end{enumerate}
 
 \end{document}
