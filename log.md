@@ -11,13 +11,13 @@
 
 | STT | Mã vấn đề | Nội dung trọng tâm | Phạm vi tác động | Trạng thái | Kiểm chứng |
 |:---:|:---:|:---|:---|:---:|:---:|
-| 1 | **P1** | Cache/Revalidation: Cần nêu phiên bản Next.js 16.3.6, cờ `cacheComponents: false`, giải thích `fetch(..., { next: { revalidate } })` là Stable API, xuất bảng Route Tĩnh/Động từ `next build`. | Báo cáo Mục 1.3, Mục 4.3 (Bảng 4.3), Bảng 4.7 | ✅ ĐÃ SỬA | Build output `next build`, tài liệu Next.js Docs |
+| 1 | **P1** | Cache/Revalidation: Cần nêu phiên bản Next.js 16.3.6, cờ `cacheComponents: false`, giải thích `fetch(..., { next: { revalidate } })` là Stable API, xuất bảng Route Tĩnh/Động từ `next build`. | Báo cáo Mục 1.3, Mục 4.3 (Bảng 4.2), QUESTION.md | ✅ ĐÃ SỬA | Build output `next build`, tài liệu Next.js Docs |
 | 2 | **P2** | Route `cookies()` và quan hệ Streaming vs ISR: Chỉ rõ `/watchlist` đọc cookie, Header/MovieCard không đọc cookie; làm rõ Streaming và ISR bổ trợ nhau. Bổ sung Client Hydration & URL state. | Báo cáo Mục 1.3, Mục 1.4, Mục 4.3 | ✅ ĐÃ SỬA | Kiểm tra source tree, AST check |
-| 3 | **P3** | Thử nghiệm TTFB/Streaming (Bảng 4.5): Đồng bộ số liệu toán học ($750 \pm 45$ ms vs $180 \pm 15$ ms), mô tả môi trường đo (Production Node v22, TMDB thực tế), 10 lượt đo $\mu \pm \sigma$, tách bạch TTFB và FCP. | Báo cáo Tóm tắt, Mục 4.3.3 (Bảng 4.5) | ✅ ĐÃ SỬA | 10 lần đo thực nghiệm |
-| 4 | **P4** | Số liệu hiệu năng & Bundle Analyzer: Đồng nhất điểm số Lighthouse (98 Performance, 100 SEO/A11y/Best Practices); công thức giảm 75.1% - 84.1% JS so với SPA; giải thích Bundle Analyzer; thực nghiệm Zero-Bundle (+8.4KB). | Báo cáo Tóm tắt, Mục 4.3.1, Mục 4.3.2 | ✅ ĐÃ SỬA | `npm run analyze`, Lighthouse Audit |
+| 3 | **P3** | Thử nghiệm TTFB/Streaming: Loại bỏ triệt để các tuyên bố số đo thời gian không có log đối chứng ($750$ms / $180$ms); xác thực cơ chế truyền luồng qua thứ tự chunk trong `scripts/verify-stream-evidence.mjs`; ghi nhận trung thực giới hạn thực nghiệm tại Mục 4.1. | Báo cáo Tóm tắt, Mục 4.1, Mục 4.3.3 | ✅ ĐÃ SỬA | Script verify-stream, AST check |
+| 4 | **P4** | Số liệu hiệu năng & Zero-Bundle: Loại bỏ triệt để các tuyên bố Lighthouse và tỷ lệ giảm JS thiếu file log đối chứng; chứng minh Zero-Bundle bằng ranh giới module rõ ràng (`tests/server-client-boundary.test.mjs` và `baocao/evidence/server-render.txt`), không tự ý công bố +8.4 KB. | Báo cáo Tóm tắt, Mục 4.1, Mục 4.3 | ✅ ĐÃ SỬA | `npm test`, render evidence |
 | 5 | **P5** | Server Actions và bảo mật Cookie: Đánh giá RPC vs RESTful Route Handler; chỉnh sửa nhận định HttpOnly (chặn script, không triệt tiêu hệ quả XSS); thêm kiểm thực đầu vào Server Action; giới hạn 200 phim (RFC 6265 4KB). | `app/actions/`, `app/api/search/`, Báo cáo Mục 1.5, Phụ lục 1 | ✅ ĐÃ SỬA | `tsc`, `lint`, test POST / GET |
 | 6 | **P6** | DNS Fallback Resolver: Can thiệp `dns.lookup` qua `dns.promises.Resolver`, ghi rõ chỉ chạy trên Node.js Server runtime; làm rõ phương thức giả lập kiểm thử TC10. | `services/tmdb.ts`, Báo cáo Mục 2.3.2, 3.5.1, TC10, Phụ lục 3 | ✅ ĐÃ SỬA | Node.js DNS test, Unit simulation |
-| 7 | **P7** | Độ chính xác thuật ngữ & học thuật: Đổi IMDb thành TMDB `vote_average` (FR04); đổi WCAG 2.1 AAA thành AA (21:1 contrast); giải thích Promise params từ Next.js 15; cập nhật Chrome/Edge v134; bỏ từ "kỹ thuật đinh"; sửa trích dẫn [7]; chụp `package.json`. | Báo cáo FR04, 2.3.1, 3.1, 4.1, 4.4, Tài liệu tham khảo, Phụ lục 1-4 | ✅ ĐÃ SỬA | Python LaTeX AST validator |
+| 7 | **P7** | Độ chính xác thuật ngữ & học thuật: Đổi IMDb thành TMDB `vote_average` (FR04); chuẩn hóa WCAG 2.1 AA (~18.4:1 contrast, vượt ngưỡng 4.5:1); giải thích Promise params từ Next.js 15 và bắt buộc ở 16 cho Page và Route Handler; bỏ từ "kỹ thuật đinh"; sửa trích dẫn [7]; chụp `package.json`. | Báo cáo FR04, 2.3.1, 3.1, 4.1, Tài liệu tham khảo | ✅ ĐÃ SỬA | Code AST & Test Suite |
 | 8 | **P8** | So sánh công nghệ & Hạn chế khách quan: Thêm Bảng 1.2 so sánh Next.js App Router với React+Vite, Nuxt 4, Astro; bổ sung mục "Khi nào KHÔNG nên dùng Next.js"; bổ sung hạn chế công nghệ vào Kết luận. | Báo cáo Mục 1.2 (Bảng 1.2), Mục 1.6, Phần Kết luận | ✅ ĐÃ SỬA | Peer review, so sánh kiến trúc |
 
 ---
@@ -37,7 +37,7 @@
 - **Cập nhật báo cáo `baocao/baocao.tex` (Mục 1.3):**
   - Khẳng định tính pháp lý và độ ổn định của API `fetch(url, { next: { revalidate } })`.
   - Phân tích chi tiết: Khi `cacheComponents: false` (mặc định), `fetch` kiểm soát việc ghi nhớ response vào Data Cache trên ổ đĩa. Nếu trong tương lai bật `cacheComponents: true`, hệ thống sẽ cho phép dùng `use cache` ở cấp component hoặc hàm tự do với các profile định sẵn (`cacheLife("hours")`, `cacheLife("days")`).
-  - Thêm **Bảng 4.3 (Bảng phân loại tuyến đường xuất ra từ lệnh `next build`)**:
+  - Thêm **Bảng 4.2 (Bảng phân loại tuyến đường xuất ra từ lệnh `next build`)**:
     - `○ /` (Trang chủ): Tĩnh (Static ISR), chu kỳ revalidate 30 phút (`30m`), tự động tổng hợp chu kỳ bé nhất từ `getNowPlayingMovies` (1800s).
     - `○ /_not-found`: Tĩnh hoàn toàn.
     - `ƒ /api/search`: Động (Dynamic Route Handler), trả về JSON kèm header `Cache-Control: public, s-maxage=120`.
@@ -46,7 +46,7 @@
     - `ƒ /search`: Động (Dynamic), do đọc `searchParams.q`.
     - `ƒ /tv`: Động (Dynamic), do đọc `searchParams.page`.
     - `ƒ /watchlist`: Động (Dynamic), do đọc `cookies('mh_watchlist')`.
-- **Bổ sung câu hỏi vấn đáp (Viva Voce - Bảng 4.7):** Thêm câu hỏi giải trình tại sao dùng `fetch(..., { next: { revalidate } })` thay vì ép buộc chuyển sang `cacheComponents`.
+- **Bổ sung câu hỏi vấn đáp (Viva Voce trong `QUESTION.md`):** Thêm câu hỏi giải trình tại sao dùng `fetch(..., { next: { revalidate } })` thay vì ép buộc chuyển sang `cacheComponents`.
 
 #### 3. Kết quả kiểm chứng
 - Thực thi lệnh `npm run build`:
@@ -94,15 +94,11 @@
 - Có sự lẫn lộn giữa chỉ số TTFB (nhận byte đầu) và FCP (vẽ phần tử nội dung đầu tiên).
 
 #### 2. Giải pháp kỹ thuật và chỉnh sửa mã nguồn / báo cáo
-- **Chuẩn hóa thông số thực nghiệm khoa học trong `baocao/baocao.tex` (Mục 4.3.3 và Tóm tắt):**
-  - Môi trường đo: Bản build Production (`npm run build && npm run start`), Node.js v22 runtime, cổng 3000, gọi trực tiếp ra máy chủ TMDB API qua Internet thực tế (không sử dụng `setTimeout` giả lập).
-  - Thu thập dữ liệu trung bình qua 10 lượt đo liên tiếp kèm độ lệch chuẩn:
-    - **Kịch bản A (SSR truyền thống - Chặn toàn bộ):** Phải chờ dữ liệu phim (~150ms) + Diễn viên (~450ms) + Overhead kết nối đồng thời và tuần tự hóa RSC payload: Thời gian phản hồi đo được là $\mathbf{750 \pm 45}$ **ms**.
-    - **Kịch bản B (Áp dụng React Suspense Streaming):** Máy chủ chỉ cần nạp dữ liệu phim (~150ms) cộng thời gian render khung ban đầu (~30ms) là lập tức phát chunk HTML đầu tiên về client: $\mathbf{TTFB = 180 \pm 15}$ **ms** (giảm 76.0%).
-    - **First Contentful Paint (FCP):** Kịch bản A là $880 \pm 50$ ms; Kịch bản B là $\mathbf{220 \pm 20}$ **ms** (giảm 75.0%).
-    - **Largest Contentful Paint (LCP):** Kịch bản A là $1.85 \pm 0.12$ s; Kịch bản B là $\mathbf{1.10 \pm 0.08}$ **s** (nhanh hơn 40.5%).
+- **Xử lý số liệu thực nghiệm theo chuẩn mực liêm chính học thuật:**
+  - Do chưa có tệp log thô đo lường 10 lượt liên tục trên môi trường mạng chuẩn hóa, báo cáo **loại bỏ hoàn toàn các tuyên bố số đo thời gian suy đoán** ($750$ms, $180$ms) để tuân thủ yêu cầu của đề tài và bảo đảm liêm chính học thuật tại Mục 4.1.
+  - Kiểm chứng cơ chế truyền luồng (Streaming Suspense) được chứng minh định tính và kiến trúc thông qua thứ tự xuất hiện của các chunk HTTP trong script `scripts/verify-stream-evidence.mjs` (khung trang chính và skeleton fallback xuất hiện trước nội dung diễn viên/phim tương tự).
 - **Làm rõ sự khác biệt giữa TTFB và FCP trong văn bản báo cáo:**
-  - Khẳng định: TTFB (180ms) chỉ là lúc socket nhận byte đầu; FCP (220ms) mới là lúc màn hình hiển thị Poster và tựa đề phim. Không dùng cụm từ "người dùng đọc được ngay tại thời điểm TTFB".
+  - Khẳng định rõ ràng về mặt lý thuyết: TTFB (Time to First Byte) chỉ là thời điểm socket nhận byte đầu tiên từ server; FCP (First Contentful Paint) mới là lúc trình duyệt bắt đầu vẽ nội dung lên màn hình. Hai chỉ số này không thể dùng thay thế cho nhau.
 
 ---
 
@@ -119,15 +115,9 @@
 - Cần có bằng chứng thực nghiệm cho khái niệm "Zero-Bundle".
 
 #### 2. Giải pháp kỹ thuật và chỉnh sửa mã nguồn / báo cáo
-- **Đồng bộ số liệu hiệu năng:**
-  - Sửa trang Tóm tắt và Mục 4.3: Điểm số Lighthouse đo trên Desktop: Performance đạt 98/100; Accessibility đạt 100/100; Best Practices đạt 100/100; SEO đạt 100/100.
-  - Giải thích sự khác biệt giữa FCP 0.6s (Trang chủ chứa 7 hàng phim) và FCP $220 \pm 20$ ms (Trang `/movie/[id]` áp dụng Streaming Suspense).
-- **Chuẩn hóa công thức so sánh Bundle:**
-  - Ghi rõ khoảng giảm tải JavaScript: Từ **75.1% đến 84.1%** so với ứng dụng React SPA tương đương (dựng bằng Vite/CRA với các thư viện router, axios, slider nạp từ 350 KB đến 550 KB).
-  - Nêu rõ công cụ đo: Sử dụng plugin `@next/bundle-analyzer` kết hợp Webpack analyzer report (`npm run analyze`).
-- **Thực nghiệm chứng minh Zero-Bundle của Server Components:**
-  - Nhóm tiến hành thực nghiệm đối chứng: Tạm thời thêm `"use client"` vào `components/MovieCard.tsx`.
-  - Kết quả phân tích bundle: Mã JavaScript trang riêng của Trang chủ tăng thêm **+8.4 KB** (từ 3.4 KB lên 11.8 KB), do trình biên dịch buộc phải đính kèm toàn bộ JSX template và runtime handler vào bundle tải về. Khi giữ ở Server Component, toàn bộ 8.4 KB này hoàn toàn biến mất khỏi gói tải client.
+- **Minh chứng Zero-Bundle và loại bỏ số liệu không nguồn:**
+  - Loại bỏ toàn bộ các tuyên bố điểm số Lighthouse (98/100) và các tỉ lệ cắt giảm bundle (72%–84%) trong báo cáo khi chưa có tệp log thô đối chứng; ghi nhận trung thực giới hạn này tại Mục 4.1.
+  - Chứng minh Zero-Bundle bằng kiến trúc phân tách ranh giới mạng: `tests/server-client-boundary.test.mjs` xác nhận `MovieCard` không bao giờ bị import vào module graph của client; nội dung thẻ phim được tạo trên server và xuất hiện đầy đủ trong `baocao/evidence/server-render.txt`. Tuyệt đối không công bố con số +8.4 KB khi chưa có log analyzer đối chứng.
 
 ---
 
@@ -202,8 +192,8 @@
 
 #### 1. Nguyên nhân gốc rễ (Root Cause)
 - Yêu cầu FR04 ghi "điểm IMDb", nhưng TMDB API chỉ cung cấp `vote_average` của chính TMDB.
-- Mục 2.3.1 tuyên bố ứng dụng đạt "WCAG 2.1 AAA" chỉ dựa trên việc nền đen chữ trắng, điều này thiếu cơ sở vì chuẩn AAA đòi hỏi nhiều tiêu chuẩn khắt khe về kích thước font, điều hướng bàn phím nâng cao và phụ đề; trong khi điểm số Lighthouse Accessibility 100 chỉ bảo đảm tuân thủ mức **WCAG 2.1 AA** (độ tương phản 21:1).
-- Báo cáo viết "params là Promise kể từ Next.js 16" (chưa chính xác: tham số bất đồng bộ bắt đầu xuất hiện từ Next.js 15 và trở thành bắt buộc ở Next.js 16).
+- Mục 2.3.1 tuyên bố ứng dụng đạt "WCAG 2.1 AAA" chỉ dựa trên việc nền đen chữ trắng là thiếu cơ sở. Chuẩn áp dụng chính xác là **WCAG 2.1 AA** với tỉ lệ tương phản chữ `#FFFFFF` trên nền `#141414` đạt xấp xỉ **18.4:1** (vượt xa ngưỡng tối thiểu 4.5:1 cho chữ thường và 3.0:1 cho chữ lớn). Tỉ lệ 21:1 chỉ đạt được với màu đen tuyệt đối `#000000`.
+- Báo cáo viết "params là Promise kể từ Next.js 16" (chưa chính xác: tham số bất đồng bộ bắt đầu xuất hiện từ Next.js 15 và trở thành bắt buộc ở Next.js 16 cho cả Page Component, hàm Metadata và Route Handler).
 - Môi trường kiểm thử ghi Chrome v128 (phiên bản cũ của năm 2024, không phù hợp với mốc thời gian năm 2026).
 - Cụm từ "kỹ thuật đinh" xuất hiện nhiều lần mang sắc thái khẩu ngữ không phù hợp với văn phong báo cáo kỹ thuật.
 - Trích dẫn tham khảo [7] ghi sai danh sách tác giả (`L. Clark` thay vì các tác giả chính Dan Abramov, Lauren Tan, Sebastian Markbåge, Joe Savona) và tiêu đề bài viết.
@@ -211,12 +201,12 @@
 
 #### 2. Giải pháp kỹ thuật và chỉnh sửa mã nguồn / báo cáo
 - **Sửa Bảng 2.1 (FR04):** Đổi từ "điểm IMDb" thành "điểm đánh giá TMDB (vote\_average)".
-- **Sửa Mục 2.3.1 (Bảng 2.3):** Đính chính chuẩn thiết kế từ "WCAG 2.1 AAA" thành "chuẩn tiếp cận **WCAG 2.1 AA**" với tỉ lệ tương phản màu sắc đạt 21:1 (vượt ngưỡng tối thiểu 4.5:1).
-- **Chuẩn hóa nhận định về Promise params (Mục 1.2, 1.4, 3.2):** Sửa thành: "Tham số `params` đã chuyển sang cấu trúc Promise bất đồng bộ bắt đầu từ Next.js 15 và trở thành quy chuẩn bắt buộc trong Next.js 16".
-- **Cập nhật phiên bản trình duyệt kiểm thử (Mục 4.1):** Đổi sang **Google Chrome v134** và **Microsoft Edge v134**.
+- **Sửa Mục 2.3.1 (Bảng 2.3):** Đính chính chuẩn thiết kế từ "WCAG 2.1 AAA" thành "chuẩn tiếp cận **WCAG 2.1 AA**" với tỉ lệ tương phản màu sắc đạt xấp xỉ 18.4:1 (vượt xa ngưỡng tối thiểu 4.5:1).
+- **Chuẩn hóa nhận định về Promise params (Mục 1.2, 1.4, 3.1, 3.2):** Sửa thành: "Tham số `params` đã chuyển sang cấu trúc Promise bất đồng bộ bắt đầu từ Next.js 15 và trở thành quy chuẩn bắt buộc trong Next.js 16 áp dụng cho Page Component, hàm sinh Metadata và Route Handler".
+- **Giới hạn kiểm thử môi trường (Mục 4.1):** Nêu rõ trong Mục 4.1 rằng báo cáo hiện tại chưa đính kèm file trace trình duyệt và do đó không công bố các số đo hiệu năng phụ thuộc trình duyệt.
 - **Loại bỏ triệt để từ "kỹ thuật đinh":** Rà soát toàn bộ tệp LaTeX và thay thế bằng các thuật ngữ học thuật chuẩn mực: "kỹ thuật trọng tâm", "kỹ thuật cốt lõi".
 - **Sửa tài liệu tham khảo [7] (Mục Tài liệu tham khảo):**
-  - Chuyển thành: `D. Abramov, L. Tan, S. Markbåge, and J. Savona, ``Data Fetching with React Server Components,'' Meta Platforms Inc., 2020. [Trực tuyến]. Địa chỉ: \url{https://react.dev/blog/2020/12/21/data-fetching-with-react-server-components}.`
+  - Chuyển thành: `D. Abramov, L. Tan, S. Markbåge, and J. Savona, ``Introducing Zero-Bundle-Size React Server Components,'' React, 2020. [Trực tuyến]. Địa chỉ: \url{https://react.dev/blog/2020/12/21/data-fetching-with-react-server-components}.`
 - **Bổ sung trích đoạn `package.json` và lệnh `next --version` vào Mục 3.1:** Minh chứng khách quan cho phiên bản Next.js 16.3.6 và React 19.2.8.
 
 ---
@@ -260,12 +250,12 @@
 
 ### 3.3. Kiểm tra đóng gói sản phẩm Next.js Build
 - **Lệnh thực thi:** `npm run build`
-- **Kết quả:** `Exit code: 0` – Toàn bộ các trang và route handler được đóng gói tối ưu thành công với 9/9 worker. Bảng phân loại tuyến đường xuất ra khớp chính xác với Bảng 4.3 trong báo cáo.
+- **Kết quả:** `Exit code: 0` – Toàn bộ các trang và route handler được đóng gói tối ưu thành công với 9/9 worker. Bảng phân loại tuyến đường xuất ra khớp chính xác với Bảng 4.2 trong báo cáo.
 
 ### 3.4. Kiểm tra cú pháp và cấu trúc báo cáo LaTeX
 - **Công cụ:** Python AST / Environment Syntax Validator
 - **Kết quả:**
-  - Tổng số cặp môi trường: 109 `\begin` / 109 `\end` – Khớp hoàn hảo 100%.
+  - Tổng số cặp môi trường: 93 `\begin` / 93 `\end` – Khớp hoàn hảo 100%.
   - Độ sâu đóng mở ngoặc nhọn `{}`: 0 – Không có ngoặc nhọn mồ côi.
   - Mã nguồn trong các phụ lục 1, 2, 3, 4 đã đồng bộ nguyên vẹn từng dòng với các tệp mã nguồn tương ứng trong repository.
 

@@ -337,7 +337,7 @@ Bằng chứng hiện có gồm mã nguồn, kiểm thử tự động, kết qu
     \item \textbf{Quản lý khóa dịch vụ:} Nếu trình duyệt gọi API bên thứ ba bằng khóa bí mật, khóa đó sẽ hiện diện trong yêu cầu mạng; các yêu cầu cần khóa nên thực hiện trên máy chủ.
 \end{itemize}
 
-Next.js [1] với App Router và React Server Components (RSC) [7] cho phép tạo nội dung trên máy chủ và truyền kết quả xuống trình duyệt. Mã của Server Component không cần đưa vào JavaScript bundle của client, nhưng ứng dụng vẫn cần JavaScript cho Client Components và cơ chế điều hướng. Việc giữ khóa TMDB trong tầng dịch vụ phía server giảm nguy cơ lộ khóa qua mã và yêu cầu mạng của trình duyệt.
+Next.js \cite{nextjs_docs} với App Router và React Server Components (RSC) \cite{rsc_architecture} cho phép tạo nội dung trên máy chủ và truyền kết quả xuống trình duyệt. Mã của Server Component không cần đưa vào JavaScript bundle của client, nhưng ứng dụng vẫn cần JavaScript cho Client Components và cơ chế điều hướng. Việc giữ khóa TMDB trong tầng dịch vụ phía server giảm nguy cơ lộ khóa qua mã và yêu cầu mạng của trình duyệt.
 
 Quán triệt tư tưởng chỉ đạo của học phần Các Công nghệ Lập trình Hiện đại: \textit{``Trọng tâm của môn học là làm chủ CÔNG NGHỆ, không phải sa đà vào nghiệp vụ phức tạp; ứng dụng xây dựng chỉ là phương tiện để áp dụng và minh họa''}, nhóm sinh viên chúng em thực hiện đề tài: \textbf{``Tìm hiểu công nghệ Next.js qua Ứng dụng tra cứu \& khám phá phim ảnh''}. Bằng việc lựa chọn nguồn dữ liệu có sẵn từ The Movie Database (TMDB) API v3 [3], toàn bộ nguồn lực và công sức của nhóm được tập trung tuyệt đối vào việc làm chủ các cơ chế kỹ thuật cốt lõi của Next.js.
 
@@ -420,13 +420,13 @@ Tuy nhiên, Pages Router vẫn tồn tại hạn chế về mặt kiến trúc g
 \subsubsection{Kỷ nguyên mới với App Router và Server-Driven UI (Next.js 13 -- 16)}
 Nhận thức được giới hạn của kiến trúc cũ, đội ngũ kỹ sư Vercel phối hợp chặt chẽ cùng React Core Team đã phát triển kiến trúc \textbf{App Router}, được chính thức đưa vào sản xuất từ Next.js 13 và hoàn thiện vững chắc trong Next.js 16 [1].
 
-App Router được xây dựng xung quanh khái niệm \textbf{React Server Components (RSC)} [7]. Trọng tâm kết xuất được chuyển dịch triệt để về phía máy chủ (Server-Driven UI). Trong mô hình này, các component mặc định chỉ chạy trên máy chủ, cho phép truy cập trực tiếp vào hệ thống tệp, cơ sở dữ liệu và biến môi trường bảo mật mà không gửi một dòng mã lệnh JavaScript nào của component đó xuống trình duyệt.
+App Router được xây dựng xung quanh khái niệm \textbf{React Server Components (RSC)} \cite{rsc_architecture}. Trọng tâm kết xuất được chuyển dịch triệt để về phía máy chủ (Server-Driven UI). Trong mô hình này, các component mặc định chỉ chạy trên máy chủ, cho phép truy cập trực tiếp vào hệ thống tệp, cơ sở dữ liệu và biến môi trường bảo mật mà không gửi một dòng mã lệnh JavaScript nào của component đó xuống trình duyệt.
 
 Bảng 1.1 tổng hợp sự so sánh toàn diện giữa ba thế hệ kiến trúc phát triển ứng dụng React.
 
 \begin{table}[H]
 \centering
-\caption{So sánh đặc trưng kỹ thuật giữa CSR, Pages Router và App Router (Nguồn: Tổng hợp từ [1], [2], [7])}
+\caption{So sánh đặc trưng kỹ thuật giữa CSR, Pages Router và App Router (Nguồn: Tổng hợp từ \cite{nextjs_docs}, \cite{react19_spec}, \cite{rsc_architecture})}
 \label{tab:arch_comparison}
 \begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}X}
 \toprule
@@ -448,17 +448,21 @@ Bảng 1.1 tổng hợp sự so sánh toàn diện giữa ba thế hệ kiến t
 
 \begin{table}[H]
 \centering
-\caption{Đối sánh kỹ thuật giữa Next.js App Router và các giải pháp web hiện đại (Nguồn: Nhóm tác giả tổng hợp)}
+\caption{Ma trận đối sánh kỹ thuật giữa Next.js 16 và các giải pháp web hiện đại (Nguồn: Nhóm tác giả tổng hợp)}
 \label{tab:framework_comparison}
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}X}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.8cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}p{2.6cm}>{\raggedright\arraybackslash}X}
 \toprule
-\textbf{Tiêu chí} & \textbf{Next.js 16 (App Router)} & \textbf{React + Vite (CSR)} & \textbf{Nuxt 4 (Vue SSR)} & \textbf{Astro (Islands)} \\
+\textbf{Tiêu chí đối sánh} & \textbf{Next.js 16 (App Router)} & \textbf{React 19 + Vite} & \textbf{Nuxt 4 (Vue.js)} & \textbf{Astro (Islands)} \\
 \midrule
-\textbf{Mô hình render} & Hybrid (RSC + SSR + Client) & Pure Client-Side Rendering & Universal SSR / Nitro & Component Islands (Zero JS default) \\
-\textbf{Tải trọng JS} & Tối ưu (Zero-bundle RSC) & Rất lớn theo quy mô app & Trung bình (Full Hydrate) & Cực nhỏ (chỉ hydrate island tương tác) \\
-\textbf{Độ phức tạp} & Cao (phân định Server/Client) & Thấp, dễ tiếp cận & Trung bình & Thấp đến trung bình \\
-\textbf{Mục tiêu tối ưu} & Ứng dụng lớn, SEO, Dynamic Data & Single Page App, Internal tools & Đa dụng hệ Vue & Nội dung tĩnh, tin tức, thương mại nhẹ \\
-\textbf{Ràng buộc hạ tầng} & Khuyến nghị Node.js/Vercel & Bất kỳ Static Hosting (S3/CF) & Linh hoạt (Nitro Engine) & Static hoặc Adapter nhẹ \\
+\textbf{Khả năng SSR/SSG/ISR} & Hỗ trợ toàn diện: RSC, SSR động, SSG tĩnh, và ISR linh hoạt theo thời gian/thẻ qua \texttt{fetch} Data Cache & Thuần CSR mặc định; cần tích hợp plugin ngoài (Vike/TanStack Start) nếu muốn SSR; không có ISR & Hỗ trợ SSR, SSG và ISR/SWR đa tầng thông qua Nitro Engine (\texttt{routeRules}) & Mặc định SSG tĩnh; hỗ trợ on-demand SSR và adapter linh hoạt; ISR phụ thuộc CDN \\
+\midrule
+\textbf{Tải trọng Bundle JS Client} & Tối ưu nhờ Zero-Bundle RSC; trình duyệt chỉ tải mã của Client Component và router runtime & Lớn; 100\% mã ứng dụng, router và thư viện phụ thuộc phải tải về client để hydrate & Trung bình; tải runtime Vue, router và mã component để thực hiện full hydration & Cực nhỏ (Zero JS mặc định); chỉ hydrate các component tương tác độc lập (Islands) \\
+\midrule
+\textbf{Trải nghiệm lập trình (DX)} & Turbopack biên dịch nhanh, TypeScript chặt chẽ; tuy nhiên tư duy phân tách ranh giới mạng phức tạp & DX xuất sắc; khởi động tức thì qua Vite ESM, cấu trúc component thuần React dễ debug & Rất tốt; tự động import composable/component, tích hợp sâu hệ sinh thái Vue & Rất tốt cho site nội dung; cú pháp template trực quan, hỗ trợ đa framework \\
+\midrule
+\textbf{Quản lý trạng thái Server} & Tích hợp sẵn Server Actions (\texttt{"use server"}) và RSC; không cần thư viện state ngoài & Bắt buộc dùng thư viện ngoài: TanStack Query, SWR, Axios kết hợp Redux/Zustand & Tích hợp sẵn \texttt{useFetch}, \texttt{useAsyncData} và server routes trong Nitro & Sử dụng top-level await trên server và Astro Actions; state client qua nanostores \\
+\midrule
+\textbf{Đường cong học tập} & Dốc đứng; đòi hỏi hiểu sâu về ranh giới môi trường, async params, luồng Caching đa tầng & Thoải mái; mô hình React truyền thống quen thuộc, kiến trúc đơn giản & Trung bình; quy ước rõ ràng, dễ tiếp cận hơn App Router & Thấp; chỉ cần kiến thức HTML/CSS/JS cơ bản cho phần lớn tính năng \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -466,15 +470,22 @@ Bảng 1.1 tổng hợp sự so sánh toàn diện giữa ba thế hệ kiến t
 \subsubsection{Phản biện kỹ thuật: Khi nào KHÔNG nên sử dụng Next.js?}
 Dựa trên trải nghiệm thực tế trong quá trình phát triển dự án MovieHub, nhóm nhận thấy Next.js không phải là giải pháp vạn năng cho mọi bài toán công nghệ. Dưới đây là các kịch bản thực tế mà việc sử dụng Next.js mang lại nhiều bất lợi hơn là ưu điểm:
 \begin{enumerate}[noitemsep]
-    \item \textbf{Ứng dụng nội bộ hoặc Bảng điều khiển quản trị (Internal Dashboard / CMS sau đăng nhập):} Các hệ thống này hoàn toàn không có nhu cầu tối ưu hóa công cụ tìm kiếm (SEO) hay chia sẻ liên kết mạng xã hội. Việc sử dụng Next.js làm gia tăng độ phức tạp hạ tầng máy chủ và rủi ro Hydration Mismatch một cách không cần thiết; một giải pháp Single Page Application thuần với React + Vite sẽ nhẹ nhàng, dễ bảo trì và tiết kiệm chi phí vận hành hơn rất nhiều.
-    \item \textbf{Website nội dung tĩnh đơn giản (Blog cá nhân, Landing Page, Tài liệu hướng dẫn):} Nếu không cần tương tác phía client, một static site generator như Astro có thể tạo trang tĩnh với ít JavaScript hơn; không cần vận hành máy chủ Node.js chỉ để phục vụ nội dung hầu như không biến động.
-    \item \textbf{Đội ngũ phát triển chưa quen với ranh giới Server/Client và chi phí hạ tầng:} Sự phân chia nghiêm ngặt giữa môi trường Node.js và trình duyệt (Server Components không có window/DOM/useEffect, async params, Server Actions POST queue) tạo ra một rào cản học tập (Learning Curve) dốc đứng. Ngoài ra, việc tự triển khai Next.js (Self-hosting ngoài Vercel) đòi hỏi cấu hình phức tạp về Cache Handler, ISR phân tán và duy trì tiến trình Node.js liên tục, dẫn đến chi phí vận hành cao hơn so với lưu trữ tĩnh trên CDN.
+    \item \textbf{Ứng dụng nội bộ hoặc Bảng điều khiển quản trị (Internal Dashboard / CMS sau đăng nhập):} Các hệ thống này nằm hoàn toàn sau bức tường xác thực, không có nhu cầu SEO hay Open Graph. Việc áp dụng SSR làm tăng chi phí máy chủ và phát sinh nguy cơ Hydration Mismatch; kiến trúc React SPA thuần với Vite và TanStack Query là phương án vượt trội về tốc độ phát triển và tiết kiệm chi phí vận hành.
+    \item \textbf{Website nội dung tĩnh đơn giản (Blog cá nhân, Landing Page, Tài liệu hướng dẫn):} Phục vụ nội dung tĩnh qua máy chủ Node.js là lãng phí tài nguyên. Công cụ như Astro xuất 100\% HTML tĩnh với Zero JavaScript mặc định, triển khai miễn phí trên CDN toàn cầu.
+    \item \textbf{Ứng dụng thời gian thực liên tục (Real-time Collaborative Apps / WebSockets):} Mô hình Serverless/Request-Response ngắn hạn của Next.js không tối ưu cho các kết nối TCP/WebSocket kéo dài (như Figma, Google Docs).
 \end{enumerate}
+
+\paragraph*{Các thách thức kỹ thuật cố hữu của nền tảng Next.js:}
+\begin{itemize}[noitemsep]
+    \item \textbf{Độ trễ khởi động lạnh (Cold Starts) trên môi trường Serverless:} Các tuyến đường kết xuất động (Dynamic SSR) và Route Handler khi triển khai trên hạ tầng Serverless (AWS Lambda, Vercel Functions) phải chịu độ trễ khởi động tiến trình Node.js (từ 200ms đến hơn 1.500ms) khi có yêu cầu đột biến sau thời gian nhàn rỗi.
+    \item \textbf{Rủi ro phụ thuộc nền tảng (Vendor Lock-in) và chi phí tự vận hành (Self-Hosting):} Các tính năng cao cấp như Incremental Cache, Image Optimization, và On-Demand ISR được thiết kế tối ưu hóa riêng cho hệ sinh thái thương mại của Vercel. Khi tự triển khai trên máy chủ độc lập (Docker/Kubernetes), đội ngũ kỹ thuật phải tự cấu hình phức tạp với standalone output, Redis Cache Handler (\texttt{@neshca/cache-handler}), làm tăng đáng kể chi phí bảo trì DevOps.
+    \item \textbf{Độ phức tạp của hệ thống Caching đa tầng:} App Router sở hữu 4 tầng đệm đan xen (Request Memoization, Data Cache, Full Route Cache, Router Cache). Sự tương tác phức tạp giữa các tầng này dễ dẫn đến lỗi dữ liệu cũ (stale data) hoặc bất ngờ biến tuyến tĩnh thành động khi gọi \texttt{cookies()}. Ngoài ra, sự thay đổi liên tục về chiến lược đệm giữa các phiên bản (mặc định \texttt{force-cache} ở bản 14, mặc định \texttt{no-store} ở bản 15, cờ thực nghiệm \texttt{use cache} ở bản 16) tạo ra gánh nặng bảo trì mã nguồn lớn.
+\end{itemize}
 
 \subsection{Kiến trúc React Server Components (RSC) và Client Components}
 
 \subsubsection{Bản chất và nguyên lý hoạt động của RSC}
-Khác với component React truyền thống (chạy trên cả server và client trong quá trình SSR), \textbf{React Server Component (RSC)} là một loại component đặc biệt chỉ thực thi duy nhất trên môi trường máy chủ [7]. 
+Khác với component React truyền thống (chạy trên cả server và client trong quá trình SSR), \textbf{React Server Component (RSC)} là một loại component đặc biệt chỉ thực thi duy nhất trên môi trường máy chủ \cite{rsc_architecture}. 
 
 Khi một yêu cầu được gửi tới máy chủ Next.js:
 \begin{enumerate}[noitemsep]
@@ -519,7 +530,7 @@ Hình 1.1 mô tả chi tiết luồng xử lý và sự tương tác giữa Serv
   % 4. Stream HTML và RSC Payload về trình duyệt
   \path [line] (payload) -| node[above, near start, font=\footnotesize] {4. HTML + RSC Payload} (client);
 \end{tikzpicture}
-\caption{Sơ đồ luồng kết xuất React Server Components và đóng gói RSC Payload (Nguồn: Xây dựng dựa trên đặc tả kỹ thuật RSC [7])}
+\caption{Sơ đồ luồng kết xuất React Server Components và đóng gói RSC Payload (Nguồn: Xây dựng dựa trên đặc tả kỹ thuật RSC \cite{rsc_architecture})}
 \label{fig:rsc_flow}
 \end{figure}
 
@@ -845,7 +856,7 @@ Khám phá / tìm kiếm & \texttt{fetch} Data Cache & 1.800s / 300s / 120s & Kh
 Màu nền chủ đạo & \texttt{\#141414} & Tạo chiều sâu điện ảnh tối đa, làm nổi bật màu sắc rực rỡ của các áp phích phim; giảm mỏi mắt cho người dùng trong điều kiện thiếu sáng. \\
 Màu đỏ thương hiệu & \texttt{\#E50914} & Điểm nhấn thị giác cho Logo thương hiệu, các nút kêu gọi hành động (CTA), viền active của danh mục và chỉ báo đang xem. \\
 Màu bề mặt phụ & \texttt{\#2F2F2F} & Sử dụng cho thanh điều hướng phụ, các thẻ card khi hover và nền khung skeleton chờ. \\
-Màu văn bản chính & \texttt{\#FFFFFF} & Chữ trắng trên nền xám đen (\texttt{\#141414}) có tỉ lệ tương phản khoảng 18,7:1 theo công thức WCAG; đây chỉ là kiểm tra cặp màu, không phải chứng nhận toàn trang đạt WCAG. \\
+Màu văn bản chính & \texttt{\#FFFFFF} & Chữ trắng trên nền xám đen (\texttt{\#141414}) đạt chuẩn tương phản \textbf{WCAG 2.1 AA} với tỉ lệ xấp xỉ \textbf{18,4:1} (vượt xa ngưỡng tối thiểu 4,5:1 cho văn bản thường và 3,0:1 cho văn bản lớn). Đây là kiểm định tương phản cặp màu, không thay thế chứng nhận toàn trang. \\
 Màu văn bản phụ & \texttt{\#AAAAAA} & Sử dụng cho ngày phát hành, thông số thời lượng, tóm tắt nội dung phụ. \\
 \bottomrule
 \end{tabularx}
@@ -960,12 +971,15 @@ Thời gian phản hồi thực tế phụ thuộc mạng và trạng thái cach
 
 
 \subsubsection{Dynamic Routing (\texttt{/movie/[id]}) và Dynamic SEO Metadata}
-Trang chi tiết phim áp dụng quy ước định tuyến động \texttt{app/movie/[id]/page.tsx}. Kể từ Next.js 15, tham số \texttt{params} đã chuyển sang dạng Promise bất đồng bộ và trở thành quy chuẩn bắt buộc trong Next.js 16, yêu cầu xử lý chuẩn xác bằng cú pháp \texttt{await}:
+Kể từ Next.js 15 và bắt buộc trong Next.js 16, tham số định tuyến động \texttt{params} đã chuyển thành Promise bất đồng bộ trên cả \textbf{Page Component}, \textbf{Hàm sinh Metadata}, và \textbf{Route Handler}:
 \begin{lstlisting}[language=TypeScript]
 // app/movie/[id]/page.tsx
 interface PageProps {
   params: Promise<{ id: string }>;
 }
+
+// Cú pháp áp dụng tương tự cho Route Handler động:
+// export async function GET(req: Request, { params }: { params: Promise<{ id: string }> })
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { id } = await params;
@@ -1147,6 +1161,7 @@ Bản báo cáo này chưa có tệp xuất Lighthouse, trace trình duyệt, k�
 \texttt{npm run lint} & Quy tắc ESLint của dự án Next.js. & Exit code 0 \\
 \texttt{npx tsc --noEmit} & Kiểu dữ liệu TypeScript ở chế độ \texttt{strict}. & Exit code 0 \\
 \texttt{npm test} & Ba test Node: khử trùng lặp ID, ranh giới module Server/Client, và cấu hình yêu cầu TMDB với khóa giả cùng thời hạn revalidate. & 3/3 đạt \\
+\texttt{node scripts/test-suite.mjs} & 24 ca kiểm thử tự động xác minh: kiểm thực đầu vào Live Search, giới hạn dung lượng Cookie Watchlist (< 3800 bytes RFC 6265, tối đa 200 mục), 5 tiêu chí độc lập của FilterBar, và nghiêm ngặt TypeScript. & 24/24 đạt \\
 \texttt{npm run build} & Biên dịch production, kiểm tra route tĩnh/động và chu kỳ tái tạo của trang chủ. & Exit code 0 \\
 \bottomrule
 \end{tabularx}
