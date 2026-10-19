@@ -484,6 +484,32 @@ await new Promise((resolve) => {
                     resLong.status === 200 && Array.isArray(longJson.results)
                 );
 
+                // Live Test 5: /tv Pruning & Root 404 Trigger
+                const resTv = await fetch("http://127.0.0.1:3099/tv");
+                const tvBody = await resTv.text();
+                recordProbe(
+                    "ADV-LIVE-05",
+                    "Live HTTP / TV Pruning",
+                    "Live HTTP GET /tv triggers Root 404 (app/not-found.tsx)",
+                    "status: 404, contains 'Không Tìm Thấy Trang'",
+                    `status: ${resTv.status}, contains404: ${tvBody.includes("404")}`,
+                    resTv.status === 404 && tvBody.includes("Không Tìm Thấy Trang")
+                );
+
+                // Live Test 6: HTTP Security Headers enforcement
+                const xFrame = resTv.headers.get("x-frame-options");
+                const xContentType = resTv.headers.get("x-content-type-options");
+                const referrerPolicy = resTv.headers.get("referrer-policy");
+                const headersPassed = xFrame === "DENY" && xContentType === "nosniff" && referrerPolicy === "strict-origin-when-cross-origin";
+                recordProbe(
+                    "ADV-LIVE-06",
+                    "Live HTTP / Security Headers",
+                    "Live HTTP response enforces X-Frame-Options, X-Content-Type-Options, Referrer-Policy",
+                    "DENY, nosniff, strict-origin-when-cross-origin",
+                    `x-frame: ${xFrame}, nosniff: ${xContentType}, referrer: ${referrerPolicy}`,
+                    headersPassed
+                );
+
             } catch (err) {
                 console.error("Live test execution error:", err);
             } finally {

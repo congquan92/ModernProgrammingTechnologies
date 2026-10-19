@@ -2,18 +2,17 @@ import type { Movie, MovieListResponse, DiscoverParams } from "@/types/tmdb";
 import { fetchTMDB, deduplicateMovies } from "./client";
 
 /**
- * Khám phá phim và TV Series đa tiêu chí (Discover API)
+ * Khám phá phim điện ảnh đa tiêu chí (Discover API)
  * Hỗ trợ phân trang chuẩn 24 phim / trang (lấp đầy hoàn hảo 4 hàng x 6 cột)
  * Cache: 30 phút (1800s)
  */
 export async function discoverMovies(params: DiscoverParams): Promise<{ results: Movie[]; totalPages: number; totalResults: number }> {
     try {
-        const isTv = params.type === "tv" || params.genre === "tv";
-        const endpointBase = isTv ? "/discover/tv" : "/discover/movie";
+        const endpointBase = "/discover/movie";
         const queryParts: string[] = [];
 
         // Xử lý thể loại
-        if (params.genre && params.genre !== "all" && params.genre !== "tv") {
+        if (params.genre && params.genre !== "all") {
             if (params.genre === "classic") {
                 queryParts.push("primary_release_date.lte=2000-01-01");
             } else {
@@ -32,9 +31,9 @@ export async function discoverMovies(params: DiscoverParams): Promise<{ results:
         // Xử lý năm phát hành
         if (params.year && params.year !== "all") {
             if (params.year === "before-2015") {
-                queryParts.push(isTv ? "first_air_date.lte=2014-12-31" : "primary_release_date.lte=2014-12-31");
+                queryParts.push("primary_release_date.lte=2014-12-31");
             } else if (/^\d{4}$/.test(params.year)) {
-                queryParts.push(isTv ? `first_air_date_year=${params.year}` : `primary_release_year=${params.year}`);
+                queryParts.push(`primary_release_year=${params.year}`);
             }
         }
 
@@ -114,35 +113,5 @@ export async function discoverMovies(params: DiscoverParams): Promise<{ results:
     } catch (error) {
         console.error("Lỗi discoverMovies:", error);
         return { results: [], totalPages: 1, totalResults: 0 };
-    }
-}
-
-/**
- * Lấy danh sách phim truyền hình phổ biến (TV Popular)
- * Mặc định trả về 24 phim
- * Chiến lược cache: 1 giờ (3600s)
- */
-export async function getTvPopular(page: number = 1, limit: number = 24): Promise<{ results: Movie[]; totalPages: number }> {
-    try {
-        const [page1, page2] = await Promise.all([
-            fetchTMDB<MovieListResponse>(`/tv/popular?page=${page}`, 3600),
-            limit > 20
-                ? fetchTMDB<MovieListResponse>(`/tv/popular?page=${page + 1}`, 3600).catch(() => ({ results: [] as Movie[], page: page + 1, total_pages: 0, total_results: 0 }))
-                : Promise.resolve({ results: [] as Movie[], page: page + 1, total_pages: 0, total_results: 0 }),
-        ]);
-        const combined = deduplicateMovies([...(page1.results || []), ...(page2.results || [])]);
-        const normalizedResults = combined.slice(0, limit).map((item) => ({
-            ...item,
-            title: item.name || item.title || "Phim bộ",
-            release_date: item.first_air_date || item.release_date || "",
-        }));
-
-        return {
-            results: normalizedResults,
-            totalPages: Math.min(page1.total_pages || 1, 500),
-        };
-    } catch (error) {
-        console.error("Lỗi getTvPopular:", error);
-        return { results: [], totalPages: 1 };
     }
 }

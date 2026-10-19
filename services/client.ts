@@ -1,40 +1,4 @@
-import dns from "node:dns";
 import type { Movie } from "@/types/tmdb";
-
-// Tự động phân giải DNS cho api.themoviedb.org qua Google DNS (8.8.8.8) & Cloudflare (1.1.1.1)
-// để giải quyết triệt để lỗi ENOTFOUND / ISP block tại Việt Nam trên Node.js Server runtime.
-if (typeof window === "undefined" && dns && dns.lookup) {
-    const origLookup = dns.lookup;
-    const resolver = new dns.promises.Resolver();
-    resolver.setServers(["8.8.8.8", "1.1.1.1"]);
-
-    // @ts-expect-error Node.js internal lookup overload
-    dns.lookup = function (hostname: string, options: unknown, callback: unknown) {
-        let cb = callback as (err: Error | null, address?: unknown, family?: number) => void;
-        let opt = options as Record<string, unknown> | undefined;
-        if (typeof options === "function") {
-            cb = options as typeof cb;
-            opt = {};
-        }
-
-        if (hostname && hostname.includes("themoviedb.org")) {
-            resolver
-                .resolve4(hostname)
-                .then((addresses) => {
-                    if (opt && opt.all) {
-                        cb(null, addresses.map((a) => ({ address: a, family: 4 })));
-                    } else {
-                        cb(null, addresses[0], 4);
-                    }
-                })
-                .catch(() => {
-                    Reflect.apply(origLookup, dns, [hostname, opt, cb]);
-                });
-        } else {
-            Reflect.apply(origLookup, dns, [hostname, opt, cb]);
-        }
-    };
-}
 
 export const TMDB_BASE_URL = process.env.TMDB_BASE_URL || "https://api.themoviedb.org/3";
 export const TMDB_API_KEY = process.env.TMDB_API_KEY;

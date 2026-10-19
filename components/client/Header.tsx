@@ -17,7 +17,7 @@ export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     // Xác định các trang có hero banner lớn tràn viền ở đầu trang
-    const hasHeroBanner = pathname === "/" || pathname?.startsWith("/movie/") || pathname === "/tv";
+    const hasHeroBanner = pathname === "/" || pathname?.startsWith("/movie/");
 
     useEffect(() => {
         const handleScroll = () => {
@@ -97,15 +97,6 @@ export default function Header() {
                             }`}
                         >
                             Trang chủ
-                        </Link>
-
-                        <Link
-                            href="/tv"
-                            className={`transition-colors ${
-                                pathname === "/tv" ? "text-white font-bold" : "text-gray-300 hover:text-white"
-                            }`}
-                        >
-                            Phim T.hình
                         </Link>
 
                         <Link
@@ -189,9 +180,6 @@ export default function Header() {
                     <div className="flex flex-col space-y-2 text-sm font-medium">
                         <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-1 text-white hover:text-[#E50914]">
                             Trang chủ
-                        </Link>
-                        <Link href="/tv" onClick={() => setIsMobileMenuOpen(false)} className="py-1 text-zinc-300 hover:text-[#E50914]">
-                            Phim Truyền Hình
                         </Link>
                         <Link href="/browse?type=movie" onClick={() => setIsMobileMenuOpen(false)} className="py-1 text-zinc-300 hover:text-[#E50914]">
                             Phim Lẻ

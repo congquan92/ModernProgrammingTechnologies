@@ -37,7 +37,6 @@ expected = (
     "Phim Thịnh Hành Trong Tuần",
     "Top 10 Phim Đánh Giá Cao Nhất",
     "Phim Đang Chiếu Rạp Dành Cho Bạn",
-    "Phim Truyền Hình Hot Trong Tuần",
     "Có Thể Bạn Muốn Xem Lại",
 )
 

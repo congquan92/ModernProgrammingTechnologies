@@ -1,0 +1,1 @@
+Đếm gọi nguồn/cache thật; kiểm chứng streaming/Watchlist; giữ đúng phạm vi local và metadata/auth.

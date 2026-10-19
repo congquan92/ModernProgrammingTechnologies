@@ -2,7 +2,6 @@ import {
     getTrendingMovies,
     getNowPlayingMovies,
     getTopRatedMovies,
-    getTvPopular,
     discoverMovies,
 } from "@/services/tmdb";
 import HeroBanner from "@/components/server/HeroBanner";
@@ -18,11 +17,10 @@ import MovieRow from "@/components/client/MovieRow";
  * 3. Hàng phim thiết kế dạng cuộn ngang (MovieRow) kèm hàng TOP 10 với số thứ tự khổng lồ.
  */
 export default async function HomePage() {
-    const [trending, nowPlaying, topRated, tvData, classicData] = await Promise.all([
+    const [trending, nowPlaying, topRated, classicData] = await Promise.all([
         getTrendingMovies(),
         getNowPlayingMovies(),
         getTopRatedMovies(),
-        getTvPopular(),
         discoverMovies({ genre: "classic" }),
     ]);
 
@@ -57,10 +55,7 @@ export default async function HomePage() {
                 {/* Hàng 3: Phim Đang Chiếu Rạp */}
                 <MovieRow title="Phim Đang Chiếu Rạp Dành Cho Bạn" cards={nowPlaying.map((movie) => <MovieCard key={movie.id} movie={movie} />)} />
 
-                {/* Hàng 4: Phim Truyền Hình Hot */}
-                <MovieRow title="Phim Truyền Hình Hot Trong Tuần" cards={tvData.results.map((movie) => <MovieCard key={movie.id} movie={movie} />)} exploreHref="/tv" />
-
-                {/* Hàng 5: Bộ Sưu Tập Phim Kinh Điển */}
+                {/* Hàng 4: Bộ Sưu Tập Phim Kinh Điển */}
                 <MovieRow
                     title="Có Thể Bạn Muốn Xem Lại"
                     cards={classicData.results.map((movie) => <MovieCard key={movie.id} movie={movie} />)}
