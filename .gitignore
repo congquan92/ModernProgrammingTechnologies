@@ -15,6 +15,7 @@
 
 # next.js
 /.next/
+/.next-evidence/
 /out/
 
 docs
@@ -22,6 +23,7 @@ docs
 /build
 build*
 !/baocao/evidence/build-output.txt
+!/baocao/evidence/build-mock-output.txt
 
 # misc
 .DS_Store
@@ -52,6 +54,8 @@ next-env.d.ts
 /baocao/*.out
 /baocao/*.synctex.gz
 /baocao/*.toc
+/baocao/*.lof
+/baocao/*.lot
 
 # agent skills (local config, not for version control)
 .agents/

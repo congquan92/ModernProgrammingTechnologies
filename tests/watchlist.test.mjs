@@ -9,13 +9,37 @@ const { toggleWatchlist, getWatchlistIds, clearAllWatchlist, isMovieSaved } = aw
 const { resetMockCookies, getMockCookieMap } = await import("../scripts/mock-headers.mjs");
 
 test("watchlist: rejects invalid movieId inputs with exact error", async () => {
-  for (const invalid of [-5, 0, 12.34, NaN, Infinity]) {
+  for (const invalid of [-5, 0, 12.34, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1, "550", true, null]) {
     resetMockCookies();
     await assert.rejects(
       () => toggleWatchlist(invalid),
       { message: "Mã định danh phim (movieId) không hợp lệ." }
     );
   }
+});
+
+test("watchlist: untrusted cookies accept only unique positive safe integers", async () => {
+  resetMockCookies(new Map([["mh_watchlist", JSON.stringify([
+    550, 550, "551", true, null, {}, [], -1, 0, 1.5, Number.MAX_SAFE_INTEGER + 1, 552,
+  ])]]));
+  assert.deepEqual(await getWatchlistIds(), [550, 552]);
+});
+
+test("watchlist: incoming cookies cannot bypass item and byte limits", async () => {
+  const tooMany = Array.from({ length: 201 }, (_, i) => i + 1);
+  resetMockCookies(new Map([["mh_watchlist", JSON.stringify(tooMany)]]));
+  assert.equal((await getWatchlistIds()).length, 200);
+
+  resetMockCookies(new Map([["mh_watchlist", `[550]${" ".repeat(3800)}`]]));
+  assert.deepEqual(await getWatchlistIds(), []);
+});
+
+test("watchlist: byte limit includes cookie percent encoding", async () => {
+  const initial = Array.from({ length: 199 }, (_, i) => 9007199254740000 + i);
+  resetMockCookies(new Map([["mh_watchlist", JSON.stringify(initial)]]));
+  const result = await toggleWatchlist(9007199254740500);
+  assert.match(result.error, /dung lượng Cookie/);
+  assert.deepEqual(await getWatchlistIds(), initial);
 });
 
 test("watchlist: toggleWatchlist adds and removes movie authentic state", async () => {

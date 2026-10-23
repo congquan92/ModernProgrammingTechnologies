@@ -5,6 +5,8 @@ import { revalidatePath } from "next/cache";
 
 const WATCHLIST_COOKIE = "mh_watchlist";
 const COOKIE_MAX_AGE = 30 * 24 * 60 * 60; // 30 ngày (tính bằng giây)
+const MAX_WATCHLIST_ITEMS = 200;
+const MAX_WATCHLIST_COOKIE_BYTES = 3800;
 
 /**
  * Lấy danh sách ID các bộ phim đã lưu từ Cookie (Tầng 1B: Mutation không cần Backend)
@@ -12,23 +14,20 @@ const COOKIE_MAX_AGE = 30 * 24 * 60 * 60; // 30 ngày (tính bằng giây)
 export async function getWatchlistIds(): Promise<number[]> {
     const cookieStore = await cookies();
     const raw = cookieStore.get(WATCHLIST_COOKIE)?.value;
-    if (!raw) return [];
+    if (!raw || Buffer.byteLength(`${WATCHLIST_COOKIE}=${encodeURIComponent(raw)}`, "utf8") > MAX_WATCHLIST_COOKIE_BYTES) return [];
 
     try {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-            return parsed
-                .map((item) => Number(item))
-                .filter((id) => Number.isInteger(id) && id > 0);
+            return [...new Set(parsed.filter(
+                (id): id is number => typeof id === "number" && Number.isSafeInteger(id) && id > 0
+            ))].slice(0, MAX_WATCHLIST_ITEMS);
         }
         return [];
     } catch {
         return [];
     }
 }
-
-const MAX_WATCHLIST_ITEMS = 200;
-const MAX_WATCHLIST_COOKIE_BYTES = 3800;
 
 /**
  * Thêm hoặc xóa phim khỏi danh sách yêu thích
@@ -37,7 +36,7 @@ const MAX_WATCHLIST_COOKIE_BYTES = 3800;
  */
 export async function toggleWatchlist(movieId: number): Promise<{ isSaved: boolean; error?: string }> {
     // 1. Kiểm thực đầu vào nghiêm ngặt trên Server
-    if (!Number.isInteger(movieId) || movieId <= 0) {
+    if (!Number.isSafeInteger(movieId) || movieId <= 0) {
         throw new Error("Mã định danh phim (movieId) không hợp lệ.");
     }
 
@@ -63,7 +62,7 @@ export async function toggleWatchlist(movieId: number): Promise<{ isSaved: boole
     }
 
     const serializedIds = JSON.stringify(updatedIds);
-    if (Buffer.byteLength(`${WATCHLIST_COOKIE}=${serializedIds}`, "utf8") > MAX_WATCHLIST_COOKIE_BYTES) {
+    if (Buffer.byteLength(`${WATCHLIST_COOKIE}=${encodeURIComponent(serializedIds)}`, "utf8") > MAX_WATCHLIST_COOKIE_BYTES) {
         return { isSaved: false, error: "Danh sách yêu thích đã đạt giới hạn dung lượng Cookie." };
     }
 

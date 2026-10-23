@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "evidence": "node scripts/collect-evidence.mjs",
     "lint": "eslint",
     "test": "node --disable-warning=DEP0205 --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs",
     "analyze": "cross-env ANALYZE=true next build --webpack"

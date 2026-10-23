@@ -21,5 +21,5 @@ export default async function CastList({ movieId }: CastListProps) {
     );
   }
 
-  return <CastSlider cast={cast} />;
+  return <div data-stream="cast-result"><CastSlider cast={cast} /></div>;
 }

@@ -1,5 +1,15 @@
 # Tự ghi minh chứng Watchlist, streaming và Data Cache
 
+## Bộ kiểm chứng HTTP tự động
+
+Chạy `npm run evidence` tại gốc dự án. Script dùng khóa giả, tạo production build trong `.next-evidence`, chọn cổng loopback trống và dừng máy chủ khi xong. Kết quả tổng hợp nằm trong `baocao/evidence/mock-runtime.json`; chỉ xem là đạt khi `status` bằng `passed` và các tệp liên quan có cùng `source_sha256`.
+
+`streaming-mock.json` ghi từng chunk HTML và kiểm tra phần chính/fallback về trước kết quả. `cache-mock.json` đếm tại mock origin, kiểm tra cả sau khi TTL 15 giây hết hạn và đợi background refresh hoàn tất. `watchlist-http.json` gọi POST Server Action thật và tải lại `/watchlist` với/không có cookie để kiểm tra thêm, lưu qua reload, cách ly cookie và xóa.
+
+TTL thử nghiệm được cấp qua `TMDB_MOCK_REVALIDATE_SECONDS=15`, chỉ áp dụng với mock HTTP `127.0.0.1`. Cờ `MOVIEHUB_EVIDENCE_BUILD=1` tách output khỏi build thường. Script tự thiết lập các biến này cho tiến trình con; không cần chỉnh `.env.local`.
+
+Đây là bằng chứng HTTP ở máy cục bộ. Nó không đo trình duyệt đã vẽ khi nào, không thay thế Network waterfall/video, không chứng minh cache ở CDN và không đo hiệu năng TMDB thật. Các bước dưới đây dành cho việc bổ sung minh chứng trực quan bằng trình duyệt.
+
 Chạy các lệnh bên dưới bằng PowerShell tại thư mục gốc dự án. Ghi rõ trong bài nộp rằng dữ liệu TMDB của phần streaming/cache là **giả lập có kiểm soát**; độ trễ 2,5 giây và 4 giây được thêm để thấy thứ tự hiển thị, không phải số đo hiệu năng thật.
 
 ## Tạo lại các log kiểm tra bằng TMDB thật

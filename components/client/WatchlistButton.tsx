@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition, useState } from "react";
+import { useTransition, useState, useOptimistic, useId } from "react";
 import { toggleWatchlist } from "@/app/actions/watchlist";
 
 interface WatchlistButtonProps {
@@ -22,27 +22,34 @@ export default function WatchlistButton({
     className = "",
 }: WatchlistButtonProps) {
     const [isPending, startTransition] = useTransition();
-    const [isSaved, setIsSaved] = useState(initialSaved);
+    const [isSaved, setOptimisticSaved] = useOptimistic(initialSaved);
+    const [errorMessage, setErrorMessage] = useState("");
+    const errorId = useId();
 
     const handleToggle = () => {
-        // Optimistic UI update
-        const nextState = !isSaved;
-        setIsSaved(nextState);
-
+        setErrorMessage("");
         startTransition(async () => {
+            setOptimisticSaved(!isSaved);
             try {
                 const res = await toggleWatchlist(movieId);
-                setIsSaved(res.isSaved);
-            } catch (error) {
-                console.error("Lỗi khi cập nhật danh sách yêu thích:", error);
-                // Rollback nếu có lỗi
-                setIsSaved(!nextState);
+                if (res.error) setErrorMessage(res.error);
+                // Cookie mutation re-renders initialSaved from the server.
+                // useOptimistic rolls back automatically if the action fails.
+            } catch {
+                setErrorMessage("Không thể cập nhật danh sách. Vui lòng thử lại.");
             }
         });
     };
 
+    const errorNotice = errorMessage ? (
+        <p id={errorId} role="alert" className="text-sm text-red-400 max-w-xs">
+            {errorMessage}
+        </p>
+    ) : null;
+
     if (variant === "compact") {
         return (
+            <>
             <button
                 type="button"
                 disabled={isPending}
@@ -54,6 +61,8 @@ export default function WatchlistButton({
                 } ${isPending ? "opacity-70 cursor-not-allowed" : ""} ${className}`}
                 title={isSaved ? "Xóa khỏi danh sách yêu thích" : "Thêm vào danh sách yêu thích"}
                 aria-label={isSaved ? "Xóa khỏi danh sách yêu thích" : "Thêm vào danh sách yêu thích"}
+                aria-pressed={isSaved}
+                aria-describedby={errorMessage ? errorId : undefined}
             >
                 <svg
                     className={`w-4 h-4 transition-transform duration-200 ${isSaved ? "fill-white stroke-white scale-110" : "fill-none stroke-current"}`}
@@ -67,10 +76,13 @@ export default function WatchlistButton({
                     />
                 </svg>
             </button>
+            {errorNotice}
+            </>
         );
     }
 
     return (
+        <>
         <button
             type="button"
             disabled={isPending}
@@ -81,6 +93,8 @@ export default function WatchlistButton({
                     : "bg-white/10 border-zinc-600 text-zinc-200 hover:bg-white/20 hover:border-zinc-400"
             } ${className}`}
             aria-label={isSaved ? "Xóa khỏi danh sách yêu thích" : "Thêm vào danh sách yêu thích"}
+            aria-pressed={isSaved}
+            aria-describedby={errorMessage ? errorId : undefined}
         >
             {isPending ? (
                 <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -101,5 +115,7 @@ export default function WatchlistButton({
             )}
             <span>{isPending ? "Đang lưu..." : isSaved ? "Đã Lưu" : "Lưu Xem Sau"}</span>
         </button>
+        {errorNotice}
+        </>
     );
 }

@@ -1,0 +1,45 @@
+generated_at: 2026-10-23T04:29:09.002Z
+git_head: c22709ed1645121d04a44dc8b70f1f28e7d972e4
+working_tree_dirty: true
+source_sha256: 83da17c2fe37993f3b0756eea7ff1bb955c9bd35b55ca6434ee15c00c889f1b1
+node: v24.19.0
+next: 16.3.6
+platform: win32
+mode: production; controlled loopback TMDB mock; Cache Components disabled
+scope: HTTP HTML streaming, upstream Data Cache counts and Server Action cookies; no browser paint/CWV/CDN claims
+command: node node_modules/next/dist/bin/next build
+
+▲ Next.js 16.3.6 (Turbopack)
+- Environments: .env.local
+✓ Running next.config.ts took 32ms
+
+  Creating an optimized production build ...
+✓ Compiled successfully in 1571ms
+  Running TypeScript ...
+  Finished TypeScript in 1638ms ...
+  Collecting page data using 11 workers ...
+  Generating static pages using 11 workers (0/10) ...
+  Generating static pages using 11 workers (2/10) 
+  Generating static pages using 11 workers (4/10) 
+  Generating static pages using 11 workers (7/10) 
+✓ Generating static pages using 11 workers (10/10) in 481ms
+  Finalizing page optimization ...
+
+Route (app)       Revalidate  Expire
+┌ ○ /                    15s      1y
+├ ○ /_not-found
+├ ƒ /api/search
+├ ƒ /browse
+├ ƒ /movie/[id]
+├ ○ /robots.txt
+├ ƒ /search
+├ ○ /sitemap.xml         15s      1y
+└ ƒ /watchlist
+
+
+○  (Static)   prerendered as static content
+ƒ  (Dynamic)  server-rendered on demand
+
+
+exit_code: 0
+signal: none

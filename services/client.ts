@@ -4,7 +4,8 @@ const TMDB_BASE_URL = process.env.TMDB_BASE_URL || "https://api.themoviedb.org/3
 const TMDB_API_KEY = process.env.TMDB_API_KEY;
 
 /**
- * Hàm gọi API TMDB dùng chung trên Server với chiến lược Caching (ISR - Tầng 1B)
+ * Hàm gọi API TMDB trên Server với Data Cache theo thời hạn.
+ * ISR của toàn route phụ thuộc thêm request-time API và cấu hình route.
  * @param endpoint Đường dẫn API TMDB (ví dụ: '/trending/movie/week')
  * @param revalidateTime Thời gian lưu cache tính bằng giây
  * @param language Ngôn ngữ trả về (mặc định vi-VN)
@@ -17,6 +18,20 @@ export async function fetchTMDB<T>(
     if (!TMDB_API_KEY || TMDB_API_KEY === "your_actual_api_key_here") {
         console.warn(`[TMDB Service] Cảnh báo: TMDB_API_KEY chưa được cấu hình hợp lệ trong .env.local!`);
         throw new Error("TMDB_API_KEY chưa được thiết lập.");
+    }
+
+    // Chỉ rút ngắn TTL khi kiểm chứng bằng mock loopback; không đổi TTL TMDB thật.
+    const mockTTL = process.env.TMDB_MOCK_REVALIDATE_SECONDS;
+    if (mockTTL !== undefined) {
+        const origin = new URL(TMDB_BASE_URL);
+        if (origin.protocol !== "http:" || origin.hostname !== "127.0.0.1") {
+            throw new Error("TMDB_MOCK_REVALIDATE_SECONDS requires an HTTP loopback mock.");
+        }
+        const seconds = Number(mockTTL);
+        if (!Number.isInteger(seconds) || seconds < 1 || seconds > 60) {
+            throw new Error("TMDB_MOCK_REVALIDATE_SECONDS must be an integer from 1 to 60.");
+        }
+        revalidateTime = seconds;
     }
 
     const delimiter = endpoint.includes("?") ? "&" : "?";

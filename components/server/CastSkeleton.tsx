@@ -4,7 +4,7 @@
  */
 export default function CastSkeleton() {
   return (
-    <div className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-2">
+    <div data-stream="cast-fallback" className="flex gap-3 sm:gap-4 overflow-x-auto no-scrollbar pb-2">
       {Array.from({ length: 8 }).map((_, i) => (
         <div
           key={i}

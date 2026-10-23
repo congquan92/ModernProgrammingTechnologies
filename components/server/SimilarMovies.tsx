@@ -21,5 +21,5 @@ export default async function SimilarMovies({ movieId }: SimilarMoviesProps) {
     );
   }
 
-  return <SimilarMoviesSlider cards={movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)} />;
+  return <div data-stream="similar-result"><SimilarMoviesSlider cards={movies.map((movie) => <MovieCard key={movie.id} movie={movie} />)} /></div>;
 }

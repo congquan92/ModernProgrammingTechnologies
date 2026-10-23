@@ -18,7 +18,7 @@ interface MovieDetailPageProps {
 
 /**
  * ─── 1. DYNAMIC SEO METADATA (Tầng 1B) ──────────────────────────────────────
- * Chạy 100% trên Server trước khi trả HTML về.
+ * Chạy trên Server; Next.js có thể stream metadata với user agent phù hợp.
  * Tự động sinh <title>, <meta description> và OpenGraph preview theo từng bộ phim.
  */
 export async function generateMetadata(
@@ -99,7 +99,7 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
   const bestTrailer = selectBestTrailer(videos);
 
   return (
-    <main className="min-h-screen bg-[#141414] pb-20 relative">
+    <main data-movie-id={movie.id} className="min-h-screen bg-[#141414] pb-20 relative">
       {/* ── NÚT QUAY LẠI TRANG CHỦ Ở ĐẦU BÊN TAY TRÁI ── */}
       <div className="absolute top-20 sm:top-24 left-4 sm:left-12 z-30">
         <Link
@@ -248,7 +248,7 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
           {/* Suspense độc lập thứ 2: Chạy song song không block CastList */}
           <Suspense
             fallback={
-              <div className="flex gap-3 sm:gap-4 overflow-hidden pb-2">
+              <div data-stream="similar-fallback" className="flex gap-3 sm:gap-4 overflow-hidden pb-2">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}

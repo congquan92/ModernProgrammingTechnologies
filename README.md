@@ -93,10 +93,28 @@
 
 - `baocao/evidence/build-output.txt`: production build, phân loại route và revalidate 30 phút của trang chủ.
 - `baocao/evidence/lint-output.txt`, `typecheck-output.txt`, `test-output.txt`: kết quả kiểm tra mã có lệnh và exit code.
-- `baocao/evidence/server-render.txt`: HTML build có năm tiêu đề hàng phim và không chứa chuỗi `api_key=`.
+- `baocao/evidence/server-render.txt`: HTML build có bốn tiêu đề hàng phim và không chứa chuỗi `api_key=`.
 - `baocao/evidence/runtime-http.txt`: route phim hợp lệ và giao diện không tìm thấy cho ID sai.
 - `baocao/HUONG_DAN_THU_MINH_CHUNG.md`: các bước tự ghi video Watchlist, streaming và bộ đếm cache.
 - Chưa có báo cáo Lighthouse hay phép so sánh `<Image />` với `<img>` trên cùng route và thiết bị. Muốn công bố LCP/CLS/FCP, hãy lưu tệp kết quả gốc, cấu hình thiết bị và URL đo.
+
+### Kiểm chứng tự động bằng một lệnh
+
+```powershell
+npm run evidence
+```
+
+Lệnh chạy lint/test, tạo build production riêng trong `.next-evidence`, kiểm tra kiểu rồi khởi động mock TMDB và Next.js trên hai cổng loopback còn trống. Script tự dừng các tiến trình đã tạo. Không cần khóa TMDB thật; build `.next` được giữ riêng.
+
+- `baocao/evidence/mock-runtime.json`: trạng thái toàn bộ lượt chạy, phiên bản Node/Next, Git HEAD, trạng thái working tree và SHA-256 mã nguồn.
+- `baocao/evidence/build-mock-output.txt`: bảng route production với TTL **15 giây của mock**, khác TTL mặc định 30 phút của trang chủ.
+- `baocao/evidence/streaming-mock.json`: thời điểm và số thứ tự chunk HTML của nội dung chính, hai fallback và hai kết quả. Với mock trì hoãn 2,5/4 giây, kết quả phải tới ở chunk sau và ít nhất 1 giây sau nội dung chính; gửi dồn nhiều chunk cùng lúc cũng bị từ chối.
+- `baocao/evidence/cache-mock.json`: bộ đếm origin trước request, sau miss, hit, hết TTL và hit sau khi revalidate. Mỗi endpoint phải có chuỗi `0 → 1 → 1 → 2 → 2`.
+- `baocao/evidence/watchlist-http.json`: POST Server Action thật, cờ cookie, thêm/xóa, tải lại `/watchlist` và kiểm tra phiên cookie khác vẫn trống. Không ghi giá trị cookie.
+
+TTL ngắn chỉ được phép khi `TMDB_BASE_URL` là HTTP tại `127.0.0.1`; cấu hình này bị từ chối với TMDB thật. Đây là kiểm chứng HTTP với dữ liệu giả có độ trễ chủ động, không phải số đo Lighthouse, thời gian vẽ của trình duyệt, video giao diện hoặc shared cache tại CDN. Các log cũ `build-output.txt`, `server-render.txt`, `runtime-http.txt` thuộc lượt chạy trước; đọc thông tin ngày/commit trong từng tệp, không ghép thành cùng một lượt đo.
+
+Lượt kiểm tra giao diện riêng có các ảnh `watchlist-browser-saved.png`, `watchlist-browser-list.png`, `watchlist-browser-removed.png` và ghi chú `watchlist-browser.json` trong thư mục minh chứng. Chúng ghi nhận thêm phim, giữ trạng thái sau reload, hiển thị danh sách và xóa phim; `npm run evidence` chỉ tự chạy phần HTTP, không tự tạo lại các ảnh này.
 
 ---
 
