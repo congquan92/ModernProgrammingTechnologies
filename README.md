@@ -81,9 +81,12 @@
 | :----------------- | :----------------------------------------------------------------------- |
 | `npm run dev`      | Khởi chạy môi trường phát triển (Hot reload) tại `http://localhost:3000` |
 | `npm run lint`     | Chạy ESLint kiểm tra chuẩn mã nguồn                                      |
+| `npm test`         | Chạy bộ kiểm thử chính trong `tests/` bằng Node.js                         |
 | `npx tsc --noEmit` | Kiểm tra toàn bộ kiểu dữ liệu TypeScript (Type-check)                    |
 | `npm run build`    | Biên dịch bản build tối ưu hóa cho Production                            |
 | `npm run start`    | Khởi chạy Production Server sau khi đã build                             |
+
+Các script cũ `scripts/test-suite.mjs` và `scripts/adversarial-probe.mjs` đã được thay thế bởi bộ test và quy trình minh chứng hiện tại. Dùng `npm test` cho kiểm thử logic; dùng `npm run evidence` cho kiểm chứng HTTP production với mock TMDB.
 
 ---
 

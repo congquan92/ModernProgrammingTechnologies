@@ -1,4 +1,4 @@
-export interface FilterItem {
+interface FilterItem {
     id: string;
     label: string;
 }

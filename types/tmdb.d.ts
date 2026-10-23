@@ -23,7 +23,6 @@ export interface DiscoverParams {
     sortBy?: string;
     page?: number;
     perPage?: number;
-    query?: string;
 }
 
 export interface MovieListResponse {
@@ -66,7 +65,7 @@ export interface MovieVideo {
     name: string;
     site: string;
     size: number;
-    type: "Trailer" | "Teaser" | "Clip" | "Featurette" | "Behind the Scenes" | string;
+    type: string;
     official: boolean;
     published_at: string;
 }

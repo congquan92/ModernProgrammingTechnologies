@@ -2,6 +2,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import { execFileSync, spawn } from "node:child_process";
 import { once } from "node:events";
+import { existsSync } from "node:fs";
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { createServer } from "node:net";
 import { fileURLToPath } from "node:url";
@@ -15,6 +16,7 @@ const git = (...args) => execFileSync("git", args, { encoding: "utf8", windowsHi
 async function fingerprint() {
   const sourceFiles = git("ls-files", "--cached", "--others", "--exclude-standard").split(/\r?\n/)
     .filter((path) => /^(app\/|components\/|services\/|utils\/|types\/|scripts\/|tests\/|package(-lock)?\.json$|next\.config\.ts$|tsconfig\.json$|eslint\.config\.mjs$|postcss\.config\.mjs$)/.test(path))
+    .filter((path) => existsSync(path))
     .sort();
   const hash = createHash("sha256");
   for (const path of sourceFiles) hash.update(path).update("\0").update(await readFile(path)).update("\0");

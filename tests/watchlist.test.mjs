@@ -9,7 +9,7 @@ const { toggleWatchlist, getWatchlistIds, clearAllWatchlist, isMovieSaved } = aw
 const { resetMockCookies, getMockCookieMap } = await import("../scripts/mock-headers.mjs");
 
 test("watchlist: rejects invalid movieId inputs with exact error", async () => {
-  for (const invalid of [-5, 0, 12.34, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1, "550", true, null]) {
+  for (const invalid of [-5, 0, 12.34, NaN, Infinity, -Infinity, Number.MAX_SAFE_INTEGER + 1, "550", "", "inception", true, false, null, undefined, {}, { id: 550 }, [550]]) {
     resetMockCookies();
     await assert.rejects(
       () => toggleWatchlist(invalid),
@@ -70,6 +70,14 @@ test("watchlist: capacity boundary allows 200 items, rejects 201st", async () =>
   assert.equal(res201.isSaved, false);
   assert.match(res201.error, /đạt giới hạn tối đa/);
   assert.equal((await getWatchlistIds()).length, 200);
+
+  // Removing an existing movie must still work at full capacity.
+  const removed = await toggleWatchlist(initial199[0]);
+  assert.equal(removed.isSaved, false);
+  assert.equal(removed.error, undefined);
+  const remaining = await getWatchlistIds();
+  assert.equal(remaining.length, 199);
+  assert.ok(!remaining.includes(initial199[0]));
 });
 
 test("watchlist: 200 serialized IDs byte size safely under RFC 6265 limit", () => {
@@ -82,6 +90,9 @@ test("watchlist: 200 serialized IDs byte size safely under RFC 6265 limit", () =
 test("watchlist: resilience to malformed or dirty cookie data", async () => {
   // Malformed JSON string
   resetMockCookies(new Map([["mh_watchlist", "malformed-json{]"]]));
+  assert.deepEqual(await getWatchlistIds(), []);
+
+  resetMockCookies(new Map([["mh_watchlist", JSON.stringify({ id: 550 })]]));
   assert.deepEqual(await getWatchlistIds(), []);
 
   // Dirty array containing non-positive and non-integer entries

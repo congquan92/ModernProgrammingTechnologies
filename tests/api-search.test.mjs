@@ -11,13 +11,16 @@ const { GET: searchRouteHandler } = await import("../app/api/search/route.ts");
 const { searchQuickLive } = await import("../services/search.ts");
 
 test("route GET /api/search: returns empty results for empty or short queries", async () => {
-  for (const q of ["", "a", "   ", "  a  "]) {
+  for (const q of ["", "a", "   ", "  a  ", "\x00\x1F\x7F"]) {
     const req = new Request(`http://localhost/api/search?q=${encodeURIComponent(q)}`);
     const res = await searchRouteHandler(req);
     assert.equal(res.status, 200);
     const body = await res.json();
     assert.deepEqual(body, { results: [] });
   }
+  const res = await searchRouteHandler(new Request("http://localhost/api/search"));
+  assert.equal(res.status, 200);
+  assert.deepEqual(await res.json(), { results: [] });
 });
 
 test("route GET /api/search: includes standard Cache-Control header and returns results", async () => {

@@ -1,5 +1,7 @@
 # BÁO CÁO ĐÁNH GIÁ TOÀN DIỆN VÀ ĐỐI SOÁT CHẤT LƯỢNG KỸ THUẬT DỰ ÁN MOVIEHUB
 
+> **Ghi chú bảo trì (2026-10-23):** Đây là đánh giá lịch sử ngày 2026-10-16. Hai script `scripts/test-suite.mjs` và `scripts/adversarial-probe.mjs` đã được dọn bỏ do trùng quy trình hiện tại; các ca biên còn hữu ích được giữ trong `tests/`. Dùng `npm test` và `npm run evidence` để kiểm tra phiên bản hiện tại.
+
 > **Văn bản Thẩm định & Giám định Kiến trúc Phần mềm Độc lập**  
 > **Căn cứ Quy chuẩn:** `REQUIRE.md` (Quy định Đồ án Chuyên sâu Next.js 16)  
 > **Tài liệu Đối soát:** Báo cáo đồ án `baocao/baocao.tex`, Tài liệu phản biện `PROPLEM.md`, và Hồ sơ minh chứng `baocao/evidence/`  
