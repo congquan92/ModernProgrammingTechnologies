@@ -44,6 +44,15 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# LaTeX build artifacts (keep report sources and PDF)
+/baocao/*.aux
+/baocao/*.fdb_latexmk
+/baocao/*.fls
+/baocao/*.log
+/baocao/*.out
+/baocao/*.synctex.gz
+/baocao/*.toc
+
 # agent skills (local config, not for version control)
 .agents/
 skills-lock.json
