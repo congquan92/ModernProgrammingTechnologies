@@ -92,6 +92,10 @@ Các script cũ `scripts/test-suite.mjs` và `scripts/adversarial-probe.mjs` đ�
 
 ## 📊 5. Bằng chứng hiện có và số đo cần bổ sung
 
+### Biên dịch báo cáo LaTeX
+
+Từ thư mục gốc repo, chạy `latexmk baocao/baocao.tex` với MiKTeX hoặc TeX Live có XeLaTeX. Cấu hình `.latexmkrc` dùng XeLaTeX, tự chạy đủ lượt cập nhật mục lục/tham chiếu và xuất bản cuối tại `baocao/baocao.pdf`; tệp trung gian nằm trong `baocao/build/`. VS Code với LaTeX Workshop đã có recipe tương ứng trong `.vscode/settings.json`. Tránh dùng tùy chọn `-pdf` vì tùy chọn này chọn lại pdfLaTeX.
+
 Để tự tạo lại log trên máy của bạn, chạy `powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1`. Sau đó mở terminal khác chạy `npm run start`, rồi chạy `powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1 -RuntimeOnly`. Script ghi lệnh, thời điểm, commit và exit code vào từng log; hãy chụp terminal sau khi lệnh chạy xong.
 
 - `baocao/evidence/build-output.txt`: production build, phân loại route và revalidate 30 phút của trang chủ.

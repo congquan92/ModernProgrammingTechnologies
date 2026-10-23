@@ -1,18 +1,18 @@
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
 \documentclass[12pt,a4paper]{extarticle}
-\usepackage{iftex}
-\ifPDFTeX
-  \usepackage[utf8]{inputenc}
-  \DeclareUnicodeCharacter{25CB}{\ensuremath{\circ}}
-  \DeclareUnicodeCharacter{0192}{\textit{f}}
-  \usepackage[T5]{fontenc}
-  \usepackage{mathptmx}
-\else
-  \usepackage{fontspec}
-  \IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{TeX Gyre Termes}}
-  \IfFontExistsTF{Arial}{\setsansfont{Arial}}{\setsansfont{TeX Gyre Heros}}
-  \IfFontExistsTF{Consolas}{\setmonofont{Consolas}}{\setmonofont{Latin Modern Mono}}
-\fi
+% extarticle has no 13pt option; set the required body size explicitly.
+\makeatletter
+\renewcommand\normalsize{\@setfontsize\normalsize{13}{15.6}}
+\makeatother
+\normalsize
+\usepackage{lmodern}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setsansfont{Times New Roman}
+\IfFontExistsTF{Consolas}{\setmonofont{Consolas}}{\setmonofont{Latin Modern Mono}}
 \usepackage[vietnamese]{babel}
+\addto\captionsvietnamese{\renewcommand{\refname}{TÀI LIỆU THAM KHẢO}}
 \usepackage[top=30mm,bottom=30mm,left=35mm,right=20mm]{geometry}
 \usepackage{setspace}
 \onehalfspacing
@@ -73,7 +73,7 @@
 \usepackage{enumitem}
 \usepackage{float}
 \usepackage{xurl}
-\usepackage[unicode,colorlinks=true,linkcolor=black,urlcolor=blue!80!black,citecolor=blue!80!black,plainpages=false,pdfpagelabels]{hyperref}
+\usepackage[unicode,colorlinks=true,linkcolor=black,urlcolor=blue!80!black,citecolor=blue!80!black,plainpages=false,pdfpagelabels,hypertexnames=false]{hyperref}
 
 \definecolor{codegreen}{rgb}{0,0.6,0}
 \definecolor{codegray}{rgb}{0.5,0.5,0.5}
@@ -356,7 +356,7 @@ Quán triệt tư tưởng chỉ đạo của học phần Các Công nghệ L�
 \begin{enumerate}[noitemsep]
     \item \textbf{Tầng 1A (Mục tiêu bắt buộc lõi):}
     \begin{itemize}[noitemsep]
-        \item Nắm vững cấu trúc thư mục App Router định tuyến theo tệp tin (\texttt{app/layout.tsx}, \texttt{app/page.tsx}).
+        \item Nắm vững cấu trúc thư mục App Router định tuyến theo tệp tin (\path{app/layout.tsx}, \path{app/page.tsx}).
         \item Phân định rõ ràng ranh giới giữa Server Components (chạy mặc định trên máy chủ) và Client Components (khai báo chỉ thị \texttt{"use client"}).
         \item Gọi TMDB tại tầng dịch vụ phía máy chủ và không truyền khóa API xuống Client Components.
     \end{itemize}
@@ -464,13 +464,13 @@ Bảng 1.1 tổng hợp sự so sánh toàn diện giữa ba thế hệ kiến t
 \toprule
 \textbf{Tiêu chí đối sánh} & \textbf{Next.js 16 (App Router)} & \textbf{React 19 + Vite} & \textbf{Nuxt 4 (Vue.js 3)} & \textbf{SvelteKit (Svelte 5)} & \textbf{Astro (Islands)} \\
 \midrule
-\textbf{Khả năng SSR/SSG/ISR} & Toàn diện: RSC, SSR động, SSG tĩnh, và ISR qua Data Cache \texttt{revalidate} & Thuần CSR mặc định; cần plugin ngoài (Vike) để SSR; không có ISR gốc & Hỗ trợ SSR, SSG và ISR/SWR linh hoạt qua Nitro Engine (\texttt{routeRules}) & Hỗ trợ SSR, SSG (\texttt{prerender}), và ISR qua Edge Adapters & Mặc định SSG tĩnh; hỗ trợ on-demand SSR qua adapter; ISR phụ thuộc CDN \\
+\textbf{Khả năng SSR/SSG/ISR} & Toàn diện: RSC, SSR động, SSG tĩnh, và ISR qua Data Cache \texttt{revalidate} & Thuần CSR mặc định; cần plugin ngoài (Vike) để SSR; không có ISR gốc & Hỗ trợ SSR, SSG và ISR/SWR linh hoạt qua Nitro Engine (\path{routeRules}) & Hỗ trợ SSR, SSG (\texttt{prerender}), và ISR qua Edge Adapters & Mặc định SSG tĩnh; hỗ trợ on-demand SSR qua adapter; ISR phụ thuộc CDN \\
 \midrule
 \textbf{Tải trọng Client JS} & Tối ưu nhờ Zero-Bundle RSC; chỉ hydrate các Client Components & Lớn nhất; 100\% mã ứng dụng và thư viện phải nạp về client để hydrate & Trung bình; nạp runtime Vue, router và code component để full hydrate & Siêu nhỏ ($<$20 KB); biên dịch trực tiếp ra DOM code, 0 Virtual DOM runtime & Cực nhỏ (Zero JS mặc định); chỉ hydrate các ốc đảo tương tác (Islands) \\
 \midrule
 \textbf{Trải nghiệm lập trình (DX)} & Turbopack biên dịch nhanh; tư duy phân tách ranh giới mạng phức tạp & DX xuất sắc; HMR tức thì qua Vite ESM, mô hình React thuần dễ debug & Rất tốt; tự động nạp composables, tích hợp sâu hệ sinh thái Vue & Xuất sắc; cú pháp Svelte thanh thoát, Runes (\$state) tinh gọn, ít boilerplate & Rất tốt cho site nội dung; cú pháp template trực quan, hỗ trợ đa framework \\
 \midrule
-\textbf{Quản lý trạng thái Server} & Tích hợp Server Actions (\texttt{"use server"}) và RSC; Route Handlers & Dùng thư viện ngoài: TanStack Query, SWR, Axios kết hợp Redux/Zustand & Tích hợp sẵn \texttt{useFetch}, \texttt{useAsyncData} và server routes Nitro & Form Actions nguyên bản (\texttt{+page.server.ts}), progressive enhancement & Sử dụng top-level await trên server và Astro Actions; state qua nanostores \\
+\textbf{Quản lý trạng thái Server} & Tích hợp Server Actions (\texttt{"use server"}) và RSC; Route Handlers & Dùng thư viện ngoài: TanStack Query, SWR, Axios kết hợp Redux/Zustand & Tích hợp sẵn \texttt{useFetch}, \path{useAsyncData} và server routes Nitro & Form Actions nguyên bản (\path{+page.server.ts}), progressive enhancement & Sử dụng top-level await trên server và Astro Actions; state qua nanostores \\
 \midrule
 \textbf{Đường cong học tập} & Dốc đứng; đòi hỏi hiểu sâu về ranh giới môi trường và Caching đa tầng & Thoải mái; mô hình React truyền thống quen thuộc & Trung bình; quy ước rõ ràng, dễ tiếp cận hơn App Router & Thấp - trung bình; cú pháp HTML/JS tự nhiên, dễ nắm bắt hơn RSC & Thấp nhất; thân thiện với lập trình viên web căn bản \\
 \bottomrule
@@ -512,6 +512,7 @@ Hình 1.1 mô tả chi tiết luồng xử lý và sự tương tác giữa Serv
 
 \begin{figure}[H]
 \centering
+\resizebox{\linewidth}{!}{%
 \begin{tikzpicture}[>=Stealth]
   \tikzstyle{block} = [rectangle, draw, fill=gray!10, text width=2.9cm, align=center, rounded corners=4pt, minimum height=1.1cm, font=\small\bfseries]
   \tikzstyle{serverblock} = [rectangle, draw=blue!70, fill=blue!5, text width=3.2cm, align=center, rounded corners=4pt, minimum height=1.1cm, font=\small\bfseries]
@@ -525,7 +526,7 @@ Hình 1.1 mô tả chi tiết luồng xử lý và sự tương tác giữa Serv
   \node [block, below=2.2cm of server] (payload) {Sinh HTML ban đầu \\ \& RSC Payload Stream};
 
   % 1. Client gửi request
-  \path [line] (client) -- node[above, font=\footnotesize] {1. HTTP Request} (server);
+  \path [line] (client) -- node[above=6mm, align=center, font=\footnotesize] {1. HTTP\\Request} (server);
   
   % Phân nhánh sang RSC và CC
   \path [line] (server.north) |- (rsc.west);
@@ -538,8 +539,9 @@ Hình 1.1 mô tả chi tiết luồng xử lý và sự tương tác giữa Serv
   \draw [line] (cc.south) |- node[pos=0.55, above, font=\footnotesize] {3. Tạo Client Slots} ([yshift=3mm]payload.east);
   
   % 4. Stream HTML và RSC Payload về trình duyệt
-  \path [line] (payload) -| node[above, near start, font=\footnotesize] {4. HTML + RSC Payload} (client);
+  \draw [line] (payload.west) -- node[midway, above=1mm, align=center, font=\footnotesize] {4. HTML +\\RSC Payload} (client |- payload.west) -- (client.south);
 \end{tikzpicture}
+}
 \caption{Sơ đồ luồng kết xuất React Server Components và đóng gói RSC Payload (Nguồn: Xây dựng dựa trên đặc tả kỹ thuật RSC \cite{rsc_architecture})}
 \label{fig:rsc_flow}
 \end{figure}
@@ -551,7 +553,7 @@ Các trường hợp bắt buộc phải sử dụng Client Component bao gồm:
 \begin{itemize}[noitemsep]
     \item Cần lắng nghe sự kiện tương tác của người dùng: \texttt{onClick}, \texttt{onChange}, \texttt{onSubmit}.
     \item Cần quản lý trạng thái động hoặc vòng đời: \texttt{useState}, \texttt{useReducer}, \texttt{useEffect}.
-    \item Cần truy cập các API riêng của trình duyệt: \texttt{localStorage}, \texttt{sessionStorage}, \texttt{window}, \texttt{document}.
+    \item Cần truy cập các API riêng của trình duyệt: \path{localStorage}, \path{sessionStorage}, \texttt{window}, \texttt{document}.
     \item Cần sử dụng các React Custom Hooks quản lý giao diện tương tác.
 \end{itemize}
 
@@ -561,7 +563,7 @@ Các trường hợp bắt buộc phải sử dụng Client Component bao gồm:
 
 Dự án MovieHub được xây dựng trên nền tảng \textbf{Next.js 16.3.6} và \textbf{React 19.2.8}. Một trong những thay đổi quan trọng nhất của Next.js kể từ phiên bản 15 và 16 là sự chuyển dịch mô hình bộ nhớ đệm: Hàm \texttt{fetch} mặc định không còn tự động lưu đệm vĩnh viễn (\texttt{force-cache}) như thời Next.js 14, mà chuyển sang mặc định \texttt{no-store} trừ khi lập trình viên chủ động khai báo chiến lược lưu trữ.
 
-\subsubsection{Tính hợp lệ của API \texttt{fetch(url, \{ next: \{ revalidate \} \})}}
+\subsubsection{Tính hợp lệ của API \texttt{fetch} và tùy chọn \texttt{revalidate}}
 Một số quan điểm cho rằng cú pháp \texttt{fetch(url, \{ next: \{ revalidate: seconds \} \})} là cơ chế cũ của Next.js 13/14 và bị thay thế hoàn toàn trong Next.js 16. Tuy nhiên, theo tài liệu đặc tả chính thức của Vercel (\url{https://nextjs.org/docs/app/api-reference/functions/fetch}), đây vẫn là \textbf{API chuẩn mực, ổn định (Stable API) và hoàn toàn hợp lệ} trong Next.js 16 để điều khiển \textbf{Data Cache ở cấp độ yêu cầu mạng (Request-level Caching)}:
 \begin{equation}
 \text{fetch}(\text{url}, \{\, \text{next}: \{\, \text{revalidate}: 3600 \,\} \,\})
@@ -680,7 +682,7 @@ Dự án được xây dựng trên nền tảng phiên bản mới nhất \text
 \subsubsection{Framework giao diện Tailwind CSS v4}
 Dự án áp dụng thế hệ mới nhất \textbf{Tailwind CSS v4} [5]. Đây là bước tái kiến trúc toàn diện của framework CSS tiện ích này:
 \begin{itemize}[noitemsep]
-    \item \textbf{Loại bỏ tệp cấu hình truyền thống:} Không còn yêu cầu tệp \texttt{tailwind.config.js} phức tạp; toàn bộ các biến giao diện, màu sắc chủ đạo, font chữ được định nghĩa trực tiếp trong tệp CSS nguồn thông qua chỉ thị \texttt{@theme}.
+    \item \textbf{Loại bỏ tệp cấu hình truyền thống:} Không còn yêu cầu tệp \path{tailwind.config.js} phức tạp; toàn bộ các biến giao diện, màu sắc chủ đạo, font chữ được định nghĩa trực tiếp trong tệp CSS nguồn thông qua chỉ thị \texttt{@theme}.
     \item \textbf{Engine biên dịch Oxide:} Tailwind CSS v4 cung cấp bộ máy xử lý mới; báo cáo không có benchmark tốc độ giữa v3 và v4 trên repo này.
     \item \textbf{Tương thích tự nhiên với biến CSS (CSS Custom Properties):} Dễ dàng xây dựng hệ thống thiết kế đồng nhất theo tiêu chuẩn điện ảnh Netflix Dark Cinema.
 \end{itemize}
@@ -692,7 +694,7 @@ Mã nguồn của toàn bộ dự án được phát triển 100\% bằng \textb
 
 The Movie Database (TMDB) [3] là cơ sở dữ liệu mở phổ biến nhất trên thế giới về phim điện ảnh và chương trình truyền hình. Hệ sinh thái MovieHub khai thác các nhóm dịch vụ REST API v3 của TMDB:
 \begin{itemize}[noitemsep]
-    \item \textbf{Nhóm dữ liệu trang chủ:} \texttt{/trending/movie/week}, \texttt{/movie/now\_playing}, \texttt{/movie/top\_rated} và \texttt{/discover/movie} cho phim kinh điển.
+    \item \textbf{Nhóm dữ liệu trang chủ:} \path{/trending/movie/week}, \path{/movie/now_playing}, \path{/movie/top_rated} và \texttt{/discover/movie} cho phim kinh điển.
     \item \textbf{Nhóm dữ liệu chi tiết:} \path{/movie/{id}} cung cấp thông tin phim; các endpoint đuôi \texttt{/credits}, \texttt{/videos} và \texttt{/similar} lần lượt cung cấp diễn viên, video và phim tương tự.
     \item \textbf{Nhóm dữ liệu khám phá và lọc động:} \texttt{/discover/movie} dùng tham số thể loại, quốc gia, năm và cách sắp xếp. Với kiểu sắp xếp theo điểm, dịch vụ thêm ngưỡng số phiếu bình chọn.
     \item \textbf{Nhóm dữ liệu tìm kiếm thời gian thực:} \texttt{/search/movie} hỗ trợ tìm kiếm trực tiếp với Live Search Preview và trang \texttt{/search}.
@@ -798,7 +800,7 @@ Mã nguồn dự án được tổ chức khoa học, tách bạch rõ ràng gi�
         \item \texttt{watchlist/page.tsx}: Trang danh sách phim yêu thích cá nhân của người dùng.
         \item \texttt{error.tsx}, \texttt{not-found.tsx}, \texttt{global-error.tsx}: Các trang bẫy lỗi và 404 tầng Root chuẩn phong cách Netflix Dark Cinema.
         \item \texttt{sitemap.ts}, \texttt{robots.ts}: Tệp siêu dữ liệu SEO chuẩn Metadata File Conventions.
-        \item \texttt{actions/watchlist.ts}: Server Action ghi cookie; \texttt{api/search/route.ts}: Route Handler GET phục vụ Live Search.
+        \item \path{actions/watchlist.ts}: Server Action ghi cookie; \path{api/search/route.ts}: Route Handler GET phục vụ Live Search.
     \end{itemize}
     \item \texttt{components/}: Chứa các UI components được phân chia mô-đun hóa:
     \begin{itemize}[noitemsep]
@@ -808,7 +810,7 @@ Mã nguồn dự án được tổ chức khoa học, tách bạch rõ ràng gi�
         \item \texttt{FilterBar.tsx}: Thanh công cụ lọc đa chiều linh hoạt.
         \item \texttt{MovieCard.tsx}: Thẻ hiển thị áp phích phim chuẩn kích thước.
     \end{itemize}
-    \item \texttt{services/client.ts}: Hàm \texttt{fetchTMDB}, cấu hình Data Cache và khử trùng lặp; \texttt{movies.ts}, \texttt{discover.ts}, \texttt{search.ts}, \texttt{videos.ts} chứa các lời gọi theo nghiệp vụ; \texttt{tmdb.ts} tái xuất các hàm cho trang.
+    \item \path{services/client.ts}: Hàm \texttt{fetchTMDB}, cấu hình Data Cache và khử trùng lặp; \texttt{movies.ts}, \texttt{discover.ts}, \texttt{search.ts}, \texttt{videos.ts} chứa các lời gọi theo nghiệp vụ; \texttt{tmdb.ts} tái xuất các hàm cho trang.
     \item \texttt{types/}: Chứa toàn bộ các định nghĩa kiểu dữ liệu TypeScript.
 \end{itemize}
 
@@ -817,7 +819,7 @@ Mã nguồn dự án được tổ chức khoa học, tách bạch rõ ràng gi�
 \subsubsection{Kiến trúc tầng dịch vụ \texttt{services/client.ts}}
 Tất cả các lời gọi mạng ra ngoài TMDB đều được tập trung vào hàm cốt lõi \texttt{fetchTMDB<T>()}. Hàm này chịu trách nhiệm:
 \begin{enumerate}[noitemsep]
-    \item Dùng URL mặc định \texttt{https://api.themoviedb.org/3}; có thể thay bằng \texttt{TMDB\_BASE\_URL} để kiểm thử.
+    \item Dùng URL mặc định \path{https://api.themoviedb.org/3}; có thể thay bằng \texttt{TMDB\_BASE\_URL} để kiểm thử.
     \item Đính kèm \texttt{api\_key=\$\{TMDB\_API\_KEY\}} ở yêu cầu từ server tới TMDB; không dùng tiền tố \texttt{NEXT\_PUBLIC\_}. Cần tránh ghi URL có khóa vào log hoặc chuyển nó qua props.
     \item Kiểm soát lỗi mạng và mã trạng thái HTTP, trả về thông báo lỗi chuẩn xác hoặc kích hoạt cơ chế dự phòng khi có sự cố.
 \end{enumerate}
@@ -889,12 +891,12 @@ Hình 2.2 thể hiện sơ đồ luồng người dùng (User Navigation Flow) t
   \node [process] (search) at (4.5, -2.2) {Tìm kiếm Live \\ \texttt{/search}};
 
   % Các đường kết nối luồng
-  \path [line] (home) -- node[above, font=\footnotesize] {Menu Lọc} (browse);
-  \path [line] (home) -- node[above, font=\footnotesize] {Bấm xem} (trailer);
-  \path [line] (home) -- node[right, font=\footnotesize] {Chọn phim} (detail);
+  \path [line] (home) -- node[above=10mm, font=\footnotesize] {Menu Lọc} (browse);
+  \path [line] (home) -- node[above=10mm, font=\footnotesize] {Bấm xem} (trailer);
+  \path [line] (home) -- node[left, font=\footnotesize] {Chọn phim} (detail);
   \path [line] (home.south east) -- node[above, sloped, font=\footnotesize] {Gõ Header} (search.north west);
   \path [line] (browse.south) |- node[below, near end, font=\footnotesize] {Chọn phim} (detail.west);
-  \path [line] (search) -- node[above, font=\footnotesize] {Chọn phim} (detail);
+  \path [line] (search) -- node[below=1mm, align=center, font=\footnotesize] {Chọn\\phim} (detail);
   \path [line] (detail) -- node[right, font=\footnotesize] {Thêm/Xóa} (watch);
 \end{tikzpicture}
 \caption{Sơ đồ luồng điều hướng trải nghiệm người dùng trong hệ thống MovieHub (Nguồn: Nhóm tác giả thiết kế)}
@@ -909,7 +911,7 @@ Dự án được triển khai trên nền tảng phần mềm hiện đại và
     \item \textbf{Ngôn ngữ và Công cụ quản lý gói:} TypeScript 5.x và npm (Node Package Manager).
     \item \textbf{Môi trường lập trình:} Visual Studio Code tích hợp tiện ích mở rộng ESLint, Tailwind CSS IntelliSense và GitLens.
     \item \textbf{Công cụ kiểm chứng:} ESLint, TypeScript, Node test runner và \texttt{next build}; dự án có cấu hình analyzer nhưng chưa lưu kết quả đo.
-    \item \textbf{Công cụ biên soạn tài liệu kỹ thuật:} Hệ thống MiKTeX với trình biên dịch \texttt{pdflatex}.
+    \item \textbf{Công cụ biên soạn tài liệu kỹ thuật:} Hệ thống MiKTeX với trình biên dịch \texttt{XeLaTeX}; \texttt{latexmk} tự chạy lại để cập nhật mục lục và tham chiếu.
 \end{itemize}
 
 % ==============================================================================
@@ -961,7 +963,7 @@ Lệnh \texttt{npx next --version} xác nhận phiên bản \texttt{Next.js v16.
 \end{itemize}
 
 \subsubsection{Server-side Data Fetching và song song hóa với \texttt{Promise.all}}
-Trang chủ \texttt{app/page.tsx} là Server Component bất đồng bộ. Bốn lời gọi dữ liệu được khởi tạo cùng lúc; kết quả được truyền vào giao diện sau khi tất cả hoàn tất. Dữ liệu TMDB được lấy bởi \texttt{fetchTMDB} trong \texttt{services/client.ts}, sử dụng biến môi trường \texttt{TMDB\_API\_KEY} và \texttt{next: \{ revalidate \}}. Khóa API không có tiền tố \texttt{NEXT\_PUBLIC\_}.
+Trang chủ \texttt{app/page.tsx} là Server Component bất đồng bộ. Bốn lời gọi dữ liệu được khởi tạo cùng lúc; kết quả được truyền vào giao diện sau khi tất cả hoàn tất. Dữ liệu TMDB được lấy bởi \texttt{fetchTMDB} trong \path{services/client.ts}, sử dụng biến môi trường \texttt{TMDB\_API\_KEY} và \texttt{next: \{ revalidate \}}. Khóa API không có tiền tố \texttt{NEXT\_PUBLIC\_}.
 \begin{lstlisting}[language=TypeScript]
 // Trich tu app/page.tsx
 const [trending, nowPlaying, topRated, classicData] =
@@ -983,7 +985,7 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-// Cú pháp áp dụng tương tự cho Route Handler động:
+// Cu phap ap dung tuong tu cho Route Handler dong:
 // export async function GET(req: Request, { params }: { params: Promise<{ id: string }> })
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
@@ -1014,7 +1016,7 @@ Live Search là tác vụ đọc. \texttt{NavSearchBar} đợi 300ms, gọi GET 
 
 
 \subsubsection{Streaming Suspense và Skeleton Loading States}
-Tại \texttt{app/movie/[id]/page.tsx}, thông tin chính cần \texttt{getMovieDetails}, \texttt{getMovieVideos} và trạng thái watchlist trước khi phần thân trang được dựng. Hai khối dữ liệu phụ \texttt{CastList} và \texttt{SimilarMovies} nằm trong các ranh giới Suspense độc lập với fallback tương ứng. Mã thật sử dụng \texttt{CastSkeleton} và một dãy khung poster chờ:
+Tại \path{app/movie/[id]/page.tsx}, thông tin chính cần \texttt{getMovieDetails}, \texttt{getMovieVideos} và trạng thái watchlist trước khi phần thân trang được dựng. Hai khối dữ liệu phụ \texttt{CastList} và \texttt{SimilarMovies} nằm trong các ranh giới Suspense độc lập với fallback tương ứng. Mã thật sử dụng \texttt{CastSkeleton} và một dãy khung poster chờ:
 \begin{lstlisting}[language=TypeScript]
 <Suspense fallback={<CastSkeleton />}>
   <CastList movieId={id} />
@@ -1067,7 +1069,7 @@ Thanh điều hướng \texttt{Header} sở hữu các tính năng cao cấp:
 \end{itemize}
 
 \subsubsection{Module Khám phá Diễn viên và Tuyển tập Phim tương tự}
-Tại trang chi tiết phim (\texttt{/movie/[id]}), các component \texttt{CastList} và \texttt{SimilarMovies} cung cấp cái nhìn toàn diện về đội ngũ diễn viên chính và các tác phẩm điện ảnh cùng phong cách, được bọc trong các ranh giới React Suspense độc lập giúp tối ưu hóa luồng tải trang.
+Tại trang chi tiết phim (\path{/movie/[id]}), các component \texttt{CastList} và \texttt{SimilarMovies} cung cấp cái nhìn toàn diện về đội ngũ diễn viên chính và các tác phẩm điện ảnh cùng phong cách, được bọc trong các ranh giới React Suspense độc lập giúp tối ưu hóa luồng tải trang.
 
 \subsection{Hiện thực cơ chế tự phục hồi và khử trùng lặp dữ liệu}
 
@@ -1099,7 +1101,7 @@ Bảng 3.1 ghi phân công và tỷ lệ nhóm tự khai. Lịch sử Git cho th
 \centering
 \caption{Bảng phân công trách nhiệm và tỷ lệ đóng góp của các thành viên (Nguồn: Nhóm tác giả thống nhất)}
 \label{tab:team_contribution}
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{2.2cm}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}p{1.8cm}}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}p{1.8cm}}
 \toprule
 \textbf{Họ và tên} & \textbf{Mã số SV} & \textbf{Nhiệm vụ kỹ thuật đảm nhiệm chính} & \textbf{Đóng góp} \\
 \midrule
@@ -1233,7 +1235,7 @@ Cookie đầu vào chỉ giữ ID số nguyên dương an toàn, loại trùng v
 
 \subsection{Ma trận đáp ứng yêu cầu môn học}
 \small
-\begin{longtable}{>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{3.7cm}>{\raggedright\arraybackslash}p{9.4cm}}
+\begin{longtable}{>{\raggedright\arraybackslash}p{1.2cm}>{\raggedright\arraybackslash}p{3.7cm}>{\raggedright\arraybackslash}p{\dimexpr\textwidth-4.9cm-6\tabcolsep\relax}}
 \caption{Đối chiếu yêu cầu và tệp minh chứng trong repo}\label{tab:coverage_matrix}\\
 \toprule
 \textbf{Tầng} & \textbf{Tiêu chí} & \textbf{Hiện thực và minh chứng} \\
@@ -1243,12 +1245,12 @@ Cookie đầu vào chỉ giữ ID số nguyên dương an toàn, loại trùng v
 \bottomrule\endfoot
 1A & App Router, page/layout, next/link & \texttt{app/layout.tsx}, \texttt{app/page.tsx}; liên kết ở \texttt{MovieCard} và \texttt{MovieRow}. Bảng~\ref{tab:route_table} là output build. \\
 1A & Server/Client, props, state, hydration & Trang chủ dựng card ở server; \texttt{MovieRow} nhận props và xử lý sự kiện; \texttt{FilterBar} dùng URL state; \texttt{Header} dùng \texttt{useEffect} cho scroll. \\
-1A & Data fetching trên server & \texttt{services/client.ts} chứa \texttt{fetchTMDB}; \texttt{app/page.tsx} gọi bốn nhóm dữ liệu song song. Log HTML build: \path{baocao/evidence/server-render.txt}. \\
-1A & API bất đồng bộ của Next.js 16 & \texttt{app/movie/[id]/page.tsx} dùng \texttt{await params}; \texttt{app/browse/page.tsx} dùng \texttt{await searchParams}; Watchlist dùng \texttt{await cookies()}. \\
-1B & Route động, loading/error/not-found & \texttt{app/movie/[id]/page.tsx}, \texttt{loading.tsx}, \texttt{error.tsx}, \texttt{not-found.tsx}, \texttt{global-error.tsx}; \texttt{sitemap.ts}, \texttt{robots.ts}; log \path{baocao/evidence/runtime-http.txt} xác nhận UI không tìm thấy và \texttt{noindex}. \\
-1B & Cache, revalidation & \texttt{services/client.ts} với \texttt{next.revalidate}; Bảng~\ref{tab:cache_experiments} đối chiếu bộ đếm miss, hit và sau TTL trên mock origin; không suy số request từ page/metadata. \\
-1B & Server Action và Route Handler & \texttt{app/actions/watchlist.ts} xử lý ghi cookie; \texttt{app/api/search/route.ts} xử lý GET. \\
-1B & Suspense, image, font, metadata & \texttt{app/movie/[id]/page.tsx}; \texttt{MovieCard.tsx} dùng \texttt{next/image}; \texttt{app/layout.tsx} dùng \texttt{next/font}; \texttt{next.config.ts} có \texttt{remotePatterns}; \texttt{generateMetadata} theo phim. \\
+1A & Data fetching trên server & \path{services/client.ts} chứa \texttt{fetchTMDB}; \texttt{app/page.tsx} gọi bốn nhóm dữ liệu song song. Log HTML build: \path{baocao/evidence/server-render.txt}. \\
+1A & API bất đồng bộ của Next.js 16 & \path{app/movie/[id]/page.tsx} dùng \texttt{await params}; \texttt{app/browse/page.tsx} dùng \texttt{await searchParams}; Watchlist dùng \texttt{await cookies()}. \\
+1B & Route động, loading/error/not-found & \path{app/movie/[id]/page.tsx}, \texttt{loading.tsx}, \texttt{error.tsx}, \texttt{not-found.tsx}, \texttt{global-error.tsx}; \texttt{sitemap.ts}, \texttt{robots.ts}; log \path{baocao/evidence/runtime-http.txt} xác nhận UI không tìm thấy và \texttt{noindex}. \\
+1B & Cache, revalidation & \path{services/client.ts} với \texttt{next.revalidate}; Bảng~\ref{tab:cache_experiments} đối chiếu bộ đếm miss, hit và sau TTL trên mock origin; không suy số request từ page/metadata. \\
+1B & Server Action và Route Handler & \path{app/actions/watchlist.ts} xử lý ghi cookie; \texttt{app/api/search/route.ts} xử lý GET. \\
+1B & Suspense, image, font, metadata & \path{app/movie/[id]/page.tsx}; \texttt{MovieCard.tsx} dùng \texttt{next/image}; \texttt{app/layout.tsx} dùng \texttt{next/font}; \texttt{next.config.ts} có \texttt{remotePatterns}; \texttt{generateMetadata} theo phim. \\
 2 & Git, chạy lại, cấu hình bí mật & Lịch sử 7 merge PR trong Git; \texttt{README.md}, \texttt{.env.example}, \texttt{package.json}. Không đưa khóa thật vào báo cáo. \\
 2 & Test và CI & \texttt{tests/*.test.mjs}, script \texttt{npm test}, \path{.github/workflows/check.yml}; log \path{baocao/evidence/test-output.txt}. \\
 2 & Bảo mật và xử lý lỗi & Xác thực đầu vào ở Route Handler/Server Action; \texttt{app/error.tsx}, \texttt{global-error.tsx}, \texttt{not-found.tsx}; Security Headers trong \texttt{next.config.ts}. \\
@@ -1256,7 +1258,7 @@ Cookie đầu vào chỉ giữ ID số nguyên dương an toàn, loại trùng v
 \end{longtable}
 \normalsize
 
-Ma trận nêu đúng những gì có thể xác minh từ repo và thực nghiệm đo lường trực tiếp. Các số liệu bundle và tỷ lệ tăng tốc Caching được đối soát qua công cụ phân tích và đo đạc môi trường production.
+Ma trận nêu phạm vi có thể xác minh từ repo và thực nghiệm đo lường trực tiếp. Bản báo cáo hiện tại chưa có tệp đo gốc để công bố số liệu bundle hoặc tỷ lệ tăng tốc Caching.
 
 % ==============================================================================
 % KẾT LUẬN VÀ HƯỚNG PHÁT TRIỂN
@@ -1280,6 +1282,8 @@ Nhóm định hướng các bước phát triển tiếp theo: (1) bổ sung b�
 % ==============================================================================
 \newpage
 \begin{thebibliography}{99}
+\urlstyle{same}
+\setlength{\itemsep}{0pt}
 \addcontentsline{toc}{section}{TÀI LIỆU THAM KHẢO}
 
 \bibitem{nextjs_docs}
@@ -1335,7 +1339,7 @@ Ví dụ rút gọn từ \texttt{app/page.tsx}: Server Component tạo card; \te
 \end{lstlisting}
 
 \subsection*{Phụ lục 2. Chọn Server Action hay Route Handler}
-Watchlist là thao tác ghi dữ liệu theo từng người dùng nên dùng \texttt{toggleWatchlist} trong \texttt{app/actions/watchlist.ts}; action kiểm tra \texttt{movieId}, ghi cookie và gọi \texttt{revalidatePath}. Live Search là thao tác đọc lặp lại khi nhập chữ nên dùng \texttt{GET /api/search?q=...}; client đợi 300ms và hủy request cũ bằng \texttt{AbortController}. Server kiểm tra từ khóa trước khi gọi TMDB. \texttt{s-maxage=120} là chỉ dẫn cho shared cache; mức độ cache thật cần kiểm tra trên môi trường triển khai.
+Watchlist là thao tác ghi dữ liệu theo từng người dùng nên dùng \texttt{toggleWatchlist} trong \path{app/actions/watchlist.ts}; action kiểm tra \texttt{movieId}, ghi cookie và gọi \texttt{revalidatePath}. Live Search là thao tác đọc lặp lại khi nhập chữ nên dùng \texttt{GET /api/search?q=...}; client đợi 300ms và hủy request cũ bằng \texttt{AbortController}. Server kiểm tra từ khóa trước khi gọi TMDB. \texttt{s-maxage=120} là chỉ dẫn cho shared cache; mức độ cache thật cần kiểm tra trên môi trường triển khai.
 
 \subsection*{Phụ lục 3. Cách tái lập các kiểm tra}
 Tại thư mục gốc của repo, chạy lần lượt:
