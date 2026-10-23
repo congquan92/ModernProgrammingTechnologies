@@ -1,10 +1,5 @@
-﻿generated_at: 2026-10-14T21:19:07.2674050+07:00
-git_head: 9be1f28
-working_tree_dirty: True
-command: python scripts/verify-render-evidence.py
 source: .next/server/app/index.html (production build)
 prerendered_home_exists: true
-expected_row_headings_in_html: 5/5
-images_with_alt_in_html: 107
+expected_row_headings_in_html: 4/4
+images_with_alt_in_html: 83
 api_key_query_in_html: False
-exit_code: 0

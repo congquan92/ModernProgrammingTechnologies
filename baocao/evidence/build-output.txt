@@ -1,39 +1,36 @@
-﻿generated_at: 2026-10-14T21:19:00.0000799+07:00
-git_head: 9be1f28
-working_tree_dirty: True
-command: npm run build
-
-> modern-programming-technologies@0.1.0 build
-> next build
-
+npm notice run modern-programming-technologies@0.1.0 build
+npm notice run next build
 ▲ Next.js 16.3.6 (Turbopack)
 - Environments: .env.local
-✓ Running next.config.ts took 37ms
+⚠ Warning: Next.js ignored package-lock.json in /home/quocdai210 because it is outside the current Git repository (/home/quocdai210/Projects/ModernProgrammingTechnologies).
+ To use this directory, set `turbopack.root` in your Next.js config.
+
+✓ Running next.config.ts took 45ms
 
   Creating an optimized production build ...
-✓ Compiled successfully in 967ms
+✓ Compiled successfully in 587ms
   Running TypeScript ...
-  Finished TypeScript in 1391ms ...
-  Collecting page data using 11 workers ...
-  Generating static pages using 11 workers (0/9) ...
-  Generating static pages using 11 workers (2/9) 
-  Generating static pages using 11 workers (4/9) 
-  Generating static pages using 11 workers (6/9) 
-✓ Generating static pages using 11 workers (9/9) in 999ms
+  Finished TypeScript in 1769ms ...
+  Collecting page data using 12 workers ...
+  Generating static pages using 12 workers (0/10) ...
+  Generating static pages using 12 workers (2/10) 
+  Generating static pages using 12 workers (4/10) 
+  Generating static pages using 12 workers (7/10) 
+✓ Generating static pages using 12 workers (10/10) in 894ms
   Finalizing page optimization ...
 
-Route (app)      Revalidate  Expire
-┌ ○ /                   30m      1y
+Route (app)       Revalidate  Expire
+┌ ○ /                    30m      1y
 ├ ○ /_not-found
 ├ ƒ /api/search
 ├ ƒ /browse
 ├ ƒ /movie/[id]
+├ ○ /robots.txt
 ├ ƒ /search
-├ ƒ /tv
+├ ○ /sitemap.xml          1h      1y
 └ ƒ /watchlist
 
 
 ○  (Static)   prerendered as static content
 ƒ  (Dynamic)  server-rendered on demand
 
-exit_code: 0

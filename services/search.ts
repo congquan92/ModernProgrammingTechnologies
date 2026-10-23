@@ -38,16 +38,15 @@ export async function searchQuickLive(query: string): Promise<Movie[]> {
     if (!trimmed) return [];
     try {
         const data = await fetchTMDB<MovieListResponse>(
-            `/search/multi?query=${encodeURIComponent(trimmed)}`,
+            `/search/movie?query=${encodeURIComponent(trimmed)}`,
             120,
         );
         const filtered = (data.results || [])
-            .filter((item) => (item as unknown as { media_type?: string }).media_type !== "person")
             .slice(0, 5)
             .map((item) => ({
                 ...item,
-                title: item.title || item.name || "Phim",
-                release_date: item.release_date || item.first_air_date || "",
+                title: item.title || "Phim",
+                release_date: item.release_date || "",
             }));
 
         return filtered;

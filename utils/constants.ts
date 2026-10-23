@@ -24,7 +24,6 @@ export const MOVIE_GENRES: FilterItem[] = [
     { id: "10770", label: "Phim Chiếu TV" },
     { id: "37", label: "Miền Tây" },
     { id: "classic", label: "Kinh Điển" },
-    { id: "tv", label: "TV Shows" },
 ];
 
 export const COUNTRIES: FilterItem[] = [
@@ -68,5 +67,4 @@ export const SORT_OPTIONS: FilterItem[] = [
 export const CONTENT_TYPES: FilterItem[] = [
     { id: "all", label: "Tất cả định dạng" },
     { id: "movie", label: "Phim lẻ" },
-    { id: "tv", label: "Phim bộ (TV Series)" },
 ];
