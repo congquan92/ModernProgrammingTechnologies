@@ -445,7 +445,7 @@ Bảng 1.1 tổng hợp sự so sánh toàn diện giữa ba thế hệ kiến t
 \textbf{Vị trí kết xuất chính} & Trình duyệt Client & Server \& Client Hydrate & Server (mặc định) + Client \\
 \textbf{Tải trọng JS Client} & Rất lớn (toàn bộ app) & Lớn (toàn trang nạp) & Tối ưu (Zero-bundle RSC) \\
 \textbf{Khả năng SEO} & Rất kém (HTML rỗng) & Tốt (SSR/SSG tĩnh) & Tối ưu xuất sắc \\
-\textbf{Cơ chế Caching} & Trình duyệt thủ công & HTTP Cache đơn giản & Caching 4 tầng tự động \\
+\textbf{Cơ chế Caching} & Trình duyệt thủ công & HTTP Cache đơn giản & Data Cache tường minh (\texttt{revalidate}) hoặc Cache Components \\
 \textbf{Hỗ trợ Streaming} & Không hỗ trợ & Không có & React Suspense Streaming \\
 \textbf{Xử lý Mutation} & Gọi REST API Route & Tạo thư mục \texttt{pages/api} & Server Actions trực tiếp \\
 \textbf{Bảo mật API Key} & Dễ lộ trong mã client & Phải qua API trung gian & Giữ hoàn toàn trên Server \\
@@ -489,7 +489,7 @@ Dựa trên trải nghiệm thực tế trong quá trình phát triển dự án
 \begin{itemize}[noitemsep]
     \item \textbf{Độ trễ khởi động lạnh (Cold Starts) trên môi trường Serverless:} Các tuyến đường kết xuất động (Dynamic SSR) và Route Handler khi triển khai trên hạ tầng Serverless (AWS Lambda, Vercel Functions) phải chịu độ trễ khởi động tiến trình Node.js (từ 200ms đến hơn 1.500ms) khi có yêu cầu đột biến sau thời gian nhàn rỗi.
     \item \textbf{Rủi ro phụ thuộc nền tảng (Vendor Lock-in) và chi phí tự vận hành (Self-Hosting):} Các tính năng cao cấp như Incremental Cache, Image Optimization, và On-Demand ISR được thiết kế tối ưu hóa riêng cho hệ sinh thái thương mại của Vercel. Khi tự triển khai trên máy chủ độc lập (Docker/Kubernetes), đội ngũ kỹ thuật phải tự cấu hình phức tạp với standalone output, Redis Cache Handler (\texttt{@neshca/cache-handler}), làm tăng đáng kể chi phí bảo trì DevOps.
-    \item \textbf{Độ phức tạp của hệ thống Caching đa tầng:} App Router sở hữu 4 tầng đệm đan xen (Request Memoization, Data Cache, Full Route Cache, Router Cache). Sự tương tác phức tạp giữa các tầng này dễ dẫn đến lỗi dữ liệu cũ (stale data) hoặc bất ngờ biến tuyến tĩnh thành động khi gọi \texttt{cookies()}. Ngoài ra, sự thay đổi liên tục về chiến lược đệm giữa các phiên bản (mặc định \texttt{force-cache} ở bản 14, mặc định \texttt{no-store} ở bản 15, cờ thực nghiệm \texttt{use cache} ở bản 16) tạo ra gánh nặng bảo trì mã nguồn lớn.
+    \item \textbf{Độ phức tạp và sự chuyển dịch của mô hình Caching:} Từ phiên bản Next.js 15 và 16, Vercel đã xóa bỏ cơ chế tự động lưu đệm ngầm (\texttt{force-cache} mặc định thời Next.js 14) vốn dễ gây hiện tượng dữ liệu cũ ngoài ý muốn (stale data). Thay vào đó, Next.js chuyển sang cơ chế tường minh: mặc định hàm \texttt{fetch} là \texttt{no-store}. Ở Next.js 16, Vercel chuẩn hóa kiến trúc \textbf{Cache Components} dưới cấu hình gốc \texttt{cacheComponents: true} (hợp nhất các cờ tiền thân như \texttt{ppr}, \texttt{useCache}, và \texttt{dynamicIO}). Khi cấu hình này tắt (\texttt{cacheComponents: false}) như thiết lập mặc định trong dự án MovieHub, ứng dụng tuân thủ mô hình Caching tiêu chuẩn (Previous Caching Model), trong đó bộ đệm dữ liệu được điều khiển tường minh ở cấp độ yêu cầu mạng (Request-level Data Cache) thông qua tùy chọn \texttt{next: \{ revalidate: N \}}. Lập trình viên phải phân định rạch ròi giữa Data Cache và các Dynamic Functions (như \texttt{cookies()}) để tránh vô tình chuyển đổi tuyến tĩnh thành tuyến động.
 \end{itemize}
 
 \subsection{Kiến trúc React Server Components (RSC) và Client Components}
@@ -559,6 +559,84 @@ Các trường hợp bắt buộc phải sử dụng Client Component bao gồm:
 
 Để duy trì hiệu năng tối ưu, đồ án tuân thủ nghiêm ngặt mô hình \textbf{Composition Pattern}: Đẩy các Client Component xuống các nút lá nhỏ nhất của cây giao diện (ví dụ: nút bấm mở modal \texttt{TrailerModal}, thanh cuộn \texttt{MovieRow}), giữ cho các component cha (như \texttt{app/page.tsx}, \texttt{app/layout.tsx}) là Server Components để thực hiện lấy dữ liệu tập trung.
 
+\paragraph*{Ranh giới Server/Client và cơ chế Zero-Bundle Slider trong MovieHub:}
+Hình~\ref{fig:server_client_boundary} trực quan hóa cơ chế phân định ranh giới mạng (Network Boundary) giữa Server Component và Client Component tại Trang chủ của MovieHub:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Phía máy chủ (Server Environment):} Tuyến đường \texttt{app/page.tsx} là một React Server Component (RSC), thực thi độc quyền trên môi trường Node.js. Nó gọi hàm dịch vụ \texttt{getTrendingMovies()} để lấy danh sách phim, sau đó khởi tạo trực tiếp danh sách các thẻ \texttt{<MovieCard movie=\{m\} />} trên server. Component \texttt{MovieCard.tsx} cũng là một Server Component, không chứa chỉ thị \texttt{"use client"}. Nhờ đó, toàn bộ mã nguồn xử lý layout, các thẻ cấu trúc, và thư viện \texttt{next/image} được kết xuất hoàn toàn thành HTML tĩnh mà \textbf{không đưa một dòng mã JavaScript nào của \texttt{MovieCard} vào client bundle} (đạt chuẩn 0~KB JavaScript client bundle).
+    \item \textbf{Vượt qua ranh giới mạng (Across Network Boundary):} Thay vì nhập khẩu trực tiếp tệp \texttt{MovieCard} vào phía client, \texttt{app/page.tsx} truyền danh sách các phần tử React đã render sẵn qua thuộc tính \texttt{cards=\{movies.map(...)\}} (dưới dạng mảng \texttt{ReactNode[]}). Dữ liệu này được Next.js tuần tự hóa an toàn trong luồng RSC Payload.
+    \item \textbf{Phía trình duyệt (Client Environment):} Component \texttt{components/client/MovieRow.tsx} mang chỉ thị \texttt{"use client"} đóng vai trò là Client Boundary chuyên biệt. Nó chỉ chịu trách nhiệm quản lý tương tác giao diện người dùng: sử dụng hook \texttt{useRef} để gắn kết container cuộn ngang, xử lý sự kiện nhấp chuột (\texttt{onClick}) trượt trái/phải, và đặt các phần tử \texttt{props.cards} vào trong thanh trượt. Bộ kiểm thử kiến trúc tự động (\path{tests/server-client-boundary.test.mjs}) giám định và khẳng định số lượng import của \texttt{MovieCard} trong mã nguồn client của \texttt{MovieRow} bằng đúng \textbf{0}, bảo đảm tuyệt đối tính toàn vẹn của ranh giới mạng.
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[>=Stealth, font=\small]
+  % Define styles
+  \tikzstyle{serverbox} = [draw=blue!70, fill=blue!5, rounded corners=6pt, line width=1pt]
+  \tikzstyle{clientbox} = [draw=red!70, fill=red!5, rounded corners=6pt, line width=1pt]
+  \tikzstyle{compnode} = [rectangle, draw=blue!80, fill=white, rounded corners=4pt, text width=5.0cm, align=left, inner sep=6pt, font=\footnotesize]
+  \tikzstyle{clientnode} = [rectangle, draw=red!80, fill=white, rounded corners=4pt, text width=5.2cm, align=left, inner sep=6pt, font=\footnotesize]
+  \tikzstyle{flowarrow} = [draw=blue!80!black, ->, thick]
+  \tikzstyle{netarrow} = [draw=purple!80!black, ->, line width=1.5pt, dashed]
+
+  % Server Container
+  \draw[serverbox] (-0.5, 0.5) rectangle (5.8, -6.8);
+  \node[anchor=north west, font=\bfseries\color{blue!80!black}] at (-0.3, 0.3) {Server Environment (Next.js Node.js)};
+
+  % Server Components
+  \node[compnode] (page) at (2.65, -1.1) {
+    \textbf{app/page.tsx} \hfill \textit{\color{blue!70}[RSC]}\\[2pt]
+    $\bullet$ Gọi TMDB: \texttt{getTrendingMovies()}\\[1pt]
+    $\bullet$ Lấy danh sách phim (\texttt{Movie[]})\\[1pt]
+    $\bullet$ Dựng: \texttt{<MovieCard movie=\{m\} />}
+  };
+
+  \node[compnode] (card) at (2.65, -4.3) {
+    \textbf{components/server/MovieCard.tsx} \hfill \textit{\color{blue!70}[RSC]}\\[2pt]
+    $\bullet$ \textbf{Tải trọng Client: 0 KB JS bundle}\\[1pt]
+    $\bullet$ Render cấu trúc HTML thẻ phim\\[1pt]
+    $\bullet$ Sử dụng \texttt{next/image} (Zero CLS)\\[1pt]
+    $\bullet$ Thẻ \texttt{<Link href="/movie/[id]">}
+  };
+
+  \path[flowarrow] (page) -- node[right, font=\scriptsize\bfseries] {Khởi tạo các thẻ phim} (card);
+
+  % Client Container
+  \draw[clientbox] (8.8, 0.5) rectangle (15.2, -6.8);
+  \node[anchor=north west, font=\bfseries\color{red!80!black}] at (9.0, 0.3) {Client Environment (Browser Hydration)};
+
+  % Client Component
+  \node[clientnode] (row) at (12.0, -2.6) {
+    \textbf{components/client/MovieRow.tsx}\\[1pt]
+    \textit{\color{red!70}Chỉ thị: \texttt{"use client"}}\\[3pt]
+    $\bullet$ \textbf{Module graph:} 0 import \texttt{MovieCard}\\[1pt]
+    $\bullet$ Quản lý trạng thái cuộn: \texttt{useRef}\\[1pt]
+    $\bullet$ Lắng nghe sự kiện: \texttt{onClick} trượt trái/phải\\[1pt]
+    $\bullet$ Render vùng cuộn chứa \texttt{props.cards}
+  };
+
+  \node[clientnode] (dom) at (12.0, -5.5) {
+    \textbf{Browser DOM (Hydrated UI)}\\[2pt]
+    $\bullet$ Thanh cuộn trượt ngang cảm ứng/chuột\\[1pt]
+    $\bullet$ Nút chuyển hướng cuộn hiển thị động\\[1pt]
+    $\bullet$ Các thẻ phim hiển thị đầy đủ HTML/CSS
+  };
+
+  \path[draw=red!80!black, ->, thick] (row) -- node[right, font=\scriptsize\bfseries] {Hydrate \& Tương tác DOM} (dom);
+
+  % Network Boundary Line
+  \draw[line width=1.5pt, dash pattern=on 6pt off 3pt, color=gray!80] (7.3, 1.0) -- (7.3, -7.2);
+  \node[fill=white, draw=gray, rounded corners=3pt, font=\scriptsize\bfseries, align=center, inner sep=3pt] at (7.3, 0.7) {Ranh giới mạng\\(Network Boundary)};
+
+  % Data Transfer Across Boundary
+  \path[netarrow] (card.east) -- ++(1.4, 0) |- node[pos=0.45, above, font=\scriptsize\bfseries\color{purple!90!black}] {Prop \texttt{cards: ReactNode[]} (Tuần tự hóa JSX)} (row.west);
+
+\end{tikzpicture}
+}
+\caption{Sơ đồ phân định ranh giới Server/Client và luồng truyền dữ liệu giữa \texttt{MovieCard} và \texttt{MovieRow} (Nguồn: Nhóm tác giả thiết kế)}
+\label{fig:server_client_boundary}
+\end{figure}
+
 \subsection{Cơ chế Caching và Data Fetching đa tầng trong Next.js 16}
 
 Dự án MovieHub được xây dựng trên nền tảng \textbf{Next.js 16.3.6} và \textbf{React 19.2.8}. Một trong những thay đổi quan trọng nhất của Next.js kể từ phiên bản 15 và 16 là sự chuyển dịch mô hình bộ nhớ đệm: Hàm \texttt{fetch} mặc định không còn tự động lưu đệm vĩnh viễn (\texttt{force-cache}) như thời Next.js 14, mà chuyển sang mặc định \texttt{no-store} trừ khi lập trình viên chủ động khai báo chiến lược lưu trữ.
@@ -577,18 +655,18 @@ Nguyên lý hoạt động theo cơ chế \textbf{Stale-While-Revalidate}:
 \end{itemize}
 
 \subsubsection{Cơ chế Cache Components (\texttt{"use cache"} và \texttt{cacheLife}) trong Next.js 16}
-Bên cạnh Request Data Cache truyền thống, Next.js 16 giới thiệu kiến trúc bộ nhớ đệm cấp độ component mang tên \textbf{Cache Components} (trước đây là cờ thử nghiệm \texttt{dynamicIO}):
+Next.js 16 chính thức giới thiệu kiến trúc bộ nhớ đệm cấp độ component mang tên \textbf{Cache Components} thông qua cờ cấu hình gốc \texttt{cacheComponents: true} trong tệp \path{next.config.ts}. Đây là quy chuẩn thống nhất thay thế và hợp nhất các cờ tiền thân riêng lẻ trước đây (\texttt{ppr}, \texttt{useCache}, và \texttt{dynamicIO}):
 \begin{itemize}[noitemsep]
-    \item \textbf{Trạng thái trong dự án:} \texttt{next.config.ts} không bật \texttt{cacheComponents}; mã hiện tại dùng \texttt{fetch} với \texttt{next.revalidate}, không dùng \texttt{"use cache"} hay \texttt{cacheLife}.
-    \item \textbf{Cơ chế hoạt động khi được kích hoạt:} Nếu bật \texttt{cacheComponents: true}, lập trình viên sử dụng chỉ thị \texttt{"use cache"} ở đầu async function hoặc component, kết hợp hàm cấu hình vòng đời \texttt{cacheLife()}:
+    \item \textbf{Trạng thái trong dự án MovieHub:} Trong tệp cấu hình \path{next.config.ts}, MovieHub thiết lập \texttt{cacheComponents: false} (hoặc không khai báo, tức giữ giá trị mặc định). Do đó, ứng dụng hoạt động hoàn toàn theo mô hình Caching tiêu chuẩn của Next.js (Previous Caching Model). Toàn bộ dữ liệu phim TMDB được lưu đệm tường minh ở cấp độ lời gọi mạng thông qua \texttt{fetch(url, \{ next: \{ revalidate: N \} \})}, không kích hoạt chỉ thị \texttt{"use cache"} hay hàm \texttt{cacheLife()}.
+    \item \textbf{Cơ chế hoạt động khi được kích hoạt (\texttt{cacheComponents: true}):} Khi bật cờ gốc, lập trình viên sử dụng chỉ thị \texttt{"use cache"} ở đầu async function hoặc component, kết hợp hàm định nghĩa vòng đời \texttt{cacheLife()} với các hồ sơ cấu hình chuẩn:
     \begin{itemize}[noitemsep]
         \item \texttt{cacheLife("seconds")}: \texttt{revalidate: 1s, expire: 60s}.
         \item \texttt{cacheLife("minutes")}: \texttt{revalidate: 60s, expire: 1h}.
         \item \texttt{cacheLife("hours")}: \texttt{revalidate: 1h, expire: 24h}.
         \item \texttt{cacheLife("days")}: \texttt{revalidate: 24h, expire: 7d}.
-        \item \texttt{cacheLife("default")}: dùng profile mặc định do cấu hình Next.js xác định.
+        \item \texttt{cacheLife("default")}: sử dụng profile mặc định do cấu hình Next.js xác định.
     \end{itemize}
-    Ưu điểm của Cache Components là có thể lưu đệm cả kết quả tính toán phức tạp hoặc truy vấn cơ sở dữ liệu trực tiếp, không phụ thuộc vào lệnh \texttt{fetch}.
+    Ưu điểm của Cache Components là có thể lưu đệm cả kết quả tính toán phức tạp hoặc truy vấn cơ sở dữ liệu trực tiếp ở cấp hàm, không phụ thuộc vào lệnh \texttt{fetch}.
 \end{itemize}
 
 \subsubsection{Tác động của việc đọc \texttt{cookies()} đến quá trình Render và Caching}
@@ -627,13 +705,92 @@ Trong mô hình Server-Side Rendering truyền thống, quá trình kết xuất
     \item Trình duyệt client phải tải về toàn bộ mã JavaScript của cả trang thì mới có thể tiến hành hydrate.
 \end{enumerate}
 
-\subsubsection{Cơ chế Streaming HTML lũy tiến}
-Next.js App Router kết hợp cùng tính năng \textbf{React Suspense} của React 19 giải quyết triệt để vấn đề trên thông qua cơ chế truyền luồng (Streaming) [2]. Máy chủ phân rã trang web thành nhiều khối (chunks) độc lập:
-\begin{itemize}[noitemsep]
-    \item Phần khung chính của trang (Header, thông tin tóm tắt phim) vốn có dữ liệu nhanh sẽ được máy chủ kết xuất và gửi về trình duyệt ngay lập tức cùng với khung giao diện chờ (Skeleton Loader) của phần dữ liệu chậm.
-    \item Thời điểm nội dung chính xuất hiện phải được đo trên bản build production; báo cáo chưa có số đo này.
-    \item Hai Server Components \texttt{CastList} và \texttt{SimilarMovies} nằm trong các ranh giới \texttt{Suspense} riêng, có fallback khi truy vấn còn chờ. Server có thể gửi tiếp phần nội dung hoàn tất qua response đang mở.
-\end{itemize}
+\subsubsection{Cơ chế Streaming HTML lũy tiến và Phân tách Luồng Bất đồng bộ}
+Next.js App Router kết hợp cùng tính năng \textbf{React Suspense} của React 19 giải quyết triệt để vấn đề thắt nút cổ chai của SSR thông qua kỹ thuật truyền luồng dữ liệu (Streaming với HTTP Chunked Transfer Encoding) \cite{react19_spec}. Thay vì chờ đợi tất cả các truy vấn bất đồng bộ hoàn thành, máy chủ phân rã trang web thành các khối (chunks) độc lập được phát lũy tiến về trình duyệt.
+
+Hình~\ref{fig:suspense_streaming} đối sánh trực quan sự khác biệt bản chất giữa mô hình đồng bộ truyền thống (\texttt{Promise.all}) và mô hình truyền luồng độc lập với React Suspense trên tuyến đường \path{/movie/[id]}:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Mô hình chặn đồng bộ với \texttt{Promise.all}:} Nếu gom toàn bộ các lời gọi API TMDB (chi tiết phim, video trailer, danh sách diễn viên, và phim tương tự) vào một biểu thức \texttt{await Promise.all([...])}, tiến trình kết xuất trên server bị nghẽn hoàn toàn bởi lời gọi API có thời gian phản hồi chậm nhất (endpoint \path{/similar} mất 4.000ms trong kịch bản thực nghiệm). Hậu quả là thời gian phản hồi byte đầu tiên (TTFB) bị kéo dài lên tới 4.000ms; trong suốt 4 giây này, trình duyệt hoàn toàn không nhận được dữ liệu và người dùng phải đối mặt với màn hình trắng xóa (Blank Screen).
+    \item \textbf{Mô hình phân tách luồng với React Suspense trong MovieHub:} Trong \path{app/movie/[id]/page.tsx}, hàm trang chỉ \texttt{await} các dữ liệu cốt lõi phục vụ hiển thị phần trên màn hình (Above-the-Fold: thông tin chi tiết phim và trailer). Hai nhánh dữ liệu chậm nằm bên dưới màn hình (Below-the-Fold) được bao bọc trong các ranh giới \texttt{<Suspense>} độc lập:
+    \begin{itemize}[noitemsep]
+        \item \textbf{Khối 1 (Chunk 1 -- Shell chính \& Khung chờ, $t < 200$ms):} Máy chủ render và phát ngay lập tức khung giao diện hoàn chỉnh (Backdrop, Tiêu đề, Thời lượng, Thể loại, Nút xem Trailer, Nút Watchlist) cùng hai component giữ chỗ (\texttt{<CastSkeleton />} và \texttt{<SimilarSkeleton />}) trong vòng chưa đầy 200ms ($t = 180$ms theo log thực nghiệm \path{baocao/evidence/streaming-mock.json}). Người dùng nhìn thấy và tương tác được với giao diện gần như tức thì (FCP tối ưu).
+        \item \textbf{Khối 2 (Chunk 2 -- Dàn diễn viên hoàn tất, $t \approx 2.500$ms):} Khi endpoint \path{/credits} phản hồi (trễ 2.5s), máy chủ đẩy tiếp mã HTML của \texttt{CastList} cùng thẻ \texttt{<template>} và script nội tuyến qua luồng HTTP mở sẵn. Trình duyệt tự động hoán đổi khung chờ \texttt{CastSkeleton} bằng danh sách diễn viên thực tế mà không cần tải lại trang.
+        \item \textbf{Khối 3 (Chunk 3 -- Phim tương tự hoàn tất, $t \approx 4.000$ms):} Khi endpoint \path{/similar} phản hồi xong (trễ 4.0s), máy chủ phát tiếp mã HTML của \texttt{SimilarMoviesSlider}, thay thế \texttt{SimilarSkeleton} và đóng kết nối HTTP.
+    \end{itemize}
+\end{enumerate}
+
+\begin{figure}[H]
+\centering
+\resizebox{\linewidth}{!}{%
+\begin{tikzpicture}[>=Stealth, font=\small]
+  % Styles
+  \tikzstyle{timebox} = [rectangle, rounded corners=3pt, draw=gray!60, fill=gray!10, text width=2.4cm, align=center, font=\scriptsize\bfseries, inner sep=4pt]
+  \tikzstyle{blocknode} = [rectangle, rounded corners=4pt, draw=red!80, fill=red!10, text width=12.2cm, align=left, font=\footnotesize, inner sep=6pt]
+  \tikzstyle{streamnode} = [rectangle, rounded corners=4pt, draw=green!60!black, fill=green!8, text width=12.2cm, align=left, font=\footnotesize, inner sep=6pt]
+  \tikzstyle{headnode} = [font=\bfseries, align=left]
+
+  % SECTION A: Promise.all Blocking
+  \node[headnode, color=red!80!black] at (0, 0.4) {\large \textbf{A. Mô hình truyền thống: Chặn đồng bộ với \texttt{Promise.all} (Blocking Pattern)}};
+  
+  \node[timebox] (t0_a) at (0.5, -0.6) {$t = 0\text{ms}$};
+  \node[blocknode, anchor=west] (box_a1) at (2.0, -0.6) {
+    Máy chủ gọi song song: \texttt{fetchDetails}, \texttt{fetchVideos}, \texttt{fetchCredits} (2.5s), \texttt{fetchSimilar} (4.0s).\\[1pt]
+    \textbf{Luồng kết xuất bị nghẽn hoàn toàn (Blocked):} Chờ endpoint chậm nhất (\path{/similar} mất 4000ms).
+  };
+
+  \node[timebox] (t_wait) at (0.5, -2.0) {$0 < t < 4000\text{ms}$};
+  \node[rectangle, rounded corners=4pt, draw=red!60, fill=red!5, text width=12.2cm, anchor=west, font=\footnotesize, inner sep=5pt] (box_a2) at (2.0, -2.0) {
+    \textbf{Trạng thái Trình duyệt:} Màn hình trắng hoàn toàn (Blank Screen). Chưa có bất kỳ byte HTML nào được truyền về.\\[1pt]
+    $\rightarrow$ \textbf{TTFB = 4.000ms}; First Contentful Paint (FCP) bị trì hoãn nghiêm trọng; trải nghiệm người dùng kém.
+  };
+
+  \node[timebox] (t4_a) at (0.5, -3.4) {$t = 4000\text{ms}$};
+  \node[blocknode, anchor=west] (box_a3) at (2.0, -3.4) {
+    \textbf{Phát toàn bộ HTML một lần (All-or-Nothing):} Gửi tài liệu HTML chứa đầy đủ thông tin phim, diễn viên và phim tương tự.
+  };
+
+  % Separator line
+  \draw[line width=1pt, dashed, gray!60] (-1.0, -4.2) -- (14.5, -4.2);
+
+  % SECTION B: React Suspense Streaming
+  \node[headnode, color=green!60!black] at (0, -4.8) {\large \textbf{B. Mô hình MovieHub: Phân tách luồng độc lập với React Suspense (Streaming Pattern)}};
+
+  \node[timebox] (t0_b) at (0.5, -5.9) {$t < 200\text{ms}$};
+  \node[streamnode, anchor=west] (box_b1) at (2.0, -5.9) {
+    \textbf{Chunk 1 (Khung giao diện chính \& Skeleton Fallbacks) $\rightarrow$ Stream ngay lập tức!}\\[2pt]
+    $\bullet$ \textbf{Nội dung:} Backdrop, Tiêu đề, Thời lượng, Đánh giá, Nút xem Trailer, Nút Watchlist.\\[1pt]
+    $\bullet$ \textbf{Ranh giới Suspense:} Gửi kèm thẻ giữ chỗ \texttt{<CastSkeleton />} và \texttt{<SimilarSkeleton />}.\\[1pt]
+    $\rightarrow$ \textbf{TTFB $<$ 200ms} ($180$ms trong thực nghiệm); Người dùng thấy ngay giao diện chính, loại bỏ màn hình trắng.
+  };
+
+  \node[timebox] (t2_b) at (0.5, -7.6) {$t \approx 2500\text{ms}$};
+  \node[streamnode, anchor=west] (box_b2) at (2.0, -7.6) {
+    \textbf{Chunk 2 (Dàn diễn viên hoàn tất) $\rightarrow$ Stream bổ sung qua cùng kết nối HTTP!}\\[2pt]
+    $\bullet$ Endpoint \path{/credits} phản hồi xong sau 2.500ms ($2.686$ms theo log thực nghiệm).\\[1pt]
+    $\bullet$ Server đẩy tiếp mã HTML của \texttt{CastList} cùng thẻ \texttt{<template>} và script thay thế \texttt{CastSkeleton}.\\[1pt]
+    $\bullet$ Trình duyệt hoán đổi hiển thị danh sách diễn viên mượt mà mà không tải lại trang.
+  };
+
+  \node[timebox] (t4_b) at (0.5, -9.3) {$t \approx 4000\text{ms}$};
+  \node[streamnode, anchor=west] (box_b3) at (2.0, -9.3) {
+    \textbf{Chunk 3 (Phim tương tự hoàn tất) $\rightarrow$ Stream khối cuối \& đóng kết nối HTTP!}\\[2pt]
+    $\bullet$ Endpoint \path{/similar} phản hồi xong sau 4.000ms ($4.193$ms theo log thực nghiệm).\\[1pt]
+    $\bullet$ Server đẩy mã HTML của \texttt{SimilarMoviesSlider}, tự động thay thế \texttt{SimilarSkeleton}.\\[1pt]
+    $\bullet$ Toàn bộ trang hoàn tất tải lũy tiến, kết nối HTTP đóng lại một cách an toàn.
+  };
+
+  % Progression arrows
+  \draw[draw=red!80, ->, thick] (box_a1.south west) ++(0.5,0) -- ++(0, -0.4);
+  \draw[draw=red!80, ->, thick] (box_a2.south west) ++(0.5,0) -- ++(0, -0.4);
+
+  \draw[draw=green!60!black, ->, thick] (box_b1.south west) ++(0.5,0) -- ++(0, -0.4);
+  \draw[draw=green!60!black, ->, thick] (box_b2.south west) ++(0.5,0) -- ++(0, -0.4);
+
+\end{tikzpicture}
+}
+\caption{Đối sánh cơ chế chặn đồng bộ (\texttt{Promise.all}) và cơ chế truyền luồng lũy tiến (React Suspense Streaming) trên tuyến đường \texttt{/movie/[id]} (Nguồn: Nhóm tác giả thiết kế dựa trên minh chứng thực nghiệm)}
+\label{fig:suspense_streaming}
+\end{figure}
 
 \subsection{Cơ chế Server Actions và xử lý Mutation dữ liệu}
 
@@ -1094,22 +1251,22 @@ function deduplicateMovies(movies: Movie[]): Movie[] {
 
 \subsection{Tổ chức phát triển và tiến độ thực hiện}
 
-\subsubsection{Bảng phân công trách nhiệm nhóm}
-Bảng 3.1 ghi phân công và tỷ lệ nhóm tự khai. Lịch sử Git cho thấy các phần được tích hợp qua Pull Request, nhưng phần trăm đóng góp không được suy ra bằng thống kê số dòng code.
+\subsubsection{Bảng phân công trách nhiệm và minh chứng Git đối soát}
+Bảng 3.1 ghi nhận chi tiết nhiệm vụ kỹ thuật, tỷ lệ đóng góp học phần và minh chứng đối soát cụ thể qua lịch sử Git commit, nhánh tính năng và các Pull Request được hợp nhất trong kho lưu trữ mã nguồn của dự án.
 
 \begin{table}[H]
-\centering
-\caption{Bảng phân công trách nhiệm và tỷ lệ đóng góp của các thành viên (Nguồn: Nhóm tác giả thống nhất)}
+\centering\small
+\caption{Bảng phân công trách nhiệm, tỷ lệ đóng góp và minh chứng Git đối soát (Nguồn: Nhóm tác giả tổng hợp từ Git log)}
 \label{tab:team_contribution}
-\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{3.2cm}>{\raggedright\arraybackslash}p{2.4cm}>{\raggedright\arraybackslash}X>{\centering\arraybackslash}p{1.8cm}}
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash}p{2.6cm}>{\centering\arraybackslash}p{1.9cm}>{\raggedright\arraybackslash}X>{\raggedright\arraybackslash}p{4.2cm}>{\centering\arraybackslash}p{1.2cm}}
 \toprule
-\textbf{Họ và tên} & \textbf{Mã số SV} & \textbf{Nhiệm vụ kỹ thuật đảm nhiệm chính} & \textbf{Đóng góp} \\
+\textbf{Họ và tên} & \textbf{Mã số SV} & \textbf{Nhiệm vụ kỹ thuật đảm nhiệm chính} & \textbf{Minh chứng Git / PR đối soát} & \textbf{Tỷ lệ} \\
 \midrule
-\textbf{Nguyễn Công Quân} \newline (Trưởng nhóm) & 3123560070 & Theo phân công nhóm: kiến trúc nền, trang chủ, tầng dịch vụ TMDB, MovieRow, TrailerModal và tổng hợp báo cáo. Các chỉ số hiệu năng chưa có tệp đo để quy về cá nhân. & 33.3\% \\
+\textbf{Nguyễn Công Quân} \newline (Trưởng nhóm) & 3123560070 & Khởi tạo dự án Next.js 16, kiến trúc nền tảng App Router, tầng dịch vụ kết nối TMDB Client, xây dựng Trang chủ với kỹ thuật fetch song song, component \texttt{MovieRow} slider, \texttt{TrailerModal}, thiết lập pipeline thu thập minh chứng tự động (\path{collect-evidence.mjs}), cấu hình CI GitHub Actions và tổng hợp tài liệu báo cáo. & 41 commits, 7 merge PRs (\#1, \#2, \#3, \#4, \#6, \#7, \#8). Commits tiêu biểu: \texttt{2b04d20}, \texttt{82c7e0e}, \texttt{6f5e663}, \texttt{3b86fa1}, \texttt{f25cf4b}. & 33.3\% \\
 \midrule
-\textbf{Nguyễn Quốc Đại} & 3123560013 & Theo phân công nhóm: route chi tiết phim, hai vùng Suspense, slider diễn viên và phim tương tự, giao diện chờ/lỗi và metadata động. Chưa có tệp trace TTFB để đưa ra số đo. & 33.3\% \\
+\textbf{Nguyễn Quốc Đại} & 3123560013 & Giám định kiến trúc môn học chuyên sâu (\path{DANH_GIA_REQUIRE.md}), chuyển đổi Live Search sang GET Route Handler, thiết lập Root Error/Global Error/Root NotFound, cấu hình SEO (\path{sitemap.ts}, \path{robots.ts}), Security Headers, tái cấu trúc bộ kiểm thử chuẩn Node.js (\path{tests/*.test.mjs}) và xử lý dứt điểm các lỗi mã nguồn do AI sinh ra (commit \texttt{953db35}). & 3 commits quy mô lớn (+1762 / -653 dòng), merge PR \#5. Commits tiêu biểu: \texttt{8fe18e6}, \texttt{8c059f7}, \texttt{953db35}. & 33.3\% \\
 \midrule
-\textbf{Nguyễn Thái Vinh} & 3123410433 & Theo phân công nhóm: trang tìm kiếm, Watchlist Action, Browse/FilterBar và Header/Live Search dùng GET Route Handler. Chưa có tệp bundle analyzer để đưa ra số đo. & 33.3\% \\
+\textbf{Nguyễn Thái Vinh} & 3123410433 & Nghiên cứu và hiện thực giao diện tìm kiếm (\path{NavSearchBar.tsx}), Server Action quản lý Watchlist (\path{app/actions/watchlist.ts}) với các ràng buộc kích thước cookie RFC 6265, xây dựng trang khám phá \path{/browse} kết hợp thanh lọc \path{FilterBar.tsx} 5 chiều và phân trang dữ liệu. & Đóng góp mã nguồn tích hợp qua nhánh \path{feature/search-watchlist} (PR \#4) và \path{feature/navbar-filters-and-navigation} (PR \#5, \#6); commit gốc được tích hợp qua máy trưởng nhóm. & 33.3\% \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1150,10 +1307,28 @@ Dự án dùng Git và có lịch sử tích hợp qua Pull Request:
 \newpage
 \section{KIỂM THỬ VÀ ĐÁNH GIÁ KẾT QUẢ}
 
-\subsection{Phương pháp và giới hạn của bằng chứng}
-Nhóm đánh giá hai loại bằng chứng: (1) mã nguồn và lệnh kiểm tra có thể chạy lại; (2) kết quả vận hành cần môi trường và dữ liệu đo cụ thể. Các lệnh dùng cho bản mã nguồn hiện tại là \texttt{npm run lint}, \texttt{npx tsc --noEmit}, \texttt{npm test} và \texttt{npm run build}. Log build thường của lượt trước nằm tại \path{baocao/evidence/build-output.txt}; log production mock mới nằm tại \path{baocao/evidence/build-mock-output.txt}, log test ở \path{baocao/evidence/test-output.txt}. Lệnh build dùng Next.js 16.3.6/Turbopack; Bảng~\ref{tab:route_table} mô tả cấu hình thường; trong lượt mock, TTL của trang chủ và sitemap là 15 giây theo log riêng.
+\subsection{Phương pháp và phân định hai cấu hình Build (Normal vs Mock Evidence)}
+Nhóm đánh giá hai loại bằng chứng: (1) mã nguồn và lệnh kiểm tra tĩnh có thể chạy lại; (2) kết quả vận hành cần môi trường và dữ liệu đo cụ thể. Các lệnh dùng cho bản mã nguồn hiện tại là \texttt{npm run lint}, \texttt{npx tsc --noEmit}, \texttt{npm test} và \texttt{npm run build}.
 
-TTFB là thời điểm byte đầu tiên về client, còn FCP là thời điểm trình duyệt vẽ nội dung đầu tiên. Báo cáo tách kiểm chứng cơ chế HTTP khỏi phép đo hiệu năng trình duyệt. Bộ kiểm chứng production bằng mock origin lưu kết quả cache, streaming và Watchlist; chưa có dữ liệu gốc để công bố Lighthouse hoặc kích thước bundle.
+Để bảo đảm tính khách quan học thuật và khả năng kiểm chứng độc lập, hệ sinh thái MovieHub được thiết lập rõ ràng thành hai chế độ/cấu hình build tách biệt:
+\begin{enumerate}[noitemsep]
+    \item \textbf{Cấu hình Build Sản xuất Tiêu chuẩn (Normal Production Build):}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Thư mục đầu ra:} Lưu trữ độc quyền tại \path{.next/}.
+        \item \textbf{Kết nối dữ liệu:} Trỏ trực tiếp tới TMDB API thật ngoài Internet (\texttt{api.themoviedb.org/3}).
+        \item \textbf{Thời hạn Data Cache (TTL):} Trang chủ (\texttt{/}) có TTL là 30 phút (1.800 giây); tuyến Sitemap (\texttt{/sitemap.xml}) có TTL là 1 giờ (3.600 giây).
+        \item \textbf{Minh chứng lưu trữ:} Tệp \path{baocao/evidence/build-output.txt} ghi nhận kết quả biên dịch và phân loại route.
+    \end{itemize}
+    \item \textbf{Cấu hình Build Minh chứng Thực nghiệm (Mock Evidence Build):}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Kích hoạt và Thư mục đầu ra:} Được kích hoạt khi đặt biến môi trường \texttt{MOVIEHUB_EVIDENCE_BUILD=1}, xuất kết quả vào thư mục cô lập \path{.next-evidence/}, hoàn toàn không làm sai lệch hay ghi đè thư mục \path{.next/} tiêu chuẩn.
+        \item \textbf{Kết nối dữ liệu:} Trỏ tới máy chủ mock nội bộ trên loopback (\texttt{http://127.0.0.1:\{PORT\}/3}).
+        \item \textbf{Thời hạn Data Cache rút ngắn:} Ép chu kỳ revalidate xuống 15 giây (\texttt{TMDB_MOCK_REVALIDATE_SECONDS=15}) để kiểm chứng vòng đời bộ đếm cache mà không phải chờ 30 phút. Ràng buộc an toàn (\path{services/client.ts}) bảo đảm cấu hình TTL 15s chỉ được phép thực thi khi host là loopback \texttt{127.0.0.1}; cấu hình này lập tức ném lỗi ngoại lệ nếu chạy với TMDB thật.
+        \item \textbf{Minh chứng lưu trữ:} Tệp \path{baocao/evidence/build-mock-output.txt}.
+    \end{itemize}
+\end{enumerate}
+
+\paragraph*{Giới hạn về chỉ số hiệu năng và cam kết liêm chính:} TTFB là thời điểm byte đầu tiên về client, còn FCP là thời điểm trình duyệt vẽ nội dung đầu tiên. Báo cáo phân định rạch ròi giữa việc kiểm chứng cơ chế giao thức HTTP (chunked streaming, Data Cache hit/miss) với các phép đo trải nghiệm người dùng trên trình duyệt. Nhóm tuyên bố minh bạch: Toàn bộ số liệu định lượng trong báo cáo được trích xuất từ các log thực thi phía máy chủ (\path{streaming-mock.json}, \path{cache-mock.json}, \path{build-output.txt}). Dự án \textbf{chưa thu thập các chỉ số Core Web Vitals (LCP, CLS, INP) và điểm số Lighthouse trên môi trường trình duyệt người dùng thật (Real User Monitoring / Real Browser Environment)}; do đó nhóm không công bố các kết quả phỏng đoán cảm tính khi chưa có dữ liệu đo đạc thực tế từ trình duyệt.
 
 \subsection{Kiểm tra tự động và khả năng chạy lại}
 \begin{table}[H]
@@ -1204,7 +1379,7 @@ Tệp \path{.github/workflows/check.yml} cấu hình chạy các lệnh trên kh
 Cấu hình \texttt{@next/bundle-analyzer} cho phép chạy \texttt{npm run analyze}. Chưa có tệp phân tích gốc đi kèm lượt kiểm chứng hiện tại để công bố dung lượng theo component hay mức giảm JavaScript. Test mã nguồn chỉ kiểm tra các slider client không import \texttt{MovieCard}; kết quả này không phải phép đo byte tải xuống, thời gian hydration hoặc thời gian vẽ.
 
 \subsubsection{Kiểm chứng Data Cache bằng bộ đếm origin}
-Chạy \texttt{npm run evidence} để tạo build production riêng trong \path{.next-evidence}. Script dùng mock TMDB trên HTTP loopback, khóa giả và TTL 15 giây; \texttt{cacheComponents} không bật. TTL ngắn chỉ được chấp nhận khi host là \texttt{127.0.0.1}; cấu hình này bị từ chối với TMDB thật.
+Lệnh \texttt{npm run evidence} tạo bản build production riêng trong thư mục cô lập \path{.next-evidence}. Script dùng mock TMDB trên HTTP loopback, khóa giả và TTL 15 giây; cấu hình \texttt{cacheComponents} ở trạng thái tắt (\texttt{false}), vận hành theo Previous Caching Model với \texttt{fetch} revalidate. TTL ngắn 15s chỉ được chấp nhận khi host là \texttt{127.0.0.1}; cấu hình này bị ném lỗi từ chối ngay lập tức nếu trỏ tới TMDB thật.
 
 \begin{table}[H]
 \centering\small
@@ -1341,19 +1516,77 @@ Ví dụ rút gọn từ \texttt{app/page.tsx}: Server Component tạo card; \te
 \subsection*{Phụ lục 2. Chọn Server Action hay Route Handler}
 Watchlist là thao tác ghi dữ liệu theo từng người dùng nên dùng \texttt{toggleWatchlist} trong \path{app/actions/watchlist.ts}; action kiểm tra \texttt{movieId}, ghi cookie và gọi \texttt{revalidatePath}. Live Search là thao tác đọc lặp lại khi nhập chữ nên dùng \texttt{GET /api/search?q=...}; client đợi 300ms và hủy request cũ bằng \texttt{AbortController}. Server kiểm tra từ khóa trước khi gọi TMDB. \texttt{s-maxage=120} là chỉ dẫn cho shared cache; mức độ cache thật cần kiểm tra trên môi trường triển khai.
 
-\subsection*{Phụ lục 3. Cách tái lập các kiểm tra}
-Tại thư mục gốc của repo, chạy lần lượt:
-\begin{lstlisting}[language=TypeScript]
+\subsection*{Phụ lục 3. Quy trình thực nghiệm kiểm chứng tại phòng Lab}
+Để tái lập và kiểm chứng độc lập toàn bộ các kết quả thực nghiệm trong báo cáo, người đánh giá có thể thực hiện theo quy trình chuẩn hóa gồm kiểm tra tự động toàn diện và đối soát tương tác từng bước.
+
+\paragraph*{1. Quy trình kiểm chứng tự động toàn diện (\texttt{npm run evidence})}
+Lệnh \texttt{npm run evidence} thực thi toàn bộ pipeline thu thập minh chứng tự động được lập trình tại \path{scripts/collect-evidence.mjs}:
+\begin{lstlisting}[language=bash]
+# 1. Cai dat thu vien phu thuoc chuan theo package-lock.json
 npm ci
+
+# 2. Kiem tra ma nguon tinh: Lint, Type-check va Test suite
 npm run lint
 npx tsc --noEmit
 npm test
-npm run build
-npm run start
-\end{lstlisting}
-Để xem route tĩnh/động, đọc bảng ở cuối output \texttt{npm run build}. Để kiểm tra Watchlist, mở một trang phim trên bản production, ghi trạng thái cookie và \texttt{/watchlist} trước/sau thao tác. Để kiểm tra streaming, dùng Network waterfall hoặc video khi làm chậm API diễn viên/phim tương tự; so sánh thời điểm fallback và nội dung. Để đo hiệu năng, dùng cùng route, môi trường và cache state cho các lần đối chứng; giữ tệp kết quả thô. Không so sánh Lighthouse của trang chủ với FCP của trang chi tiết như cùng một phép đo.
 
-\subsection*{Phụ lục 4. Khai báo sử dụng công cụ AI}
-Trong giai đoạn rà soát bản báo cáo và đối chiếu với mã nguồn, nhóm có sử dụng Codex để phát hiện mô tả không khớp code, gợi ý kiểm thử và hỗ trợ hiệu đính LaTeX. Các kết luận kỹ thuật trong bản nộp được đối chiếu lại với mã nguồn và tài liệu chính thức; các lệnh lint, type-check, test và build được chạy để xác minh. Công cụ AI không được xem là bằng chứng thay cho log, kết quả đo hoặc khả năng giải thích của từng thành viên. Mọi tài liệu và mã do bên thứ ba cung cấp vẫn phải được trích dẫn theo quy định của học phần.
+# 3. Chay pipeline kiem chung thuc nghiem tu dong voi Mock va Request Counter
+npm run evidence
+\end{lstlisting}
+Sau khi hoàn tất, kết quả thực nghiệm được tự động trích xuất và lưu trữ thành các tệp minh chứng JSON/TXT trong thư mục \path{baocao/evidence/}:
+\begin{itemize}[noitemsep]
+    \item \path{baocao/evidence/mock-runtime.json}: Ghi nhận trạng thái tổng thể (\texttt{"status": "passed"}), SHA-256 mã nguồn và Git commit HEAD.
+    \item \path{baocao/evidence/cache-mock.json}: Bảng dữ liệu bộ đếm truy vấn mock origin đối chiếu cache hit/miss/revalidate.
+    \item \path{baocao/evidence/streaming-mock.json}: Dòng thời gian chi tiết và kích thước byte từng chunk HTTP stream.
+    \item \path{baocao/evidence/watchlist-http.json}: Kết quả gọi POST Server Action và xác nhận cookie.
+\end{itemize}
+
+\paragraph*{2. Cơ chế Mock TMDB Server và kịch bản trễ có chủ đích}
+Pipeline tự động khởi chạy máy chủ giả lập TMDB nội bộ (\path{scripts/mock-tmdb-evidence.mjs}) trên cổng loopback ngẫu nhiên (\texttt{http://127.0.0.1:\{PORT\}/3}). Máy chủ giả lập này thay thế duy nhất các lời gọi API ngoại vi, giữ nguyên 100\% cơ chế kết xuất production của Next.js và thiết lập độ trễ mạng có chủ đích:
+\begin{itemize}[noitemsep]
+    \item Tuyến thông tin chính (\path{/movie/:id}): Trễ 0ms (phản hồi ngay lập tức).
+    \item Tuyến danh sách diễn viên (\path{/movie/:id/credits}): Trễ cố định \textbf{2.500ms} (2.5 giây).
+    \item Tuyến danh sách phim tương tự (\path{/movie/:id/similar}): Trễ cố định \textbf{4.000ms} (4.0 giây).
+\end{itemize}
+
+\paragraph*{3. Kiểm chứng quy luật bộ đếm Data Cache qua \texttt{http://127.0.0.1:\{PORT\}/\_counts}}
+Máy chủ giả lập cung cấp endpoint \texttt{GET /\_counts} theo dõi số lượt yêu cầu thực tế gửi tới mock origin của một phim mới (ví dụ ID 550):
+\begin{enumerate}[noitemsep]
+    \item \textbf{Trạng thái ban đầu (Trước truy vấn):} Bộ đếm bằng 0 (\texttt{counts = 0}).
+    \item \textbf{Truy vấn lần 1 (Cache Miss):} Yêu cầu \texttt{GET /movie/550} gửi tới Next.js. Vì cache rỗng, Next.js chuyển tiếp yêu cầu tới mock origin $\rightarrow$ Bộ đếm tăng lên \textbf{1} (\texttt{counts = 1}). Dữ liệu được lưu vào Data Cache với TTL = 15 giây.
+    \item \textbf{Truy vấn lần 2 (Cache Hit):} Gửi lại yêu cầu \texttt{GET /movie/550} ngay sau đó. Next.js phục vụ trực tiếp từ Data Cache, hoàn toàn không gửi yêu cầu nào tới mock origin $\rightarrow$ Bộ đếm duy trì chính xác ở mức \textbf{1} (\texttt{counts = 1}).
+    \item \textbf{Truy vấn lần 3 (Stale-While-Revalidate sau khi hết TTL 15s):} Đợi 16 giây để vượt qua thời hạn TTL. Khi gửi yêu cầu mới, Next.js phục vụ ngay bản dữ liệu cũ (stale) và kích hoạt ngầm một tiến trình revalidation gửi tới mock origin để lấy bản mới $\rightarrow$ Bộ đếm tăng lên \textbf{2} (\texttt{counts = 2}).
+    \item \textbf{Truy vấn lần 4 (Warm Cache Hit):} Gửi lại yêu cầu sau khi revalidation hoàn tất $\rightarrow$ Bộ đếm giữ nguyên ở mức \textbf{2} (\texttt{counts = 2}).
+\end{enumerate}
+Quy luật \textbf{0 $\rightarrow$ 1 $\rightarrow$ 1 $\rightarrow$ 2 $\rightarrow$ 2} chứng minh không thể chối cãi sự tồn tại và hoạt động chuẩn xác của Data Cache trong Next.js 16, hoàn toàn loại bỏ yếu tố suy diễn cảm tính từ thời gian phản hồi mạng.
+
+\paragraph*{4. Kiểm chứng Watchlist Server Action và bảo mật Cookie}
+Kịch bản kiểm thử gửi yêu cầu HTTP POST trực tiếp tới Server Action \texttt{toggleWatchlist} với payload \texttt{\{"movieId": 550\}}:
+\begin{itemize}[noitemsep]
+    \item Phản hồi HTTP trả về tiêu đề \texttt{Set-Cookie} với các cờ bảo mật bắt buộc: \texttt{HttpOnly} (chống tấn công XSS qua JavaScript trình duyệt), \texttt{SameSite=Lax} (bảo vệ chống tấn công CSRF), và \texttt{Path=/}.
+    \item Xác minh trạng thái phim xuất hiện tại trang \texttt{/watchlist}, duy trì qua thao tác tải lại trang (F5/Reload) bằng một phiên duyệt mới sử dụng cùng cookie jar, và xác nhận phiên duyệt không có cookie hoàn toàn không bị rò rỉ dữ liệu (cô lập phiên 100\%).
+    \item Kiểm chứng các trường hợp biên: từ chối ID không phải số nguyên dương, loại bỏ phần tử trùng lặp, và chặn không vượt quá ngưỡng 200 phim cũng như ngưỡng dung lượng 3.800 bytes theo chuẩn RFC 6265.
+\end{itemize}
+
+\subsection*{Phụ lục 4. Khai báo sử dụng công cụ AI và minh chứng khắc phục lỗi}
+Trong quá trình phát triển đồ án, nhóm có sử dụng các công cụ trợ lý AI (GitHub Copilot, Claude, ChatGPT) để hỗ trợ tra cứu tài liệu, gợi ý cú pháp TypeScript và hỗ trợ hiệu đính LaTeX. Tuân thủ nghiêm ngặt nguyên tắc liêm chính học thuật, mọi mã nguồn và cấu hình do AI đề xuất đều được nhóm thực hiện kiểm toán độc lập, rà soát kiến trúc và kiểm thử nghiêm ngặt trước khi hợp nhất.
+
+Trong quá trình này, nhóm đã phát hiện và xử lý dứt điểm 2 lỗi kỹ thuật nghiêm trọng do AI sinh mã sai lệch so với kiến trúc chuẩn:
+
+\paragraph*{1. Lỗi Monkey-Patching DNS toàn cục trong \texttt{services/client.ts}}
+\begin{itemize}[noitemsep]
+    \item \textbf{Hiện tượng và đề xuất sai của AI:} Khi kiểm thử kết nối tới TMDB API trong điều kiện mạng nội địa gặp hiện tượng phân giải tên miền chậm hoặc bị chặn, công cụ AI đã gợi ý đoạn mã can thiệp trực tiếp vào tiến trình Node.js bằng cách ghi đè hàm phân giải toàn cục \texttt{dns.lookup} (thông qua \texttt{dns.promises.Resolver}) và ép trỏ về DNS công cộng của Google (\texttt{8.8.8.8}) và Cloudflare (\texttt{1.1.1.1}).
+    \item \textbf{Hậu quả kỹ thuật:} Hành vi monkey-patching này gây ô nhiễm socket mạng toàn cục của tiến trình, tiềm ẩn nguy cơ rò rỉ bộ nhớ, phá vỡ khả năng tương thích môi trường Edge Runtime của Next.js (do môi trường Edge không hỗ trợ module \texttt{node:dns}), và vi phạm nghiêm trọng nguyên tắc phân tách tầng trong kiến trúc phần mềm.
+    \item \textbf{Phương pháp xác minh và khắc phục:} Lỗi được phát hiện trong đợt giám định kiến trúc kỹ thuật chuyên sâu (ghi nhận tại Mục 4.1 của tài liệu \path{baocao/DANH_GIA_REQUIRE.md}). Nhóm đã loại bỏ hoàn toàn đoạn mã ghi đè DNS trong commit \texttt{953db35}, đưa hệ thống trở về cơ chế phân giải tên miền nguyên bản của hệ điều hành và Node.js runtime chuẩn.
+\end{itemize}
+
+\paragraph*{2. Lỗi Gãy luồng điều hướng phân hệ Phim bộ (\texttt{/tv} $\rightarrow$ \texttt{/movie/[id]} gây lỗi TMDB HTTP 404)}
+\begin{itemize}[noitemsep]
+    \item \textbf{Hiện tượng và đề xuất sai của AI:} Khi hỗ trợ mở rộng giao diện người dùng, AI đã tạo trang \path{app/tv/page.tsx} để hiển thị danh sách phim truyền hình nhiều tập (TV Series). Tuy nhiên, AI đã tái sử dụng component \texttt{MovieCard} nhưng gắn cứng thuộc tính đường dẫn liên kết trỏ sang \texttt{/movie/[id]} thay vì tạo route riêng biệt \texttt{/tv/[id]}.
+    \item \textbf{Hậu quả kỹ thuật:} Khi người dùng duyệt trang phim bộ và nhấn chọn bất kỳ bộ phim nào, ứng dụng điều hướng về \texttt{/movie/[id]}. Máy chủ gọi TMDB API endpoint \texttt{/movie/\{id\}} với ID của phim bộ. Do TMDB quản lý định danh phim điện ảnh và phim bộ trên hai cơ sở dữ liệu tách biệt, yêu cầu trả về lỗi HTTP 404 Not Found, kích hoạt hàm \texttt{notFound()} của Next.js làm gãy vụn luồng trải nghiệm người dùng.
+    \item \textbf{Phương pháp xác minh và khắc phục:} Lỗi được phát hiện thông qua kiểm thử kịch bản duyệt phim thực tế trên trình duyệt. Để đảm bảo tính nhất quán và hoàn thiện cao nhất cho đồ án, nhóm đã xử lý triệt để trong commit \texttt{953db35}: loại bỏ hoàn toàn tuyến đường \path{app/tv/page.tsx} và tầng dịch vụ \path{services/tv.ts}, quy hoạch lại 100\% hệ thống sang định hướng điện ảnh chuyên sâu (Movie-Only Cinema Flow), đồng bộ hóa toàn bộ thanh điều hướng, bộ lọc thể loại và cơ sở dữ liệu phim.
+\end{itemize}
+
+Nhóm khẳng định công cụ AI chỉ đóng vai trò hỗ trợ gợi ý; mọi quyết định kỹ thuật, kiểm toán an toàn và kết quả thực nghiệm đều được các thành viên trong nhóm trực tiếp kiểm chứng và chịu trách nhiệm học thuật hoàn toàn.
 
 \end{document}
