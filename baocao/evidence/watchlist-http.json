@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-28T09:21:17.411Z",
-  "git_head": "8e9779cf6ee36d8491d92828ce4b35d25a2ace7e",
+  "generated_at": "2026-10-29T10:35:22.891Z",
+  "git_head": "974f24f490524cfcf4c894280ed8c1bd95002520",
   "working_tree_dirty": true,
   "source_sha256": "b6249d3ab56359ba3e6daea126e7845d71c48b652d758930ecf735164961f495",
   "node": "v26.12.1",
@@ -8,7 +8,7 @@
   "platform": "linux",
   "mode": "production; controlled loopback TMDB mock; Cache Components disabled",
   "scope": "real production Server Action HTTP requests; browser interaction/video not measured",
-  "route": "/movie/1793179289880",
+  "route": "/movie/1793270136321",
   "add_post": 200,
   "cookie_flags": [
     "HttpOnly",

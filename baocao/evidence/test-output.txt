@@ -1,5 +1,5 @@
-generated_at: 2026-10-28T09:21:17.411Z
-git_head: 8e9779cf6ee36d8491d92828ce4b35d25a2ace7e
+generated_at: 2026-10-29T10:35:22.891Z
+git_head: 974f24f490524cfcf4c894280ed8c1bd95002520
 working_tree_dirty: true
 source_sha256: b6249d3ab56359ba3e6daea126e7845d71c48b652d758930ecf735164961f495
 node: v26.12.1
@@ -9,31 +9,31 @@ mode: production; controlled loopback TMDB mock; Cache Components disabled
 scope: HTTP HTML streaming, upstream Data Cache counts and Server Action cookies; no browser paint/CWV/CDN claims
 command: node --disable-warning=DEP0205 --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs
 
-✔ route GET /api/search: returns empty results for empty or short queries (12.547748ms)
-✔ route GET /api/search: includes standard Cache-Control header and returns results (1.824328ms)
-✔ route GET /api/search: sanitizes control characters and truncates queries to 100 chars (1.385923ms)
-✔ search service: searchQuickLive limits output to exactly 5 items (0.50738ms)
-✔ architecture: FilterBar implements all 5 independent criteria (2.233735ms)
-✔ architecture: services/client.ts contains no 'as any' type bypasses (0.638425ms)
-✔ deduplicateMovies retains the first movie for each positive ID (3.511168ms)
-✔ short evidence TTL is allowed only for the loopback mock (95.504336ms)
-✔ R1: Dead code and TV subsystem files are pruned (6.463734ms)
-✔ R1: searchQuickLive queries /search/movie for pure movie results (0.657303ms)
-✔ R2: robots.ts provides correct crawler directives and sitemap URL (76.731956ms)
-✔ R2: sitemap.ts provides valid sitemap configuration with fallback (1.287737ms)
-✔ R2: next.config.ts configures mandatory HTTP security headers (5.668419ms)
-✔ R2: error boundaries and 404 components exist and export default (0.789353ms)
-✔ client sliders receive rendered cards instead of importing MovieCard (2.966111ms)
-✔ fetchTMDB keeps the key in the server request and configures revalidation (94.273038ms)
-✔ streaming verifier rejects a buffered response split into multiple chunks (64.579091ms)
-✔ watchlist: rejects invalid movieId inputs with exact error (5.196693ms)
-✔ watchlist: untrusted cookies accept only unique positive safe integers (1.456268ms)
-✔ watchlist: incoming cookies cannot bypass item and byte limits (0.618356ms)
-✔ watchlist: byte limit includes cookie percent encoding (0.971085ms)
-✔ watchlist: toggleWatchlist adds and removes movie authentic state (0.781252ms)
-✔ watchlist: capacity boundary allows 200 items, rejects 201st (0.94438ms)
-✔ watchlist: 200 serialized IDs byte size safely under RFC 6265 limit (0.310291ms)
-✔ watchlist: resilience to malformed or dirty cookie data (0.625013ms)
+✔ route GET /api/search: returns empty results for empty or short queries (13.693046ms)
+✔ route GET /api/search: includes standard Cache-Control header and returns results (1.877699ms)
+✔ route GET /api/search: sanitizes control characters and truncates queries to 100 chars (1.470638ms)
+✔ search service: searchQuickLive limits output to exactly 5 items (0.511984ms)
+✔ architecture: FilterBar implements all 5 independent criteria (2.76218ms)
+✔ architecture: services/client.ts contains no 'as any' type bypasses (0.821739ms)
+✔ deduplicateMovies retains the first movie for each positive ID (3.618313ms)
+✔ short evidence TTL is allowed only for the loopback mock (97.662806ms)
+✔ R1: Dead code and TV subsystem files are pruned (4.54983ms)
+✔ R1: searchQuickLive queries /search/movie for pure movie results (0.749388ms)
+✔ R2: robots.ts provides correct crawler directives and sitemap URL (86.417902ms)
+✔ R2: sitemap.ts provides valid sitemap configuration with fallback (1.539825ms)
+✔ R2: next.config.ts configures mandatory HTTP security headers (6.604215ms)
+✔ R2: error boundaries and 404 components exist and export default (0.684764ms)
+✔ client sliders receive rendered cards instead of importing MovieCard (2.230467ms)
+✔ fetchTMDB keeps the key in the server request and configures revalidation (82.789015ms)
+✔ streaming verifier rejects a buffered response split into multiple chunks (67.232286ms)
+✔ watchlist: rejects invalid movieId inputs with exact error (5.132594ms)
+✔ watchlist: untrusted cookies accept only unique positive safe integers (1.437948ms)
+✔ watchlist: incoming cookies cannot bypass item and byte limits (0.695882ms)
+✔ watchlist: byte limit includes cookie percent encoding (0.994165ms)
+✔ watchlist: toggleWatchlist adds and removes movie authentic state (0.739462ms)
+✔ watchlist: capacity boundary allows 200 items, rejects 201st (1.904849ms)
+✔ watchlist: 200 serialized IDs byte size safely under RFC 6265 limit (0.35797ms)
+✔ watchlist: resilience to malformed or dirty cookie data (0.582229ms)
 ℹ tests 25
 ℹ suites 0
 ℹ pass 25
@@ -41,7 +41,7 @@ command: node --disable-warning=DEP0205 --experimental-strip-types --disable-war
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 404.170761
+ℹ duration_ms 425.480917
 
 exit_code: 0
 signal: none

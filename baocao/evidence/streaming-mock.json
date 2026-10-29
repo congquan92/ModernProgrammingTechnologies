@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-10-28T09:21:17.411Z",
-  "git_head": "8e9779cf6ee36d8491d92828ce4b35d25a2ace7e",
+  "generated_at": "2026-10-29T10:35:22.891Z",
+  "git_head": "974f24f490524cfcf4c894280ed8c1bd95002520",
   "working_tree_dirty": true,
   "source_sha256": "b6249d3ab56359ba3e6daea126e7845d71c48b652d758930ecf735164961f495",
   "node": "v26.12.1",
@@ -8,169 +8,164 @@
   "platform": "linux",
   "mode": "production; controlled loopback TMDB mock; Cache Components disabled",
   "scope": "HTTP HTML streaming, upstream Data Cache counts and Server Action cookies; no browser paint/CWV/CDN claims",
-  "route": "/movie/1793179289880",
+  "route": "/movie/1793270136321",
   "status": 200,
   "events": {
     "main": {
-      "ms": 217,
-      "chunk": 20
+      "ms": 226,
+      "chunk": 19
     },
     "cast_fallback": {
-      "ms": 217,
-      "chunk": 20
+      "ms": 226,
+      "chunk": 19
     },
     "similar_fallback": {
-      "ms": 217,
-      "chunk": 20
+      "ms": 226,
+      "chunk": 19
     },
     "cast_result": {
-      "ms": 2720,
-      "chunk": 22
+      "ms": 2727,
+      "chunk": 21
     },
     "similar_result": {
-      "ms": 4223,
-      "chunk": 27
+      "ms": 4228,
+      "chunk": 26
     }
   },
   "chunks": [
     {
       "chunk": 1,
-      "ms": 174,
+      "ms": 178,
       "bytes": 16384
     },
     {
       "chunk": 2,
-      "ms": 174,
+      "ms": 178,
       "bytes": 1436
     },
     {
       "chunk": 3,
-      "ms": 202,
+      "ms": 208,
       "bytes": 60
     },
     {
       "chunk": 4,
-      "ms": 211,
+      "ms": 218,
       "bytes": 639
     },
     {
       "chunk": 5,
-      "ms": 211,
+      "ms": 219,
       "bytes": 5434
     },
     {
       "chunk": 6,
-      "ms": 212,
+      "ms": 220,
       "bytes": 3783
     },
     {
       "chunk": 7,
-      "ms": 213,
+      "ms": 221,
       "bytes": 3317
     },
     {
       "chunk": 8,
-      "ms": 213,
+      "ms": 221,
       "bytes": 1715
     },
     {
       "chunk": 9,
-      "ms": 214,
+      "ms": 222,
       "bytes": 3284
     },
     {
       "chunk": 10,
-      "ms": 214,
+      "ms": 223,
       "bytes": 433
     },
     {
       "chunk": 11,
-      "ms": 214,
+      "ms": 223,
       "bytes": 5130
     },
     {
       "chunk": 12,
-      "ms": 215,
+      "ms": 223,
       "bytes": 844
     },
     {
       "chunk": 13,
-      "ms": 215,
+      "ms": 224,
       "bytes": 2290
     },
     {
       "chunk": 14,
-      "ms": 215,
+      "ms": 224,
       "bytes": 195
     },
     {
       "chunk": 15,
-      "ms": 216,
-      "bytes": 611
+      "ms": 224,
+      "bytes": 1743
     },
     {
       "chunk": 16,
-      "ms": 217,
-      "bytes": 3597
+      "ms": 225,
+      "bytes": 2465
     },
     {
       "chunk": 17,
-      "ms": 217,
-      "bytes": 1293
+      "ms": 226,
+      "bytes": 2425
     },
     {
       "chunk": 18,
-      "ms": 217,
-      "bytes": 1175
-    },
-    {
-      "chunk": 19,
-      "ms": 217,
+      "ms": 226,
       "bytes": 3824
     },
     {
-      "chunk": 20,
-      "ms": 217,
+      "chunk": 19,
+      "ms": 226,
       "bytes": 8567
     },
     {
-      "chunk": 21,
-      "ms": 2720,
+      "chunk": 20,
+      "ms": 2726,
       "bytes": 399
     },
     {
+      "chunk": 21,
+      "ms": 2727,
+      "bytes": 1169
+    },
+    {
       "chunk": 22,
-      "ms": 2720,
-      "bytes": 1126
+      "ms": 2727,
+      "bytes": 697
     },
     {
       "chunk": 23,
-      "ms": 2721,
-      "bytes": 740
-    },
-    {
-      "chunk": 24,
-      "ms": 4221,
+      "ms": 4227,
       "bytes": 195
     },
     {
+      "chunk": 24,
+      "ms": 4228,
+      "bytes": 587
+    },
+    {
       "chunk": 25,
-      "ms": 4222,
-      "bytes": 442
+      "ms": 4228,
+      "bytes": 1574
     },
     {
       "chunk": 26,
-      "ms": 4222,
-      "bytes": 1719
-    },
-    {
-      "chunk": 27,
-      "ms": 4223,
+      "ms": 4228,
       "bytes": 2672
     },
     {
-      "chunk": 28,
-      "ms": 4223,
+      "chunk": 27,
+      "ms": 4228,
       "bytes": 14
     }
   ]
