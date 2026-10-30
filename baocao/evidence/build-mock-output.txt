@@ -1,28 +1,28 @@
-generated_at: 2026-10-23T04:29:09.002Z
-git_head: c22709ed1645121d04a44dc8b70f1f28e7d972e4
+generated_at: 2026-10-29T10:35:22.891Z
+git_head: 974f24f490524cfcf4c894280ed8c1bd95002520
 working_tree_dirty: true
-source_sha256: 83da17c2fe37993f3b0756eea7ff1bb955c9bd35b55ca6434ee15c00c889f1b1
-node: v24.19.0
+source_sha256: b6249d3ab56359ba3e6daea126e7845d71c48b652d758930ecf735164961f495
+node: v26.12.1
 next: 16.3.6
-platform: win32
+platform: linux
 mode: production; controlled loopback TMDB mock; Cache Components disabled
 scope: HTTP HTML streaming, upstream Data Cache counts and Server Action cookies; no browser paint/CWV/CDN claims
 command: node node_modules/next/dist/bin/next build
 
 ▲ Next.js 16.3.6 (Turbopack)
 - Environments: .env.local
-✓ Running next.config.ts took 32ms
+✓ Running next.config.ts took 37ms
 
   Creating an optimized production build ...
-✓ Compiled successfully in 1571ms
+✓ Compiled successfully in 637ms
   Running TypeScript ...
-  Finished TypeScript in 1638ms ...
-  Collecting page data using 11 workers ...
-  Generating static pages using 11 workers (0/10) ...
-  Generating static pages using 11 workers (2/10) 
-  Generating static pages using 11 workers (4/10) 
-  Generating static pages using 11 workers (7/10) 
-✓ Generating static pages using 11 workers (10/10) in 481ms
+  Finished TypeScript in 2.1s ...
+  Collecting page data using 12 workers ...
+  Generating static pages using 12 workers (0/10) ...
+  Generating static pages using 12 workers (2/10) 
+  Generating static pages using 12 workers (4/10) 
+  Generating static pages using 12 workers (7/10) 
+✓ Generating static pages using 12 workers (10/10) in 1001ms
   Finalizing page optimization ...
 
 Route (app)       Revalidate  Expire

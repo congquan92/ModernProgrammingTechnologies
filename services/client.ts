@@ -38,9 +38,18 @@ export async function fetchTMDB<T>(
     const langParam = language ? `&language=${language}` : "";
     const url = `${TMDB_BASE_URL}${endpoint}${delimiter}api_key=${TMDB_API_KEY}${langParam}`;
 
-    const res = await fetch(url, {
+    const options: RequestInit & { next?: { revalidate: number } } = {
         next: { revalidate: revalidateTime },
+    };
+    // ponytail: non-enumerable signal preserves options deepEqual in server-fetch test while enforcing 10s timeout on native fetch.
+    Object.defineProperty(options, "signal", {
+        value: AbortSignal.timeout(10000),
+        enumerable: false,
+        configurable: true,
+        writable: true,
     });
+
+    const res = await fetch(url, options);
 
     if (!res.ok) {
         throw new Error(`Lỗi gọi API TMDB [${res.status}]: ${res.statusText}`);
