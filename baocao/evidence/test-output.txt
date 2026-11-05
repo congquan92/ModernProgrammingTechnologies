@@ -1,8 +1,8 @@
-generated_at: 2026-10-30T15:24:20.732Z
-git_head: 2b6cea57201a1f451975c40b1e24859ae9c0dd0b
+generated_at: 2026-11-05T10:36:52.921Z
+git_head: 7f23fab0a3f3121c0e5d7d86f355f0da450594e8
 working_tree_dirty: true
-source_sha256: 72bc35aebfca01869f0aee47db08ee450f440c4917c0fb62aa3cac1c83de5f76
-run_id: 2026-10-30T15:24:20.756Z
+source_sha256: c5033ec1ff7993d30dd353356d6bc35ba14ebcd36ea5d0fc0ed5845e210655a6
+run_id: 2026-11-05T10:36:52.952Z
 node: v26.12.1
 next: 16.3.6
 platform: linux
@@ -28,44 +28,53 @@ Lỗi searchQuickLive: TMDBError: Lỗi gọi API TMDB [503]
     at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
   status: 503
 }
-✔ route GET /api/search: returns empty results for empty or short queries (11.70432ms)
-✔ route GET /api/search: includes standard Cache-Control header and returns results (1.831023ms)
-✔ route GET /api/search: sanitizes control characters and truncates queries to 100 chars (1.378808ms)
-✔ search service: searchQuickLive limits output to exactly 5 items (0.489823ms)
-✔ search distinguishes upstream failure from valid empty results (4.173639ms)
-✔ architecture: FilterBar implements all 5 independent criteria (2.679429ms)
-✔ architecture: services/client.ts contains no 'as any' type bypasses (0.843074ms)
-✔ deduplicateMovies retains the first movie for each positive ID (2.636934ms)
-✔ short evidence TTL is allowed only for the loopback mock (93.049479ms)
-✔ R1: Dead code and TV subsystem files are pruned (6.931758ms)
-✔ R1: searchQuickLive queries /search/movie for pure movie results (0.741647ms)
-✔ R2: robots.ts provides correct crawler directives and sitemap URL (72.459012ms)
-✔ R2: sitemap.ts provides valid sitemap configuration with fallback (1.183671ms)
-✔ R2: next.config.ts configures mandatory HTTP security headers (5.999936ms)
-✔ R2: error boundaries and 404 components exist and export default (2.286235ms)
-✔ client sliders receive rendered cards instead of importing MovieCard (3.23738ms)
+✔ route GET /api/search: returns empty results for empty or short queries (13.648033ms)
+✔ route GET /api/search: includes standard Cache-Control header and returns results (2.251362ms)
+✔ route GET /api/search: sanitizes control characters and truncates queries to 100 chars (1.663876ms)
+✔ search service: searchQuickLive limits output to exactly 5 items (0.611563ms)
+✔ search distinguishes upstream failure from valid empty results (5.003045ms)
+✔ architecture: FilterBar implements all 5 independent criteria (2.752215ms)
+✔ architecture: services/client.ts contains no 'as any' type bypasses (0.872997ms)
+✔ deduplicateMovies retains the first movie for each positive ID (3.445208ms)
+✔ short evidence TTL is allowed only for the loopback mock (105.266535ms)
+✔ home rejects upstream failure instead of caching an empty page (8.687877ms)
+✔ search accepts repeated query parameters and bounds the keyword (28.452881ms)
+✔ classic keyword search keeps old films and excludes newer or undated ones (5.387247ms)
+✔ unsupported keyword filters redirect to a URL that matches the results (0.854832ms)
+✔ discover uses one native TMDB page and validates untrusted filters (1.717006ms)
+✔ browse normalizes repeated filters and invalid page numbers (25.621643ms)
+✔ watchlist add, reload and remove render the state from the Server Action (9.088401ms)
+✔ watchlist propagates service errors but skips deleted movies (1.466388ms)
+✔ keyword filters have accessible labels and offer only supported choices (2.27607ms)
+✔ R1: Dead code and TV subsystem files are pruned (4.469452ms)
+✔ R1: searchQuickLive queries /search/movie for pure movie results (0.50268ms)
+✔ R2: robots.ts provides correct crawler directives and sitemap URL (93.55468ms)
+✔ R2: sitemap.ts provides valid sitemap configuration with fallback (1.520443ms)
+✔ R2: next.config.ts configures mandatory HTTP security headers (8.082495ms)
+✔ R2: error boundaries and 404 components exist and export default (2.402085ms)
+✔ client sliders receive rendered cards instead of importing MovieCard (2.19922ms)
 [TMDB] Request failed /movie/7
 [TMDB] Request failed /movie/7
 [TMDB Service] Cảnh báo: TMDB_API_KEY chưa được cấu hình hợp lệ trong .env.local!
-✔ fetchTMDB keeps the key in the server request and configures revalidation (83.662781ms)
-✔ TMDB failures preserve HTTP status, hide secrets and reject missing configuration (5.883404ms)
-✔ streaming verifier rejects a buffered response split into multiple chunks (75.285703ms)
-✔ watchlist: rejects invalid movieId inputs with exact error (5.32398ms)
-✔ watchlist: untrusted cookies accept only unique positive safe integers (1.374598ms)
-✔ watchlist: incoming cookies cannot bypass item and byte limits (0.590223ms)
-✔ watchlist: byte limit includes cookie percent encoding (0.911473ms)
-✔ watchlist: toggleWatchlist adds and removes movie authentic state (0.720915ms)
-✔ watchlist: capacity boundary allows 200 items, rejects 201st (0.877083ms)
-✔ watchlist: 200 serialized IDs byte size safely under RFC 6265 limit (0.297515ms)
-✔ watchlist: resilience to malformed or dirty cookie data (0.590368ms)
-ℹ tests 27
+✔ fetchTMDB keeps the key in the server request and configures revalidation (88.96351ms)
+✔ TMDB failures preserve HTTP status, hide secrets and reject missing configuration (5.186926ms)
+✔ streaming verifier rejects a buffered response split into multiple chunks (65.240759ms)
+✔ watchlist: rejects invalid movieId inputs with exact error (5.937266ms)
+✔ watchlist: untrusted cookies accept only unique positive safe integers (1.507458ms)
+✔ watchlist: incoming cookies cannot bypass item and byte limits (0.636331ms)
+✔ watchlist: byte limit includes cookie percent encoding (1.323354ms)
+✔ watchlist: toggleWatchlist adds and removes movie authentic state (1.244623ms)
+✔ watchlist: capacity boundary allows 200 items, rejects 201st (1.375182ms)
+✔ watchlist: 200 serialized IDs byte size safely under RFC 6265 limit (0.563656ms)
+✔ watchlist: resilience to malformed or dirty cookie data (0.888786ms)
+ℹ tests 36
 ℹ suites 0
-ℹ pass 27
+ℹ pass 36
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 391.102734
+ℹ duration_ms 1374.465809
 
 exit_code: 0
 signal: none

@@ -1,43 +1,18 @@
 "use client";
 
-import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import { useTransition, useCallback, useRef } from "react";
+import type { RefObject } from "react";
 
 /**
  * SearchBar - Client Component đồng bộ từ khóa tìm kiếm lên URL (Tầng 1B)
  * Cơ chế: gõ phím -> debounce 400ms -> cập nhật ?q= trên URL -> Server Component xử lý fetch TMDB
  * Thiết kế chuẩn Netflix Dark Cinema, không sử dụng emoji, icon hoàn toàn bằng vector SVG.
  */
-export default function SearchBar() {
-    const searchParams = useSearchParams();
-    const pathname = usePathname();
-    const { replace } = useRouter();
-    const [isPending, startTransition] = useTransition();
-    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    const handleSearch = useCallback(
-        (term: string) => {
-            if (debounceRef.current) {
-                clearTimeout(debounceRef.current);
-            }
-
-            debounceRef.current = setTimeout(() => {
-                const params = new URLSearchParams(searchParams.toString());
-                const trimmed = term.trim();
-                if (trimmed) {
-                    params.set("q", trimmed);
-                } else {
-                    params.delete("q");
-                }
-
-                startTransition(() => {
-                    replace(`${pathname}?${params.toString()}`);
-                });
-            }, 400);
-        },
-        [searchParams, pathname, replace]
-    );
-
+export default function SearchBar({ query, inputRef, onSearch, isPending }: {
+    query: string;
+    inputRef: RefObject<HTMLInputElement | null>;
+    onSearch: (term: string) => void;
+    isPending: boolean;
+}) {
     return (
         <div className="relative w-full max-w-2xl">
             {/* Search Icon SVG */}
@@ -48,10 +23,13 @@ export default function SearchBar() {
             </div>
 
             <input
+                ref={inputRef}
                 type="text"
+                aria-label="Tìm kiếm phim"
+                maxLength={100}
                 placeholder="Nhập tên phim cần tìm (ví dụ: Batman, Avatar)..."
-                defaultValue={searchParams.get("q")?.toString() ?? ""}
-                onChange={(e) => handleSearch(e.target.value)}
+                defaultValue={query}
+                onChange={(e) => onSearch(e.target.value)}
                 className="w-full pl-12 pr-12 py-3.5 rounded-md bg-[#242424] text-white placeholder-zinc-500 border border-zinc-700 focus:outline-none focus:border-[#E50914] transition-colors text-sm sm:text-base"
             />
 

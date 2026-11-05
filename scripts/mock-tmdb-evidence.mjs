@@ -48,7 +48,7 @@ createServer(async (request, response) => {
   const videos = path.match(/^\/movie\/(\d+)\/videos$/);
 
   if (detail) {
-    data = movie(Number(detail[1]));
+    data = { ...movie(Number(detail[1])), tagline: `Phiên bản ${count}` };
   } else if (credits) {
     delay = 2500;
     data = {

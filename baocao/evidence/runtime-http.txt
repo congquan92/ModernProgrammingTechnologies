@@ -1,12 +1,19 @@
-﻿generated_at: 2026-10-14T21:19:28.3185178+07:00
-git_head: 9be1f28
+generated_at: 2026-11-05T10:40:24.690118+00:00
+run_id: 2026-11-05T10:40:24.690118+00:00
+git_head: 7f23fab0a3f3121c0e5d7d86f355f0da450594e8
 working_tree_dirty: True
-command: python scripts/verify-runtime-http.py
+source_sha256: c5033ec1ff7993d30dd353356d6bc35ba14ebcd36ea5d0fc0ed5845e210655a6
+mode: normal .next production build; controlled loopback TMDB mock at runtime
+command: python3 scripts/verify-runtime-http.py
+
 source: npm run start at localhost:3000
 /: HTTP 200; api_key_in_body=False
-/movie/1236045: HTTP 200; api_key_in_body=False
+/movie/550: HTTP 200; api_key_in_body=False
 /movie/not-a-number: HTTP 200; api_key_in_body=False
 invalid_movie_not_found_ui: True; noindex: True
 /watchlist: HTTP 200; api_key_in_body=False
 /api/search?q=a: HTTP 200; api_key_in_body=False
+
 exit_code: 0
+sitemap_http: 200; dynamic_movie_url: true
+home_data_cache_hit: true

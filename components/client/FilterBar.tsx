@@ -1,7 +1,8 @@
 "use client";
 
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useEffect, useOptimistic, useRef, useTransition } from "react";
+import SearchBar from "./SearchBar";
 import {
     MOVIE_GENRES,
     COUNTRIES,
@@ -12,19 +13,72 @@ import {
 
 interface FilterBarProps {
     hideType?: boolean;
+    showSearch?: boolean;
 }
 
-export default function FilterBar({ hideType = false }: FilterBarProps) {
+export default function FilterBar({ hideType = false, showSearch = false }: FilterBarProps) {
     const searchParams = useSearchParams();
+    const committedQuery = searchParams.toString();
+    const [optimisticQuery, setOptimisticQuery] = useOptimistic(committedQuery);
+    const params = new URLSearchParams(optimisticQuery);
     const pathname = usePathname();
     const router = useRouter();
     const [isPending, startTransition] = useTransition();
+    const latestParams = useRef(new URLSearchParams(committedQuery));
+    const previousQuery = useRef(committedQuery);
+    const ownNavigations = useRef(new Set<string>());
+    const inputRef = useRef<HTMLInputElement>(null);
+    const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-    const currentType = searchParams.get("type") || "all";
-    const currentGenre = searchParams.get("genre") || "all";
-    const currentCountry = searchParams.get("country") || "all";
-    const currentYear = searchParams.get("year") || "all";
-    const currentSort = searchParams.get("sortBy") || "popularity.desc";
+    useEffect(() => {
+        // Chỉ điều hướng ngoài mới thay bản nháp; response cũ phải giữ phần đang gõ.
+        const externalNavigation = previousQuery.current !== committedQuery && !ownNavigations.current.has(committedQuery);
+        if (externalNavigation) {
+            if (debounceRef.current) clearTimeout(debounceRef.current);
+            if (inputRef.current) inputRef.current.value = searchParams.get("q") ?? "";
+        }
+        previousQuery.current = committedQuery;
+        if (!isPending || externalNavigation) latestParams.current = new URLSearchParams(committedQuery);
+        if (!isPending) ownNavigations.current.clear();
+    }, [committedQuery, isPending, searchParams]);
+
+    useEffect(() => () => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+    }, []);
+
+    const navigate = (next: URLSearchParams, replace = false) => {
+        const query = next.toString();
+        latestParams.current = next;
+        ownNavigations.current.add(query);
+        startTransition(() => {
+            setOptimisticQuery(query);
+            router[replace ? "replace" : "push"](`${pathname}${query ? `?${query}` : ""}`, { scroll: false });
+        });
+    };
+
+    const handleSearch = (term: string) => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = setTimeout(() => {
+            const next = new URLSearchParams(latestParams.current);
+            const trimmed = term.trim();
+            if (trimmed) {
+                next.set("q", trimmed);
+                next.delete("country");
+                if (next.get("sortBy") === "revenue.desc") next.delete("sortBy");
+            } else {
+                next.delete("q");
+            }
+            next.delete("page");
+            navigate(next, true);
+        }, 400);
+    };
+
+    const hasQuery = Boolean(params.get("q")?.trim());
+    const currentType = params.get("type") || "all";
+    const currentGenre = params.get("genre") || "all";
+    const currentCountry = params.get("country") || "all";
+    const currentYear = params.get("year") || "all";
+    const currentSort = params.get("sortBy") || "popularity.desc";
 
     const hasActiveFilters =
         (currentType !== "all" && !hideType) ||
@@ -34,7 +88,7 @@ export default function FilterBar({ hideType = false }: FilterBarProps) {
         currentSort !== "popularity.desc";
 
     const updateFilter = (key: string, value: string) => {
-        const params = new URLSearchParams(searchParams.toString());
+        const params = new URLSearchParams(latestParams.current);
         if (value && value !== "all" && value !== "popularity.desc") {
             params.set(key, value);
         } else {
@@ -43,25 +97,23 @@ export default function FilterBar({ hideType = false }: FilterBarProps) {
         // Reset về trang 1 khi đổi bộ lọc
         params.delete("page");
 
-        startTransition(() => {
-            const query = params.toString();
-            router.push(`${pathname}${query ? `?${query}` : ""}`);
-        });
+        navigate(params);
     };
 
     const resetFilters = () => {
         const params = new URLSearchParams();
         // Giữ lại từ khóa tìm kiếm q nếu có
-        const currentQ = searchParams.get("q");
+        const currentQ = latestParams.current.get("q");
         if (currentQ) params.set("q", currentQ);
 
-        startTransition(() => {
-            const query = params.toString();
-            router.push(`${pathname}${query ? `?${query}` : ""}`);
-        });
+        navigate(params);
     };
 
     return (
+        <>
+        {showSearch && <div className="mb-6">
+            <SearchBar query={searchParams.get("q") ?? ""} inputRef={inputRef} onSearch={handleSearch} isPending={isPending} />
+        </div>}
         <div className="bg-[#181818]/90 border border-[#2E2E2E] rounded-lg p-3 sm:p-4 mb-8 backdrop-blur-sm shadow-xl shadow-black/40">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2">
@@ -96,8 +148,9 @@ export default function FilterBar({ hideType = false }: FilterBarProps) {
                 {/* 1. Loại phim */}
                 {!hideType && (
                     <div className="space-y-1">
-                        <label className="text-[11px] text-zinc-400 font-medium">Định dạng</label>
+                        <label htmlFor="filter-type" className="text-[11px] text-zinc-400 font-medium">Định dạng</label>
                         <select
+                            id="filter-type"
                             value={currentType}
                             onChange={(e) => updateFilter("type", e.target.value)}
                             className="w-full bg-[#222222] text-white text-xs sm:text-sm rounded border border-zinc-700 px-2.5 py-2 focus:outline-none focus:border-[#E50914] transition-colors cursor-pointer"
@@ -113,8 +166,9 @@ export default function FilterBar({ hideType = false }: FilterBarProps) {
 
                 {/* 2. Thể loại */}
                 <div className="space-y-1">
-                    <label className="text-[11px] text-zinc-400 font-medium">Thể loại</label>
+                    <label htmlFor="filter-genre" className="text-[11px] text-zinc-400 font-medium">Thể loại</label>
                     <select
+                        id="filter-genre"
                         value={currentGenre}
                         onChange={(e) => updateFilter("genre", e.target.value)}
                         className="w-full bg-[#222222] text-white text-xs sm:text-sm rounded border border-zinc-700 px-2.5 py-2 focus:outline-none focus:border-[#E50914] transition-colors cursor-pointer"
@@ -131,9 +185,10 @@ export default function FilterBar({ hideType = false }: FilterBarProps) {
                 </div>
 
                 {/* 3. Quốc gia */}
-                <div className="space-y-1">
-                    <label className="text-[11px] text-zinc-400 font-medium">Quốc gia</label>
+                {!hasQuery && <div className="space-y-1">
+                    <label htmlFor="filter-country" className="text-[11px] text-zinc-400 font-medium">Quốc gia</label>
                     <select
+                        id="filter-country"
                         value={currentCountry}
                         onChange={(e) => updateFilter("country", e.target.value)}
                         className="w-full bg-[#222222] text-white text-xs sm:text-sm rounded border border-zinc-700 px-2.5 py-2 focus:outline-none focus:border-[#E50914] transition-colors cursor-pointer"
@@ -147,12 +202,13 @@ export default function FilterBar({ hideType = false }: FilterBarProps) {
                             </option>
                         ))}
                     </select>
-                </div>
+                </div>}
 
                 {/* 4. Năm phát hành */}
                 <div className="space-y-1">
-                    <label className="text-[11px] text-zinc-400 font-medium">Năm phát hành</label>
+                    <label htmlFor="filter-year" className="text-[11px] text-zinc-400 font-medium">Năm phát hành</label>
                     <select
+                        id="filter-year"
                         value={currentYear}
                         onChange={(e) => updateFilter("year", e.target.value)}
                         className="w-full bg-[#222222] text-white text-xs sm:text-sm rounded border border-zinc-700 px-2.5 py-2 focus:outline-none focus:border-[#E50914] transition-colors cursor-pointer"
@@ -170,20 +226,22 @@ export default function FilterBar({ hideType = false }: FilterBarProps) {
 
                 {/* 5. Sắp xếp */}
                 <div className="space-y-1">
-                    <label className="text-[11px] text-zinc-400 font-medium">Sắp xếp theo</label>
+                    <label htmlFor="filter-sort" className="text-[11px] text-zinc-400 font-medium">Sắp xếp theo</label>
                     <select
+                        id="filter-sort"
                         value={currentSort}
                         onChange={(e) => updateFilter("sortBy", e.target.value)}
                         className="w-full bg-[#222222] text-white text-xs sm:text-sm rounded border border-zinc-700 px-2.5 py-2 focus:outline-none focus:border-[#E50914] transition-colors cursor-pointer"
                     >
-                        {SORT_OPTIONS.map((sort) => (
+                        {SORT_OPTIONS.filter((sort) => !hasQuery || sort.id !== "revenue.desc").map((sort) => (
                             <option key={sort.id} value={sort.id} className="bg-[#181818] text-white">
-                                {sort.label}
+                                {hasQuery && sort.id === "popularity.desc" ? "Liên quan nhất" : sort.label}
                             </option>
                         ))}
                     </select>
                 </div>
             </div>
         </div>
+        </>
     );
 }

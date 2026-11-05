@@ -1,27 +1,21 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { searchMovies, discoverMovies, getTrendingMovies } from "@/services/tmdb";
-import SearchBar from "@/components/client/SearchBar";
 import FilterBar from "@/components/client/FilterBar";
 import MovieCard from "@/components/server/MovieCard";
 import type { Movie } from "@/types/tmdb";
+import { redirect } from "next/navigation";
+import { normalizeMovieParams, type MovieSearchParams } from "@/utils/searchParams";
 
 interface SearchPageProps {
-    searchParams: Promise<{
-        q?: string;
-        genre?: string;
-        year?: string;
-        country?: string;
-        sortBy?: string;
-        type?: string;
-    }>;
+    searchParams: Promise<MovieSearchParams>;
 }
 
 export async function generateMetadata({ searchParams }: SearchPageProps): Promise<Metadata> {
-    const params = await searchParams;
+    const params = normalizeMovieParams(await searchParams);
     const q = params.q?.trim();
     return {
-        title: q ? `Kết quả tìm kiếm: "${q}" | MovieHub` : "Tìm kiếm & Khám phá phim | MovieHub",
+        title: q ? `Kết quả tìm kiếm: "${q}"` : "Tìm kiếm & Khám phá phim",
         description: "Tìm kiếm và lọc phim chất lượng cao theo thể loại, quốc gia, năm phát hành trên MovieHub.",
     };
 }
@@ -31,7 +25,7 @@ export async function generateMetadata({ searchParams }: SearchPageProps): Promi
  * Nhận searchParams bất đồng bộ từ Next.js 16, gọi TMDB API an toàn phía server.
  */
 export default async function SearchPage({ searchParams }: SearchPageProps) {
-    const params = await searchParams;
+    const params = normalizeMovieParams(await searchParams);
     const query = params.q?.trim() ?? "";
     const hasFilters = Boolean(
         params.genre || params.year || params.country || params.sortBy || params.type
@@ -41,21 +35,27 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
     let trendingMovies: Movie[] = [];
 
     if (query) {
-        // Có từ khóa: Gọi searchMovies từ TMDB (lấy 48 phim để lọc và hiển thị đủ 24 phim)
+        if (params.country || params.sortBy === "revenue.desc") {
+            delete params.country;
+            if (params.sortBy === "revenue.desc") delete params.sortBy;
+            redirect(`/search?${new URLSearchParams(params)}`);
+        }
+        // ponytail: lọc tối đa hai trang kết quả TMDB; thêm phân trang khi cần tìm sâu hơn.
         const searchResults = await searchMovies(query, 48);
 
         // Áp dụng bộ lọc bổ sung nếu có
         results = searchResults.filter((movie) => {
             if (params.genre && params.genre !== "all") {
-                const numericGenre = Number(params.genre.split("-")[0]);
-                if (movie.genre_ids && !movie.genre_ids.includes(numericGenre)) {
+                if (params.genre === "classic") {
+                    if (!movie.release_date || movie.release_date > "2000-01-01") return false;
+                } else if (!movie.genre_ids?.includes(Number(params.genre))) {
                     return false;
                 }
             }
             if (params.year && params.year !== "all") {
                 if (params.year === "before-2015") {
                     const releaseYear = Number(movie.release_date?.split("-")[0]);
-                    if (releaseYear && releaseYear >= 2015) return false;
+                    if (!releaseYear || releaseYear >= 2015) return false;
                 } else if (!movie.release_date?.startsWith(params.year)) {
                     return false;
                 }
@@ -76,14 +76,12 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
         // Giới hạn hiển thị 24 phim để vừa khít hoàn hảo lưới (4 hàng x 6 cột)
         results = results.slice(0, 24);
     } else if (hasFilters) {
-        // Không có từ khóa nhưng có bộ lọc: Gọi discoverMovies lấy chuẩn 24 phim
+        // Không có từ khóa: dùng bộ lọc và phân trang gốc của TMDB.
         const discoverData = await discoverMovies({
-            type: (params.type as "movie" | "tv") || undefined,
             genre: params.genre,
             country: params.country,
             year: params.year,
             sortBy: params.sortBy,
-            perPage: 24,
         });
         results = discoverData.results;
     } else {
@@ -113,24 +111,13 @@ export default async function SearchPage({ searchParams }: SearchPageProps) {
                     ) : null}
                 </div>
 
-                {/* SearchBar Client Component */}
-                <Suspense
-                    fallback={
-                        <div className="w-full max-w-2xl h-[52px] bg-[#242424] rounded-md animate-pulse mb-6" />
-                    }
-                >
-                    <div className="mb-6">
-                        <SearchBar />
-                    </div>
-                </Suspense>
-
-                {/* Bộ Lọc Phim Đa Tiêu Chí */}
+                {/* Tìm kiếm và bộ lọc dùng chung trạng thái URL. */}
                 <Suspense
                     fallback={
                         <div className="w-full h-24 bg-[#181818] rounded-lg animate-pulse mb-8" />
                     }
                 >
-                    <FilterBar />
+                    <FilterBar showSearch />
                 </Suspense>
 
                 {/* Trạng thái và Kết quả */}

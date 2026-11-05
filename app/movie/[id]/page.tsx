@@ -31,7 +31,7 @@ export async function generateMetadata(
     const year = movie.release_date ? movie.release_date.split("-")[0] : "";
 
     return {
-      title: `${movie.title} ${year ? `(${year})` : ""} | MovieHub`,
+      title: `${movie.title}${year ? ` (${year})` : ""}`,
       description:
         movie.overview ||
         `Xem thông tin chi tiết, dàn diễn viên và đánh giá của bộ phim ${movie.title} trên MovieHub.`,

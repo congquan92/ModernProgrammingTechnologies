@@ -1,12 +1,13 @@
 ## Lượt tự động dùng cho nghiệm thu nhóm 21
 
-Chạy `npm ci` rồi `npm run evidence` từ thư mục gốc (Node 24 trở lên). Lệnh chạy lint/test/build/typecheck, dựng `.next-evidence`, khởi động Next production và TMDB mock loopback với TTL 15 giây. Không cần API key thật. Đọc `mock-runtime.json`: chỉ nghiệm thu khi `status=passed`, các artifact cùng `run_id` và `source_sha256`.
+Chạy `npm ci` rồi `npm run evidence` từ thư mục gốc (Node 24 trở lên). Lệnh chạy lint/test/build Webpack/typecheck, dựng `.next-evidence`, khởi động Next production và TMDB mock loopback với TTL 15 giây. CI chạy cùng lệnh, không cần API key thật. Đọc `mock-runtime.json`: chỉ nghiệm thu khi `status=passed`, các artifact cùng `run_id` và `source_sha256`.
 
-- `cache-mock.json`: bảng `steps` ghi request và số lần origin nhận; mỗi endpoint có chuỗi 0 → 1 → 1 → 2 → 2. HTTP client không prefetch; metadata/details cùng endpoint không được suy thành hai request origin nếu chưa thấy counter tăng.
+- `cache-mock.json`: bảng `steps` ghi request và số lần origin nhận; mỗi endpoint có chuỗi 0 → 1 → 1 → 2 → 2. Nội dung phim phải đổi từ “Phiên bản 1” sang “Phiên bản 2” sau revalidation. HTTP client không prefetch; metadata/details cùng endpoint không được suy thành hai request origin nếu chưa thấy counter tăng.
+- `routes-http.json`: HTML server có đủ bốn hàng phim, query lặp chạy được, GET tìm kiếm trả phim và ID sai có `noindex`.
 - `streaming-mock.json`: HTML phần chính/fallback phải đến trước credits/similar trì hoãn; chỉ kết luận HTTP streaming, không kết luận FCP/khả năng tương tác.
 - `watchlist-http.json`: thêm → GET mới → xóa → GET mới, phiên cookie riêng vẫn trống. Test đơn vị kiểm tra trùng/giới hạn cookie.
 
-Mock thay API TMDB; Next production, Data Cache và Server Actions chạy thật. Build `.next` dùng TTL dịch vụ thường (trang chủ thấp nhất 1800 giây) là lượt riêng. Các bước thủ công bên dưới dùng TTL thường nếu không khai báo override; không trộn counter với lượt tự động hoặc hardcode ID 550 đã được build dùng trước.
+Mock thay API TMDB; Next production, Data Cache và Server Actions chạy thật. Build `.next` là lượt riêng; trang chủ và sitemap render khi có request, các fetch dùng TTL dịch vụ thường (thấp nhất 1800 giây). Các bước thủ công bên dưới dùng TTL thường nếu không khai báo override; không trộn counter với lượt tự động hoặc hardcode ID 550 đã được dùng ở các lượt trước.
 
 Lỗi API thật không tự chuyển mock. Kiểm tra bằng trình duyệt với khóa hợp lệ: mở phim tồn tại, lưu/reload/xóa/reload; ngắt kết nối upstream để kiểm tra thông báo thử lại. Các ảnh cũ không chứng minh bản sửa hiện tại đã qua kiểm tra browser; chưa có Core Web Vitals mới.
 

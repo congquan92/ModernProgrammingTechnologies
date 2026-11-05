@@ -1,12 +1,14 @@
 import type { MetadataRoute } from "next";
 import { getTrendingMovies } from "@/services/tmdb";
+import { connection } from "next/server";
 
 /**
  * Next.js 16 Metadata Route - Sitemap tự động (app/sitemap.ts)
  * Cung cấp sơ đồ trang web chuẩn XML cho công cụ tìm kiếm (Googlebot, Bingbot).
- * Có fallback try/catch đảm bảo build không bao giờ lỗi khi TMDB API ngắt kết nối.
+ * Tải danh sách phim khi có request; lỗi TMDB vẫn trả các liên kết tĩnh.
  */
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+    await connection();
     const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://moviehub.vn";
     const now = new Date();
 

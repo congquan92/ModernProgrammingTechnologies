@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect } from "react";
+import "./globals.css";
 
 interface GlobalErrorProps {
     error: Error & { digest?: string };
-    reset: () => void;
+    retry: () => void;
 }
 
 /**
@@ -12,7 +13,7 @@ interface GlobalErrorProps {
  * Bắt các lỗi nghiêm trọng phát sinh trong chính RootLayout (app/layout.tsx).
  * Theo quy chuẩn Next.js, component này BẮT BUỘC phải tự định nghĩa thẻ <html> và <body>.
  */
-export default function GlobalErrorBoundary({ error, reset }: GlobalErrorProps) {
+export default function GlobalErrorBoundary({ error, retry }: GlobalErrorProps) {
     useEffect(() => {
         console.error("[GlobalError] Lỗi layout toàn cục:", error);
     }, [error]);
@@ -53,7 +54,7 @@ export default function GlobalErrorBoundary({ error, reset }: GlobalErrorProps) 
                     <div className="flex items-center justify-center gap-3 pt-2">
                         <button
                             type="button"
-                            onClick={() => reset()}
+                            onClick={retry}
                             className="bg-white hover:bg-white/80 text-black font-extrabold px-6 py-2.5 rounded-md transition-colors shadow-lg cursor-pointer text-sm"
                         >
                             Thử lại

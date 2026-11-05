@@ -16,13 +16,11 @@ export interface Movie {
 }
 
 export interface DiscoverParams {
-    type?: "movie" | "tv";
     genre?: string;
     year?: string;
     country?: string;
     sortBy?: string;
     page?: number;
-    perPage?: number;
 }
 
 export interface MovieListResponse {

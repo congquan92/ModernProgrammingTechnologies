@@ -151,6 +151,8 @@ export default function NavSearchBar() {
                         <input
                             ref={inputRef}
                             type="text"
+                            aria-label="Tìm kiếm phim"
+                            maxLength={100}
                             value={query}
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}

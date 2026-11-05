@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getWatchlistIds } from "@/app/actions/watchlist";
-import { getMovieDetails } from "@/services/tmdb";
+import { getMovieDetails, TMDBError } from "@/services/tmdb";
 import MovieCard from "@/components/server/MovieCard";
 import WatchlistButton from "@/components/client/WatchlistButton";
 import ClearWatchlistButton from "@/components/client/ClearWatchlistButton";
 import type { MovieDetails } from "@/types/tmdb";
 
 export const metadata: Metadata = {
-    title: "Danh Sách Yêu Thích | MovieHub",
+    title: "Danh Sách Yêu Thích",
     description: "Tất cả các bộ phim bạn đã lưu vào danh sách xem sau.",
 };
 
@@ -27,8 +27,9 @@ export default async function WatchlistPage() {
                       ids.map(async (id) => {
                           try {
                               return await getMovieDetails(String(id));
-                          } catch {
-                              return null;
+                          } catch (error) {
+                              if (error instanceof TMDBError && error.status === 404) return null;
+                              throw error;
                           }
                       })
                   )

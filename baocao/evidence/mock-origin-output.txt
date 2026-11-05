@@ -1,8 +1,8 @@
-generated_at: 2026-10-30T15:24:20.732Z
-git_head: 2b6cea57201a1f451975c40b1e24859ae9c0dd0b
+generated_at: 2026-11-05T10:36:52.921Z
+git_head: 7f23fab0a3f3121c0e5d7d86f355f0da450594e8
 working_tree_dirty: true
-source_sha256: 72bc35aebfca01869f0aee47db08ee450f440c4917c0fb62aa3cac1c83de5f76
-run_id: 2026-10-30T15:24:20.756Z
+source_sha256: c5033ec1ff7993d30dd353356d6bc35ba14ebcd36ea5d0fc0ed5845e210655a6
+run_id: 2026-11-05T10:36:52.952Z
 node: v26.12.1
 next: 16.3.6
 platform: linux
@@ -10,58 +10,62 @@ mode: production; controlled loopback TMDB mock; Cache Components disabled
 scope: HTTP HTML streaming, upstream Data Cache counts and Server Action cookies; no browser paint/CWV/CDN claims
 command: node scripts/mock-tmdb-evidence.mjs
 
-Mock TMDB: http://127.0.0.1:43219/3
+Mock TMDB: http://127.0.0.1:44795/3
 Chỉ dùng cho minh chứng; log không ghi api_key.
 START /trending/movie/week #1
 END   /trending/movie/week #1 1ms
+START /trending/movie/week #2
+END   /trending/movie/week #2 1ms
 START /movie/now_playing #1
 END   /movie/now_playing #1 0ms
 START /movie/now_playing #2
-END   /movie/now_playing #2 0ms
+END   /movie/now_playing #2 1ms
 START /movie/top_rated #1
 END   /movie/top_rated #1 0ms
-START /trending/movie/week #2
-END   /trending/movie/week #2 1ms
 START /discover/movie #1
 END   /discover/movie #1 0ms
-START /discover/movie #2
-END   /discover/movie #2 0ms
-START /movie/1793373873774 #1
-END   /movie/1793373873774 #1 0ms
-START /movie/1793373873774/videos #1
-END   /movie/1793373873774/videos #1 1ms
-START /movie/1793373873774/credits #1
-START /movie/1793373873774/similar #1
-END   /movie/1793373873774/credits #1 2502ms
-END   /movie/1793373873774/similar #1 4002ms
-START /movie/1793373873774 #2
-END   /movie/1793373873774 #2 0ms
-START /movie/1793373873774/videos #2
-END   /movie/1793373873774/videos #2 0ms
-START /movie/1793373873774/credits #2
-START /movie/1793373873774/similar #2
-END   /movie/1793373873774/credits #2 2501ms
-END   /movie/1793373873774/similar #2 4001ms
-START /movie/1793373873774 #3
-END   /movie/1793373873774 #3 0ms
-START /movie/1793373873774/videos #3
-END   /movie/1793373873774/videos #3 0ms
-START /movie/1793373873774 #4
-END   /movie/1793373873774 #4 0ms
-START /movie/1793373873774/credits #3
-START /movie/1793373873774/similar #3
-END   /movie/1793373873774/credits #3 2502ms
-END   /movie/1793373873774/similar #3 4001ms
-START /movie/1793373873774 #5
-END   /movie/1793373873774 #5 0ms
-START /movie/1793373873774/videos #4
-END   /movie/1793373873774/videos #4 0ms
-START /movie/1793373873774 #6
-END   /movie/1793373873774 #6 1ms
-START /movie/1793373873774/credits #4
-START /movie/1793373873774/similar #4
-END   /movie/1793373873774/credits #4 2501ms
-END   /movie/1793373873774/similar #4 4001ms
+START /search/movie #1
+END   /search/movie #1 0ms
+START /search/movie #2
+END   /search/movie #2 0ms
+START /search/movie #3
+END   /search/movie #3 1ms
+START /movie/1793875041913 #1
+END   /movie/1793875041913 #1 0ms
+START /movie/1793875041913/videos #1
+END   /movie/1793875041913/videos #1 0ms
+START /movie/1793875041913/credits #1
+START /movie/1793875041913/similar #1
+END   /movie/1793875041913/credits #1 2503ms
+END   /movie/1793875041913/similar #1 4001ms
+START /movie/1793875041913 #2
+END   /movie/1793875041913 #2 1ms
+START /movie/1793875041913/videos #2
+END   /movie/1793875041913/videos #2 0ms
+START /movie/1793875041913/credits #2
+START /movie/1793875041913/similar #2
+END   /movie/1793875041913/credits #2 2502ms
+END   /movie/1793875041913/similar #2 4001ms
+START /movie/1793875041913 #3
+END   /movie/1793875041913 #3 1ms
+START /movie/1793875041913/videos #3
+END   /movie/1793875041913/videos #3 0ms
+START /movie/1793875041913 #4
+END   /movie/1793875041913 #4 0ms
+START /movie/1793875041913/credits #3
+START /movie/1793875041913/similar #3
+END   /movie/1793875041913/credits #3 2502ms
+END   /movie/1793875041913/similar #3 4002ms
+START /movie/1793875041913 #5
+END   /movie/1793875041913 #5 0ms
+START /movie/1793875041913/videos #4
+END   /movie/1793875041913/videos #4 0ms
+START /movie/1793875041913 #6
+END   /movie/1793875041913 #6 0ms
+START /movie/1793875041913/credits #4
+START /movie/1793875041913/similar #4
+END   /movie/1793875041913/credits #4 2502ms
+END   /movie/1793875041913/similar #4 4001ms
 
 exit_code: null
 signal: SIGTERM
