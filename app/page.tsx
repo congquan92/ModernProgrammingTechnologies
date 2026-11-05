@@ -7,6 +7,7 @@ import {
 import HeroBanner from "@/components/server/HeroBanner";
 import MovieCard from "@/components/server/MovieCard";
 import MovieRow from "@/components/client/MovieRow";
+import { connection } from "next/server";
 
 /**
  * HomePage - Server Component trang chủ mang phong cách trải nghiệm Netflix (Tầng 1A & Tầng 1B)
@@ -17,6 +18,8 @@ import MovieRow from "@/components/client/MovieRow";
  * 3. Hàng phim thiết kế dạng cuộn ngang (MovieRow) kèm hàng TOP 10 với số thứ tự khổng lồ.
  */
 export default async function HomePage() {
+    // Chỉ gọi TMDB khi có request; build không phụ thuộc API ngoài.
+    await connection();
     const [trending, nowPlaying, topRated, classicData] = await Promise.all([
         getTrendingMovies(),
         getNowPlayingMovies(),
@@ -32,20 +35,14 @@ export default async function HomePage() {
             {/* 1. Hero Billboard Banner (Tràn viền với 2 nút Phát & Thông tin khác) */}
             <HeroBanner movie={featuredMovie} />
 
-            {/* Thông báo nếu chưa có API Key */}
-            {trending.length === 0 && nowPlaying.length === 0 && topRated.length === 0 && (
-                <div className="container mx-auto px-4 sm:px-12 my-8">
-                    <div className="rounded-md border border-[#E50914]/40 bg-[#181818] p-6 text-center text-gray-200 shadow-xl">
-                        <p className="text-xl font-bold text-[#E50914]">Chưa cấu hình TMDB API Key</p>
-                        <p className="text-sm text-gray-400 mt-2">
-                            Vui lòng mở file <code className="text-white bg-black px-2 py-0.5 rounded">.env.local</code> và điền <code className="text-white bg-black px-2 py-0.5 rounded">TMDB_API_KEY</code> để tải toàn bộ poster phim từ TMDB.
-                        </p>
-                    </div>
+            {!featuredMovie && (
+                <div role="status" className="px-4 sm:px-12 pt-28 pb-16 text-white">
+                    <p>Hiện chưa có phim để hiển thị.</p>
                 </div>
             )}
 
             {/* 2. Các hàng danh mục phim cuộn ngang chuẩn Netflix (bắt đầu phủ lên chân Billboard) */}
-            <div className="-mt-10 sm:-mt-16 lg:-mt-24 relative z-20 space-y-6 sm:space-y-10">
+            <div className={`relative z-20 space-y-6 sm:space-y-10 ${!featuredMovie ? "" : "-mt-10 sm:-mt-16 lg:-mt-24"}`}>
                 {/* Hàng 1: Phim Thịnh Hành Trong Tuần */}
                 <MovieRow title="Phim Thịnh Hành Trong Tuần" cards={trending.map((movie) => <MovieCard key={movie.id} movie={movie} />)} />
 

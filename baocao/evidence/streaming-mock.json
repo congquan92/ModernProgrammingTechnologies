@@ -1,171 +1,177 @@
 {
-  "generated_at": "2026-10-29T10:35:22.891Z",
-  "git_head": "974f24f490524cfcf4c894280ed8c1bd95002520",
+  "generated_at": "2026-11-05T10:36:52.921Z",
+  "git_head": "7f23fab0a3f3121c0e5d7d86f355f0da450594e8",
   "working_tree_dirty": true,
-  "source_sha256": "b6249d3ab56359ba3e6daea126e7845d71c48b652d758930ecf735164961f495",
+  "source_sha256": "c5033ec1ff7993d30dd353356d6bc35ba14ebcd36ea5d0fc0ed5845e210655a6",
+  "run_id": "2026-11-05T10:36:52.952Z",
   "node": "v26.12.1",
   "next": "16.3.6",
   "platform": "linux",
   "mode": "production; controlled loopback TMDB mock; Cache Components disabled",
   "scope": "HTTP HTML streaming, upstream Data Cache counts and Server Action cookies; no browser paint/CWV/CDN claims",
-  "route": "/movie/1793270136321",
+  "route": "/movie/1793875041913",
   "status": 200,
   "events": {
     "main": {
-      "ms": 226,
-      "chunk": 19
-    },
-    "cast_fallback": {
-      "ms": 226,
-      "chunk": 19
-    },
-    "similar_fallback": {
-      "ms": 226,
-      "chunk": 19
-    },
-    "cast_result": {
-      "ms": 2727,
+      "ms": 63,
       "chunk": 21
     },
+    "cast_fallback": {
+      "ms": 63,
+      "chunk": 21
+    },
+    "similar_fallback": {
+      "ms": 63,
+      "chunk": 21
+    },
+    "cast_result": {
+      "ms": 2564,
+      "chunk": 23
+    },
     "similar_result": {
-      "ms": 4228,
-      "chunk": 26
+      "ms": 4064,
+      "chunk": 27
     }
   },
   "chunks": [
     {
       "chunk": 1,
-      "ms": 178,
+      "ms": 50,
       "bytes": 16384
     },
     {
       "chunk": 2,
-      "ms": 178,
-      "bytes": 1436
+      "ms": 50,
+      "bytes": 1652
     },
     {
       "chunk": 3,
-      "ms": 208,
+      "ms": 55,
       "bytes": 60
     },
     {
       "chunk": 4,
-      "ms": 218,
-      "bytes": 639
+      "ms": 56,
+      "bytes": 522
     },
     {
       "chunk": 5,
-      "ms": 219,
+      "ms": 57,
       "bytes": 5434
     },
     {
       "chunk": 6,
-      "ms": 220,
-      "bytes": 3783
+      "ms": 58,
+      "bytes": 3433
     },
     {
       "chunk": 7,
-      "ms": 221,
+      "ms": 58,
       "bytes": 3317
     },
     {
       "chunk": 8,
-      "ms": 221,
-      "bytes": 1715
+      "ms": 59,
+      "bytes": 1966
     },
     {
       "chunk": 9,
-      "ms": 222,
-      "bytes": 3284
+      "ms": 59,
+      "bytes": 3201
     },
     {
       "chunk": 10,
-      "ms": 223,
+      "ms": 60,
       "bytes": 433
     },
     {
       "chunk": 11,
-      "ms": 223,
-      "bytes": 5130
+      "ms": 60,
+      "bytes": 5115
     },
     {
       "chunk": 12,
-      "ms": 223,
-      "bytes": 844
+      "ms": 60,
+      "bytes": 723
     },
     {
       "chunk": 13,
-      "ms": 224,
-      "bytes": 2290
+      "ms": 60,
+      "bytes": 1739
     },
     {
       "chunk": 14,
-      "ms": 224,
+      "ms": 60,
       "bytes": 195
     },
     {
       "chunk": 15,
-      "ms": 224,
-      "bytes": 1743
+      "ms": 61,
+      "bytes": 1192
     },
     {
       "chunk": 16,
-      "ms": 225,
-      "bytes": 2465
+      "ms": 61,
+      "bytes": 1066
     },
     {
       "chunk": 17,
-      "ms": 226,
-      "bytes": 2425
+      "ms": 62,
+      "bytes": 629
     },
     {
       "chunk": 18,
-      "ms": 226,
-      "bytes": 3824
+      "ms": 63,
+      "bytes": 2091
     },
     {
       "chunk": 19,
-      "ms": 226,
-      "bytes": 8567
+      "ms": 63,
+      "bytes": 2782
     },
     {
       "chunk": 20,
-      "ms": 2726,
-      "bytes": 399
+      "ms": 63,
+      "bytes": 4001
     },
     {
       "chunk": 21,
-      "ms": 2727,
-      "bytes": 1169
+      "ms": 63,
+      "bytes": 7601
     },
     {
       "chunk": 22,
-      "ms": 2727,
-      "bytes": 697
+      "ms": 2564,
+      "bytes": 442
     },
     {
       "chunk": 23,
-      "ms": 4227,
-      "bytes": 195
+      "ms": 2564,
+      "bytes": 1558
     },
     {
       "chunk": 24,
-      "ms": 4228,
-      "bytes": 587
+      "ms": 2564,
+      "bytes": 308
     },
     {
       "chunk": 25,
-      "ms": 4228,
-      "bytes": 1574
+      "ms": 4062,
+      "bytes": 239
     },
     {
       "chunk": 26,
-      "ms": 4228,
-      "bytes": 2672
+      "ms": 4063,
+      "bytes": 2161
     },
     {
       "chunk": 27,
-      "ms": 4228,
+      "ms": 4064,
+      "bytes": 2672
+    },
+    {
+      "chunk": 28,
+      "ms": 4065,
       "bytes": 14
     }
   ]

@@ -11,19 +11,22 @@
 
 - **Tầng 1A (Lõi Bắt Buộc):**
     - **App Router:** Sử dụng cấu trúc thư mục mới nhất của Next.js 16 (`app/layout.tsx`, `app/page.tsx`).
-    - **Server Components:** Trang chủ (`app/page.tsx`) lấy năm nhóm dữ liệu song song trên server; `MovieCard` được dựng ở server rồi truyền cho thanh cuộn client.
+    - **Server Components:** Trang chủ (`app/page.tsx`) lấy bốn nhóm dữ liệu song song trên server; `MovieCard` được dựng ở server rồi truyền cho thanh cuộn client.
     - **Khóa TMDB:** `TMDB_API_KEY` được đọc ở tầng dịch vụ server. Không đưa khóa vào `NEXT_PUBLIC_` hoặc props của Client Component.
 - **Tầng 1B (Cơ Chế Nâng Cao Đã Áp Dụng):**
-    - **Incremental Static Regeneration (ISR):** Áp dụng chiến lược Caching với thời gian sống (TTL): `fetch(url, { next: { revalidate: N } })`.
+    - **Data Cache và revalidation:** Cache kết quả TMDB có thời hạn qua `fetch(url, { next: { revalidate: N } })`.
         - Phim thịnh hành (Trending): Cache 1 giờ (3600s).
         - Phim đang chiếu (Now Playing): Cache 30 phút (1800s).
         - Phim đánh giá cao (Top Rated): Cache 24 giờ (86400s).
+    - Trang chủ và sitemap dùng `await connection()` để render khi có request, không gọi TMDB lúc build. Các fetch vẫn có Data Cache theo thời hạn; trang chủ truyền lỗi tải danh mục tới error boundary. Đây là SSR với Data Cache, không phải ISR của toàn trang.
     - **Hình ảnh (`next/image`):** Có `remotePatterns`, `sizes` đáp ứng màn hình và khung poster tỉ lệ 2:3. Chưa đo CLS thực tế.
     - **Trạng thái điều hướng:** `app/loading.tsx` hiển thị Skeleton loaders mượt mà khi dữ liệu đang được nạp.
 - **Tầng 2 (Chuẩn Kỹ Nghệ Phần Mềm):**
     - Phân nhánh Git: `feature/home-and-layout`.
     - TypeScript strict mode, ESLint chuẩn Next.js.
     - Quản lý biến môi trường với `.env.example` và `.env.local`.
+    - Test Node kiểm tra logic và render các trang thật; GitHub Actions chạy `npm run evidence` bằng mock, không cần secret TMDB.
+    - Codex hỗ trợ rà soát và sửa mã nguồn. Thay đổi được kiểm chứng bằng lint, test, build và kiểm tra trình duyệt; nhóm vẫn chịu trách nhiệm khai báo theo quy định môn học và giải thích code độc lập.
 - **Tầng 3 (Đo Lường & Đào Sâu Hiệu Năng):** Chưa có tệp Lighthouse, bundle analyzer hoặc trace đối chứng gốc; không công bố các chỉ số đó như kết quả đã đạt.
 
 ---
@@ -32,8 +35,10 @@
 
 ### Yêu Cầu Hệ Thống:
 
-- **Node.js:** `>= 20.9` (CI dùng Node.js 24)
+- **Node.js:** `>= 24.0.0` (CI dùng Node.js 24; bộ test dùng khả năng chạy TypeScript của Node)
+- **Framework:** Next.js `16.4.5`, React/React DOM `19.2.8`; phiên bản cài lại được chốt trong `package-lock.json`.
 - **Trình quản lý gói:** `npm` (khuyến nghị) hoặc `pnpm`/`yarn`
+- **Kiểm tra trình duyệt:** Chrome/Chromium; nếu không ở đường dẫn Linux thông dụng, đặt `CHROME_BIN` thành đường dẫn tệp thực thi. CI dùng Chrome có sẵn trên `ubuntu-latest`.
 
 ### Các Bước Cài Đặt:
 
@@ -41,13 +46,13 @@
 
     ```bash
     git clone https://github.com/congquan92/ModernProgrammingTechnologies.git
-    cd modern-programming-technologies
+    cd ModernProgrammingTechnologies
     ```
 
 2. **Cài đặt các gói phụ thuộc (Dependencies):**
 
     ```bash
-    npm install
+    npm ci
     ```
 
 3. **Cấu hình biến môi trường:**
@@ -59,8 +64,10 @@
     ```env
     TMDB_API_KEY=your_actual_tmdb_api_key_here
     TMDB_BASE_URL=https://api.themoviedb.org/3
-    TMDB_IMAGE_BASE_URL=https://image.tmdb.org/t/p
+    NEXT_PUBLIC_SITE_URL=http://localhost:3000
     ```
+
+   Đổi `NEXT_PUBLIC_SITE_URL` thành URL triển khai khi xuất sitemap/robots. Ảnh dùng `image.tmdb.org` theo `remotePatterns` trong `next.config.ts`. Build cần tải Google Fonts; khóa và kết nối TMDB chỉ cần khi chạy ứng dụng. Dùng `npm run evidence` để kiểm tra với dữ liệu giả.
 
 ---
 
@@ -80,13 +87,16 @@
 | Lệnh               | Mục đích                                                                 |
 | :----------------- | :----------------------------------------------------------------------- |
 | `npm run dev`      | Khởi chạy môi trường phát triển (Hot reload) tại `http://localhost:3000` |
-| `npm run lint`     | Chạy ESLint kiểm tra chuẩn mã nguồn                                      |
+| `npm run lint`     | Chạy ESLint, thất bại nếu có bất kỳ warning nào                           |
 | `npm test`         | Chạy bộ kiểm thử chính trong `tests/` bằng Node.js                         |
+| `npm audit --audit-level=moderate` | Kiểm tra cảnh báo dependency; CI chặn từ mức moderate trở lên       |
 | `npx tsc --noEmit` | Kiểm tra toàn bộ kiểu dữ liệu TypeScript (Type-check)                    |
-| `npm run build`    | Biên dịch bản build tối ưu hóa cho Production                            |
+| `npm run build`    | Biên dịch production bằng Webpack, không gọi TMDB                         |
 | `npm run start`    | Khởi chạy Production Server sau khi đã build                             |
 
 Các script cũ `scripts/test-suite.mjs` và `scripts/adversarial-probe.mjs` đã được thay thế bởi bộ test và quy trình minh chứng hiện tại. Dùng `npm test` cho kiểm thử logic; dùng `npm run evidence` cho kiểm chứng HTTP production với mock TMDB.
+
+`package.json` chỉ override `minimatch` của `@typescript-eslint/typescript-estree` lên `11.0.1` để vá GHSA-g3hv-75wg-m249; upstream hiện vẫn yêu cầu bản 10 chưa vá. Bỏ override khi upstream dùng phiên bản đã vá. Callsite `minimatch(filePath, pattern, { dot: true })` giữ nguyên API; lint xác minh parser trên source thật.
 
 ---
 
@@ -94,13 +104,13 @@ Các script cũ `scripts/test-suite.mjs` và `scripts/adversarial-probe.mjs` đ�
 
 ### Biên dịch báo cáo LaTeX
 
-Từ thư mục gốc repo, chạy `latexmk baocao/baocao.tex` với MiKTeX hoặc TeX Live có XeLaTeX. Cấu hình `.latexmkrc` dùng XeLaTeX, tự chạy đủ lượt cập nhật mục lục/tham chiếu và xuất bản cuối tại `baocao/baocao.pdf`; tệp trung gian nằm trong `baocao/build/`. VS Code với LaTeX Workshop đã có recipe tương ứng trong `.vscode/settings.json`. Tránh dùng tùy chọn `-pdf` vì tùy chọn này chọn lại pdfLaTeX.
+Từ thư mục gốc repo, chạy `latexmk -xelatex -interaction=nonstopmode -halt-on-error -outdir=baocao/build baocao/baocao.tex` với MiKTeX hoặc TeX Live có XeLaTeX. PDF và tệp trung gian nằm trong `baocao/build/`; chép `baocao/build/baocao.pdf` sang `baocao/baocao.pdf` sau khi biên dịch thành công.
 
 Để tự tạo lại log trên máy của bạn, chạy `powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1`. Sau đó mở terminal khác chạy `npm run start`, rồi chạy `powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1 -RuntimeOnly`. Script ghi lệnh, thời điểm, commit và exit code vào từng log; hãy chụp terminal sau khi lệnh chạy xong.
 
-- `baocao/evidence/build-output.txt`: production build, phân loại route và revalidate 30 phút của trang chủ.
+- `baocao/evidence/build-output.txt`: production build thường, phân loại trang chủ và sitemap là SSR; ghi số error/warning.
 - `baocao/evidence/lint-output.txt`, `typecheck-output.txt`, `test-output.txt`: kết quả kiểm tra mã có lệnh và exit code.
-- `baocao/evidence/server-render.txt`: HTML build có bốn tiêu đề hàng phim và không chứa chuỗi `api_key=`.
+- `baocao/evidence/server-render.txt`: kiểm tra HTML server qua HTTP sau `npm run start`; log cũ từ bản prerender cần đọc ngày/commit riêng.
 - `baocao/evidence/runtime-http.txt`: route phim hợp lệ và giao diện không tìm thấy cho ID sai.
 - `baocao/HUONG_DAN_THU_MINH_CHUNG.md`: các bước tự ghi video Watchlist, streaming và bộ đếm cache.
 - Chưa có báo cáo Lighthouse hay phép so sánh `<Image />` với `<img>` trên cùng route và thiết bị. Muốn công bố LCP/CLS/FCP, hãy lưu tệp kết quả gốc, cấu hình thiết bị và URL đo.
@@ -111,17 +121,19 @@ Từ thư mục gốc repo, chạy `latexmk baocao/baocao.tex` với MiKTeX ho�
 npm run evidence
 ```
 
-Lệnh chạy lint/test, tạo build production riêng trong `.next-evidence`, kiểm tra kiểu rồi khởi động mock TMDB và Next.js trên hai cổng loopback còn trống. Script tự dừng các tiến trình đã tạo. Không cần khóa TMDB thật; build `.next` được giữ riêng.
+Lệnh chạy lint/test, tạo build production Webpack riêng trong `.next-evidence`, kiểm tra kiểu rồi khởi động mock TMDB và Next.js trên hai cổng loopback còn trống. Build thường và build minh chứng đều dùng Webpack được Next.js hỗ trợ, tránh lỗi cổng nội bộ của Turbopack trong môi trường hạn chế. Script từ chối warning/error trong log build và tự dừng các tiến trình đã tạo. Không cần khóa TMDB thật; build `.next` được giữ riêng. Đặt `MOVIEHUB_EVIDENCE_DIR` để ghi log ngoài `baocao/evidence`; CI ghi vào thư mục tạm.
 
 - `baocao/evidence/mock-runtime.json`: trạng thái toàn bộ lượt chạy, phiên bản Node/Next, Git HEAD, trạng thái working tree và SHA-256 mã nguồn.
-- `baocao/evidence/build-mock-output.txt`: bảng route production với TTL **15 giây của mock**, khác TTL mặc định 30 phút của trang chủ.
+- `baocao/evidence/build-mock-output.txt`: bảng route production; trang chủ và sitemap là SSR. TTL **15 giây của Data Cache mock** được kiểm chứng khi chạy trong `cache-mock.json`.
+- `baocao/evidence/routes-http.json`: bốn hàng phim có trong HTML server, Route Handler tìm kiếm trả kết quả, query lặp chạy được và ID phim sai có `noindex`.
 - `baocao/evidence/streaming-mock.json`: thời điểm và số thứ tự chunk HTML của nội dung chính, hai fallback và hai kết quả. Với mock trì hoãn 2,5/4 giây, kết quả phải tới ở chunk sau và ít nhất 1 giây sau nội dung chính; gửi dồn nhiều chunk cùng lúc cũng bị từ chối.
-- `baocao/evidence/cache-mock.json`: bộ đếm origin trước request, sau miss, hit, hết TTL và hit sau khi revalidate. Mỗi endpoint phải có chuỗi `0 → 1 → 1 → 2 → 2`.
+- `baocao/evidence/cache-mock.json`: bộ đếm origin trước request, sau miss, hit, hết TTL và hit sau khi revalidate. Mỗi endpoint phải có chuỗi `0 → 1 → 1 → 2 → 2`; nội dung đổi từ “Phiên bản 1” sang “Phiên bản 2” sau revalidation.
 - `baocao/evidence/watchlist-http.json`: POST Server Action thật, cờ cookie, thêm/xóa, tải lại `/watchlist` và kiểm tra phiên cookie khác vẫn trống. Không ghi giá trị cookie.
+- `baocao/evidence/browser-interactions.json`: Chrome kiểm tra đổi bộ lọc liên tiếp, tìm kiếm chậm/Unicode, đồng bộ URL/Back/Forward, debounce kết hợp bộ lọc, rollback Watchlist, focus bàn phím, responsive header, carousel có nhiều thẻ và kích thước skeleton trước/sau streaming. Chạy qua Chrome DevTools Protocol bằng Node, không thêm thư viện test.
 
-TTL ngắn chỉ được phép khi `TMDB_BASE_URL` là HTTP tại `127.0.0.1`; cấu hình này bị từ chối với TMDB thật. Đây là kiểm chứng HTTP với dữ liệu giả có độ trễ chủ động, không phải số đo Lighthouse, thời gian vẽ của trình duyệt, video giao diện hoặc shared cache tại CDN. Các log cũ `build-output.txt`, `server-render.txt`, `runtime-http.txt` thuộc lượt chạy trước; đọc thông tin ngày/commit trong từng tệp, không ghép thành cùng một lượt đo.
+TTL ngắn chỉ được phép khi `TMDB_BASE_URL` là HTTP tại `127.0.0.1`; cấu hình này bị từ chối với TMDB thật. Đây là kiểm chứng HTTP với dữ liệu giả có độ trễ chủ động, không phải số đo Lighthouse, thời gian vẽ của trình duyệt, video giao diện hoặc shared cache tại CDN. Đọc ngày/commit trong từng log; các lượt build thường, mock và ảnh trình duyệt phải được phân biệt, không ghép thành cùng một lượt đo.
 
-Lượt kiểm tra giao diện riêng có các ảnh `watchlist-browser-saved.png`, `watchlist-browser-list.png`, `watchlist-browser-removed.png` và ghi chú `watchlist-browser.json` trong thư mục minh chứng. Chúng ghi nhận thêm phim, giữ trạng thái sau reload, hiển thị danh sách và xóa phim; `npm run evidence` chỉ tự chạy phần HTTP, không tự tạo lại các ảnh này.
+Lượt kiểm tra giao diện riêng có các ảnh `watchlist-browser-saved.png`, `watchlist-browser-list.png`, `watchlist-browser-removed.png` và ghi chú `watchlist-browser.json` trong thư mục minh chứng. Chúng ghi nhận thêm phim, giữ trạng thái sau reload, hiển thị danh sách và xóa phim; `npm run evidence` chạy kiểm tra HTTP và Chrome, không tự tạo lại các ảnh này.
 
 ---
 
@@ -155,10 +167,10 @@ Chạy `scripts/mock-tmdb-evidence.mjs` để có dữ liệu TMDB giả với t
 - **Server Component (`app/search/page.tsx`):**
   - Nhận `searchParams` bất đồng bộ từ Next.js 16 (`await searchParams`).
   - Gọi TMDB API trên Server qua `services/tmdb.ts` với Data Cache theo thời gian `revalidate` của từng lời gọi. `TMDB_API_KEY` chỉ được dùng ở server; không in khóa vào ảnh hoặc log nộp bài.
-- **Client Component (`components/client/SearchBar.tsx`):**
-  - Có chỉ thị `'use client'`.
-  - Quản lý input và debounce 400ms bằng `useRef` + `useCallback`.
-  - Đồng bộ từ khóa lên URL query param `?q=...` thông qua `useSearchParams`, `usePathname`, `useRouter.replace()` kết hợp `useTransition`.
+- **Client Components (`components/client/FilterBar.tsx`, `SearchBar.tsx`):**
+  - Có chỉ thị `'use client'`; `SearchBar` hiển thị input, `FilterBar` quản lý chung query và bộ lọc.
+  - Debounce 400ms đọc query mới nhất; `useOptimistic` phản hồi lựa chọn ngay trong khi chờ server.
+  - Đồng bộ URL qua `useSearchParams`, `usePathname`, `useRouter` và `useTransition`; giữ bản nháp mới hơn khi response cũ về, cập nhật input khi điều hướng ngoài.
   - Được bọc trong React `<Suspense>` tại Server Component cha để đảm bảo SSR không bị de-opt.
 
 ---
@@ -194,7 +206,7 @@ Nhằm nâng cấp trải nghiệm người dùng theo tiêu chuẩn Netflix và
 - **Thể Loại ⌵:** Menu chọn thể loại phim theo danh sách trong ứng dụng.
 - **Quốc Gia ⌵:** Dropdown chọn theo nguồn gốc xuất xứ phim (Âu Mỹ, Hàn Quốc, Trung Quốc, Nhật Bản, Việt Nam, Thái Lan, Ấn Độ...).
 - **Năm Phát Hành ⌵:** Lọc theo các năm từ 2026 lùi dần về trước 2015.
-- Khắc phục toàn bộ các liên kết điều hướng trên thanh Navbar: "Phim T.hình" (`/tv`), "Phim Lẻ" (`/browse?type=movie`), "Mới & Phổ biến" (`/browse?sortBy=popularity.desc`).
+- Điều hướng phim điện ảnh: "Phim Lẻ" (`/browse?type=movie`), "Mới & Phổ biến" (`/browse?sortBy=popularity.desc`) và Watchlist.
 
 ### 2. Thanh Tìm Kiếm Co Giãn & Gợi Ý Trực Tiếp (Live Autocomplete):
 - **Slide-in Animation:** Biểu tượng kính lúp mở rộng mượt mà khi nhấp chuột chuẩn giao diện Netflix.
@@ -203,7 +215,40 @@ Nhằm nâng cấp trải nghiệm người dùng theo tiêu chuẩn Netflix và
 
 ### 3. Bộ Lọc Phim Đa Tiêu Chí (Comprehensive Filter Bar):
 - Tích hợp tại cả 2 trang `/browse` và `/search`.
-- Cho phép người dùng kết hợp linh hoạt 5 tiêu chí cùng lúc: **Định dạng (Phim lẻ / Phim bộ) + Thể loại + Quốc gia + Năm phát hành + Sắp xếp (Phổ biến / Điểm cao / Mới nhất)**.
+- `/browse` giữ các tiêu chí phim điện ảnh hiện có, lấy một trang TMDB tối đa 20 phim, giới hạn 500 trang. Không ghép nhiều trang để đủ 24 phim; TMDB có thể đổi thứ tự giữa các lượt tải nên không cam kết danh sách bất biến xuyên trang.
+- Khi tìm theo từ khóa, hỗ trợ thể loại (kể cả kinh điển), năm và sắp xếp theo độ liên quan/điểm/ngày phát hành. Quốc gia và doanh thu không có trong dữ liệu search nên được ẩn; URL cũ chứa các lựa chọn này chuyển về URL phù hợp. Lọc trong tối đa 40 kết quả đầu, hiển thị tối đa 24 phim.
 - Đồng bộ URL SearchParams hai chiều, hỗ trợ lưu link, chia sẻ bộ lọc và phân trang mượt mà qua React Transitions.
 
+### Đối chiếu Tầng 1A, 1B, 2
 
+| Yêu cầu | Code và kiểm chứng |
+| --- | --- |
+| 1A — App Router, Server/Client, server fetching | `app/layout.tsx`, `app/page.tsx`, `MovieCard`, `MovieRow`; `routes-http.json` và `server-client-boundary.test.mjs` |
+| 1B — Route động và trạng thái điều hướng | `app/movie/[id]/` với loading/error/not-found; `routes-http.json` |
+| 1B — Cache và revalidation để giảm gọi TMDB | `services/client.ts`; `cache-mock.json` kiểm tra bộ đếm và dữ liệu trước/sau đổi |
+| 1B — Mutation và API cho tương tác | `app/actions/watchlist.ts`, `app/api/search/route.ts`; `watchlist-http.json`, `api-search.test.mjs` |
+| 1B — Streaming, Image/Font, SEO | Hai Suspense ở trang phim để tải khối phụ độc lập; `next/image`, `next/font`, metadata; `streaming-mock.json` |
+| 2 — Git, cấu hình, test, CI, lỗi, tài liệu | Lịch sử nhánh/merge PR; `.env.example`; `tests/page-flows.test.mjs`, các test logic và `.github/workflows/check.yml`; log cùng lượt trong `mock-runtime.json` |
+
+Trailer dùng `<dialog>.showModal()` để trình duyệt giữ/khôi phục focus và chặn tương tác phần nền. Các thành viên vẫn cần tự chạy, kiểm tra bàn phím và giải thích luồng đã nhận; log tự động không chứng minh năng lực cá nhân hay việc review PR trên GitHub.
+
+
+
+
+## Đối chiếu nhận xét nhóm 21 (tuần 7)
+
+Nguồn: [Google Sheets, nhóm 21](https://docs.google.com/spreadsheets/d/1FqmZ8Ihw5UeJ_y3nGx-ThKwZ_0JFUghJb0CJbu3iIDM/edit?gid=595430299).
+
+```text
+Server module imports: app/page → services/tmdb; app/page → MovieCard
+Client module imports: MovieRow → React hooks (không import MovieCard)
+Render: app/page dựng <MovieCard>, truyền cards={...} → MovieRow
+```
+
+`cards` là nội dung React truyền qua RSC; dữ liệu phim/props phải truyền được qua ranh giới server/client. Vị trí card dưới slider trong cây hiển thị không đưa module MovieCard vào client bundle. CastSlider hiện nhận dữ liệu diễn viên và dựng markup phía client; không áp kết luận của MovieRow cho mọi slider.
+
+`cacheComponents: false` được khai báo rõ. Fetch TMDB có `next.revalidate`; đây là Data Cache. Full Route Cache phụ thuộc route có dùng request-time API hay không; Router Cache thuộc trình duyệt, request memoization chỉ trong lượt render. Không có cam kết “bốn tầng cache tự động”. Trang chủ dùng `Promise.all` cho bốn danh mục; lỗi tải được truyền tới error boundary để tránh cache trang rỗng. Trang chủ đợi các tác vụ, không streaming từng hàng. Trang chi tiết đợi details, cookie và trailer trước khi dựng nội dung chính; credits/similar nằm trong hai Suspense riêng.
+
+HTTP 404 từ TMDB dẫn tới not-found cho trang chi tiết; lỗi mạng, timeout 10 giây, thiếu khóa hay 5xx tới error boundary có nút thử lại. Trang chủ và hai nhánh phụ có thông báo lỗi thay vì giả định kết quả rỗng là thiếu API key. Trailer có thể không khả dụng; lỗi trailer được log ở server. Không tự chuyển sang mock khi API thật lỗi. Chạy mock chỉ bằng cấu hình môi trường chủ động; kết quả giả không chứng minh tính ổn định TMDB.
+
+`npm run evidence` tạo log build, bảng `steps` đầu vào → counter → kết luận, chunk streaming và Watchlist trên cùng `run_id`/`source_sha256`. HTTP Watchlist kiểm tra reload sau cả thêm và xóa; unit test kiểm tra ID trùng, giới hạn 200 ID/3800 byte. Ảnh trình duyệt cũ là lượt riêng, không phải kết quả tự tạo lại bởi lệnh này. Chưa đo browser Web Vitals trên bản sửa này.

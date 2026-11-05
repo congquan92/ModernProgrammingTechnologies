@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { searchQuickLive } from "@/services/tmdb";
+import { normalizeMovieParams } from "@/utils/searchParams";
 
 /**
  * Route Handler GET /api/search?q=...
@@ -19,7 +20,7 @@ export async function GET(request: Request) {
         return NextResponse.json({ results: [] }, { status: 200 });
     }
 
-    const trimmed = query.trim().slice(0, 100).replace(/[\x00-\x1F\x7F]/g, "");
+    const trimmed = normalizeMovieParams({ q: query }).q;
     if (trimmed.length < 2) {
         return NextResponse.json({ results: [] }, { status: 200 });
     }

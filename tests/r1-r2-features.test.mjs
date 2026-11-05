@@ -42,7 +42,7 @@ test("R2: sitemap.ts provides valid sitemap configuration with fallback", () => 
     assert.match(sitemapSource, /export\s+default\s+async\s+function\s+sitemap/, "sitemap.ts must export default async function sitemap");
     assert.match(sitemapSource, /baseUrl\s*,\s*lastModified:\s*now/, "sitemap.ts must contain root path");
     assert.match(sitemapSource, /\/browse/, "sitemap.ts must contain /browse");
-    assert.match(sitemapSource, /\/watchlist/, "sitemap.ts must contain /watchlist");
+    assert.doesNotMatch(sitemapSource, /\/watchlist/, "sitemap.ts must not advertise the cookie-based watchlist");
     assert.match(sitemapSource, /\/movie\/\$\{movie\.id\}/, "sitemap.ts must contain dynamic /movie/ routes");
     assert.match(sitemapSource, /try\s*\{[\s\S]*getTrendingMovies[\s\S]*\}\s*catch/, "sitemap.ts must have try/catch fallback");
 });

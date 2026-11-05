@@ -5,7 +5,7 @@ import Link from "next/link";
 
 interface ErrorProps {
     error: Error & { digest?: string };
-    reset: () => void;
+    retry: () => void;
 }
 
 /**
@@ -13,7 +13,7 @@ interface ErrorProps {
  * Bắt lỗi runtime cấp Root, giữ nguyên RootLayout (Header/Footer).
  * Phong cách giao diện: Netflix Dark Cinema (#141414, #E50914, #FFFFFF)
  */
-export default function GlobalError({ error, reset }: ErrorProps) {
+export default function GlobalError({ error, retry }: ErrorProps) {
     useEffect(() => {
         console.error("[RootError] Lỗi runtime toàn cục:", error);
     }, [error]);
@@ -31,7 +31,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
                     Đã Xảy Ra Sự Cố Không Mong Muốn!
                 </h1>
                 
-                <p className="text-gray-400 text-sm sm:text-base leading-relaxed">
+                <p role="alert" className="text-gray-400 text-sm sm:text-base leading-relaxed">
                     Hệ thống không thể hoàn tất yêu cầu lúc này. Vui lòng kiểm tra lại kết nối mạng hoặc thử tải lại trang.
                 </p>
 
@@ -44,7 +44,7 @@ export default function GlobalError({ error, reset }: ErrorProps) {
                 <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
                     <button
                         type="button"
-                        onClick={() => reset()}
+                        onClick={retry}
                         className="bg-white hover:bg-white/80 text-black font-extrabold px-6 py-2.5 rounded-md transition-colors shadow-lg cursor-pointer"
                     >
                         Thử Lại

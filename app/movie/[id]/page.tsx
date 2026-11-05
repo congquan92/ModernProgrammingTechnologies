@@ -3,10 +3,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getMovieDetails, getMovieVideos, selectBestTrailer } from "@/services/tmdb";
+import { getMovieDetails, getMovieVideos, selectBestTrailer, TMDBError } from "@/services/tmdb";
 import { formatRuntime } from "@/utils/formatRuntime";
 import CastList from "@/components/server/CastList";
 import CastSkeleton from "@/components/server/CastSkeleton";
+import MovieCardSkeleton from "@/components/server/MovieCardSkeleton";
 import SimilarMovies from "@/components/server/SimilarMovies";
 import { isMovieSaved } from "@/app/actions/watchlist";
 import WatchlistButton from "@/components/client/WatchlistButton";
@@ -31,7 +32,7 @@ export async function generateMetadata(
     const year = movie.release_date ? movie.release_date.split("-")[0] : "";
 
     return {
-      title: `${movie.title} ${year ? `(${year})` : ""} | MovieHub`,
+      title: `${movie.title}${year ? ` (${year})` : ""}`,
       description:
         movie.overview ||
         `Xem thông tin chi tiết, dàn diễn viên và đánh giá của bộ phim ${movie.title} trên MovieHub.`,
@@ -45,11 +46,9 @@ export async function generateMetadata(
           : [],
       },
     };
-  } catch {
-    return {
-      title: "Không tìm thấy phim | MovieHub",
-      description: "Bộ phim bạn tìm kiếm không tồn tại hoặc đã bị gỡ bỏ.",
-    };
+  } catch (error) {
+    if (error instanceof TMDBError && error.status === 404) notFound();
+    throw error;
   }
 }
 
@@ -64,15 +63,16 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
   const { id } = await params;
   if (!/^[1-9]\d*$/.test(id)) notFound();
 
-  // Lấy thông tin phim chính — nếu lỗi hoặc không tồn tại sẽ chuyển sang 404
+  // Chỉ trả 404 khi phim không tồn tại; lỗi dịch vụ tới error boundary.
   let movie;
   try {
     movie = await getMovieDetails(id);
     if (!movie || !movie.id) {
       notFound();
     }
-  } catch {
-    notFound();
+  } catch (error) {
+    if (error instanceof TMDBError && error.status === 404) notFound();
+    throw error;
   }
 
   const backdropUrl = movie.backdrop_path
@@ -248,12 +248,14 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
           {/* Suspense độc lập thứ 2: Chạy song song không block CastList */}
           <Suspense
             fallback={
-              <div data-stream="similar-fallback" className="flex gap-3 sm:gap-4 overflow-hidden pb-2">
+              <div data-stream="similar-fallback" className="flex items-center gap-2.5 sm:gap-3.5 overflow-x-auto no-scrollbar py-2">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="w-36 sm:w-44 aspect-[2/3] shrink-0 rounded-md bg-zinc-800/80 animate-pulse"
-                  />
+                    className="w-36 sm:w-44 md:w-52 shrink-0"
+                  >
+                    <MovieCardSkeleton />
+                  </div>
                 ))}
               </div>
             }

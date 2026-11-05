@@ -1,20 +1,15 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { discoverMovies } from "@/services/tmdb";
 import MovieCard from "@/components/server/MovieCard";
 import FilterBar from "@/components/client/FilterBar";
 import { MOVIE_GENRES, COUNTRIES, YEARS, SORT_OPTIONS } from "@/utils/constants";
+import { normalizeMovieParams, type MovieSearchParams } from "@/utils/searchParams";
 
 interface BrowsePageProps {
-    searchParams: Promise<{
-        type?: string;
-        genre?: string;
-        year?: string;
-        country?: string;
-        sortBy?: string;
-        page?: string;
-    }>;
+    searchParams: Promise<MovieSearchParams>;
 }
 
 // Hàm hỗ trợ tạo tiêu đề ngữ cảnh từ params
@@ -73,26 +68,25 @@ function getPageRange(current: number, total: number): (number | "...")[] {
 }
 
 export async function generateMetadata({ searchParams }: BrowsePageProps): Promise<Metadata> {
-    const params = await searchParams;
+    const params = normalizeMovieParams(await searchParams);
     const title = getFilterTitle(params.genre, params.country, params.year, params.type, params.sortBy);
     return {
-        title: `${title} | MovieHub`,
+        title,
         description: `Khám phá danh sách ${title} chất lượng cao chuẩn Netflix trên MovieHub.`,
     };
 }
 
 export default async function BrowsePage({ searchParams }: BrowsePageProps) {
-    const params = await searchParams;
-    const currentPage = Number(params.page) || 1;
+    const params = normalizeMovieParams(await searchParams);
+    const requestedPage = Number(params.page);
+    const currentPage = Number.isSafeInteger(requestedPage) && requestedPage > 0 ? Math.min(requestedPage, 500) : 1;
 
     const { results, totalPages, totalResults } = await discoverMovies({
-        type: (params.type as "movie" | "tv") || undefined,
         genre: params.genre,
         country: params.country,
         year: params.year,
         sortBy: params.sortBy,
         page: currentPage,
-        perPage: 24,
     });
 
     const pageTitle = getFilterTitle(params.genre, params.country, params.year, params.type, params.sortBy);
@@ -108,6 +102,8 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         current.set("page", pageNumber.toString());
         return `/browse?${current.toString()}`;
     };
+
+    if (currentPage > totalPages) redirect(buildPaginationUrl(totalPages));
 
     const paginationPages = getPageRange(currentPage, totalPages);
 

@@ -42,9 +42,10 @@ function Invoke-EvidenceCommand {
 }
 
 if ($RuntimeOnly) {
-    if (-not (Test-Path -LiteralPath '.next/server/app/index.html')) {
+    if (-not (Test-Path -LiteralPath '.next/BUILD_ID')) {
         throw 'Chua co production build. Chay .\scripts\refresh-evidence.ps1 truoc.'
     }
+    Invoke-EvidenceCommand 'server-render.txt' 'python scripts/verify-render-evidence.py' 'python' @('scripts/verify-render-evidence.py')
     Invoke-EvidenceCommand 'runtime-http.txt' 'python scripts/verify-runtime-http.py' 'python' @('scripts/verify-runtime-http.py')
     return
 }
@@ -53,5 +54,4 @@ Invoke-EvidenceCommand 'lint-output.txt' 'npm run lint' 'npm.cmd' @('run', 'lint
 Invoke-EvidenceCommand 'typecheck-output.txt' 'npx tsc --noEmit' 'npx.cmd' @('tsc', '--noEmit')
 Invoke-EvidenceCommand 'test-output.txt' 'npm test' 'npm.cmd' @('test')
 Invoke-EvidenceCommand 'build-output.txt' 'npm run build' 'npm.cmd' @('run', 'build')
-Invoke-EvidenceCommand 'server-render.txt' 'python scripts/verify-render-evidence.py' 'python' @('scripts/verify-render-evidence.py')
 Write-Host 'Mo terminal khac, chay npm run start; sau do chay .\scripts\refresh-evidence.ps1 -RuntimeOnly.'

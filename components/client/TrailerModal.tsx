@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 
 interface TrailerModalProps {
     trailerKey?: string | null;
@@ -14,30 +14,25 @@ interface TrailerModalProps {
  */
 export default function TrailerModal({ trailerKey, movieTitle }: TrailerModalProps) {
     const [isOpen, setIsOpen] = useState(false);
+    const dialogRef = useRef<HTMLDialogElement>(null);
 
     const handleClose = useCallback(() => {
         setIsOpen(false);
     }, []);
 
-    // Khóa cuộn trang và lắng nghe phím ESC khi mở Modal
+    // Dialog gốc giữ focus, chặn phần nền và khôi phục focus khi đóng.
     useEffect(() => {
         if (!isOpen) return;
-
-        const handleKeyDown = (e: KeyboardEvent) => {
-            if (e.key === "Escape") {
-                handleClose();
-            }
-        };
-
-        window.addEventListener("keydown", handleKeyDown);
+        const dialog = dialogRef.current;
+        dialog?.showModal();
         const originalOverflow = document.body.style.overflow;
         document.body.style.overflow = "hidden";
 
         return () => {
-            window.removeEventListener("keydown", handleKeyDown);
+            dialog?.close();
             document.body.style.overflow = originalOverflow;
         };
-    }, [isOpen, handleClose]);
+    }, [isOpen]);
 
     const youtubeSearchUrl = `https://www.youtube.com/results?search_query=${encodeURIComponent(
         `${movieTitle} official trailer`
@@ -60,11 +55,11 @@ export default function TrailerModal({ trailerKey, movieTitle }: TrailerModalPro
 
             {/* Popup Dialog YouTube Tối Giản */}
             {isOpen && (
-                <div
-                    className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-2 sm:p-4 md:p-8 animate-in fade-in duration-200"
+                <dialog
+                    ref={dialogRef}
+                    className="fixed inset-0 m-0 h-full max-h-none w-full max-w-none border-0 bg-black/90 text-white backdrop-blur-md open:flex items-center justify-center p-2 sm:p-4 md:p-8"
                     onClick={handleClose}
-                    role="dialog"
-                    aria-modal="true"
+                    onClose={handleClose}
                     aria-label={`Trailer phim ${movieTitle}`}
                 >
                     <div
@@ -75,7 +70,7 @@ export default function TrailerModal({ trailerKey, movieTitle }: TrailerModalPro
                         <button
                             type="button"
                             onClick={handleClose}
-                            className="absolute top-3 right-3 z-30 w-9 h-9 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20 shadow-lg focus:outline-none"
+                            className="absolute top-3 right-3 z-30 w-9 h-9 rounded-full bg-black/70 hover:bg-black/90 text-white flex items-center justify-center transition-colors cursor-pointer border border-white/20 shadow-lg focus-visible:ring-2 focus-visible:ring-white"
                             aria-label="Đóng trailer"
                             title="Đóng (ESC)"
                         >
@@ -119,7 +114,7 @@ export default function TrailerModal({ trailerKey, movieTitle }: TrailerModalPro
                             </div>
                         )}
                     </div>
-                </div>
+                </dialog>
             )}
         </>
     );

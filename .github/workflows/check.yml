@@ -14,9 +14,15 @@ jobs:
                   node-version: 24
                   cache: npm
             - run: npm ci
-            - run: npm run lint
-            - run: npx tsc --noEmit
-            - run: npm test
-            - run: npm run build
+            - run: npm audit --audit-level=moderate
+            - run: google-chrome --version
+            - run: npm run evidence
               env:
-                  TMDB_API_KEY: ${{ secrets.TMDB_API_KEY }}
+                  MOVIEHUB_EVIDENCE_DIR: ${{ runner.temp }}/moviehub-evidence
+            - uses: actions/upload-artifact@v4
+              if: always()
+              with:
+                  name: verification-evidence
+                  path: |
+                      ${{ runner.temp }}/moviehub-evidence/*.json
+                      ${{ runner.temp }}/moviehub-evidence/*-output.txt

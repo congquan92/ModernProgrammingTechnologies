@@ -1,6 +1,7 @@
 
 import fs from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
+import ts from "typescript";
 
 export async function resolve(specifier, context, nextResolve) {
   if (specifier === "next/headers") {
@@ -10,7 +11,14 @@ export async function resolve(specifier, context, nextResolve) {
     return nextResolve(new URL("./mock-cache.mjs", import.meta.url).href, context);
   }
   if (specifier === "next/server") {
-    return nextResolve("next/server.js", context);
+    return nextResolve(new URL("./mock-server.mjs", import.meta.url).href, context);
+  }
+  if (["next/image", "next/link"].includes(specifier)) {
+    const resolved = await nextResolve(`${specifier}.js`, context);
+    return { ...resolved, url: `${resolved.url}?test-default` };
+  }
+  if (specifier === "next/navigation") {
+    return nextResolve(`${specifier}.js`, context);
   }
 
   if (specifier.startsWith("@/")) {
@@ -34,4 +42,19 @@ export async function resolve(specifier, context, nextResolve) {
   }
 
   return nextResolve(specifier, context);
+}
+
+export async function load(url, context, nextLoad) {
+  if (url.endsWith("?test-default")) {
+    return { format: "module", shortCircuit: true,
+      source: `import value from ${JSON.stringify(url.split("?")[0])}; export default value.default ?? value;` };
+  }
+  if (!url.endsWith(".tsx")) return nextLoad(url, context);
+  return {
+    format: "module",
+    shortCircuit: true,
+    source: ts.transpileModule(fs.readFileSync(fileURLToPath(url), "utf8"), {
+      compilerOptions: { module: ts.ModuleKind.ESNext, jsx: ts.JsxEmit.ReactJSX, target: ts.ScriptTarget.ES2022 },
+    }).outputText,
+  };
 }

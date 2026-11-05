@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getWatchlistIds } from "@/app/actions/watchlist";
-import { getMovieDetails } from "@/services/tmdb";
+import { getMovieDetails, TMDBError } from "@/services/tmdb";
 import MovieCard from "@/components/server/MovieCard";
 import WatchlistButton from "@/components/client/WatchlistButton";
 import ClearWatchlistButton from "@/components/client/ClearWatchlistButton";
 import type { MovieDetails } from "@/types/tmdb";
 
 export const metadata: Metadata = {
-    title: "Danh Sách Yêu Thích | MovieHub",
+    title: "Danh Sách Yêu Thích",
     description: "Tất cả các bộ phim bạn đã lưu vào danh sách xem sau.",
 };
 
@@ -27,8 +27,9 @@ export default async function WatchlistPage() {
                       ids.map(async (id) => {
                           try {
                               return await getMovieDetails(String(id));
-                          } catch {
-                              return null;
+                          } catch (error) {
+                              if (error instanceof TMDBError && error.status === 404) return null;
+                              throw error;
                           }
                       })
                   )
@@ -45,11 +46,11 @@ export default async function WatchlistPage() {
                             Danh Sách Của Tôi
                         </h1>
                         <p className="text-zinc-400 text-sm mt-1">
-                            {movies.length > 0 ? `${movies.length} bộ phim đã lưu` : "Chưa có phim nào trong danh sách"}
+                            {movies.length > 0 ? `${movies.length} bộ phim đã lưu` : ids.length > 0 ? "Phim đã lưu không còn khả dụng" : "Chưa có phim nào trong danh sách"}
                         </p>
                     </div>
 
-                    {movies.length > 0 && <ClearWatchlistButton />}
+                    {ids.length > 0 && <ClearWatchlistButton />}
                 </div>
 
                 {/* Nội dung danh sách */}
@@ -65,9 +66,13 @@ export default async function WatchlistPage() {
                                 />
                             </svg>
                         </div>
-                        <p className="text-zinc-300 text-lg font-semibold">Danh sách xem sau của bạn đang trống</p>
+                        <p className="text-zinc-300 text-lg font-semibold">
+                            {ids.length > 0 ? "Phim đã lưu không còn khả dụng" : "Danh sách xem sau của bạn đang trống"}
+                        </p>
                         <p className="text-zinc-500 text-sm max-w-md">
-                            Khám phá các bộ phim thịnh hành hoặc tìm kiếm phim bạn yêu thích và nhấn &ldquo;Lưu Xem Sau&rdquo; để thêm vào đây.
+                            {ids.length > 0
+                                ? "Các phim trong danh sách không còn tồn tại. Chọn Xóa tất cả để dọn danh sách và lưu phim mới."
+                                : <>Khám phá các bộ phim thịnh hành hoặc tìm kiếm phim bạn yêu thích và nhấn &ldquo;Lưu Xem Sau&rdquo; để thêm vào đây.</>}
                         </p>
                         <Link
                             href="/"

@@ -6,6 +6,7 @@ const withBundleAnalyzer = bundleAnalyzer({
 });
 
 const nextConfig: NextConfig = {
+  cacheComponents: false,
   // Tách build minh chứng khỏi .next để không ghi đè build dùng TMDB thật.
   distDir: process.env.MOVIEHUB_EVIDENCE_BUILD === "1" ? ".next-evidence" : ".next",
   images: {

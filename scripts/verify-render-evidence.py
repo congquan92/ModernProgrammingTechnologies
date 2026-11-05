@@ -1,7 +1,7 @@
-"""Summarize prerendered home HTML without printing secrets or movie data."""
+"""Check server-rendered home HTML without printing secrets or movie data."""
 
 from html.parser import HTMLParser
-from pathlib import Path
+from urllib.request import urlopen
 
 
 class HomeParser(HTMLParser):
@@ -26,11 +26,8 @@ class HomeParser(HTMLParser):
             self.headings.append(data.strip())
 
 
-path = Path(".next/server/app/index.html")
-if not path.is_file():
-    raise SystemExit("Missing prerendered home HTML; run npm run build first.")
-
-source = path.read_text(encoding="utf-8")
+with urlopen("http://localhost:3000/", timeout=30) as response:
+    source = response.read().decode("utf-8", "replace")
 parser = HomeParser()
 parser.feed(source)
 expected = (
@@ -40,8 +37,8 @@ expected = (
     "Có Thể Bạn Muốn Xem Lại",
 )
 
-print("source: .next/server/app/index.html (production build)")
-print("prerendered_home_exists: true")
+print("source: GET http://localhost:3000/ (npm run start)")
+print("server_rendered_home: true")
 heading_count = sum(any(title in h for h in parser.headings) for title in expected)
 print(f"expected_row_headings_in_html: {heading_count}/{len(expected)}")
 print(f"images_with_alt_in_html: {parser.image_alts}")

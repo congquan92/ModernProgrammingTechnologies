@@ -1,36 +1,45 @@
-npm notice run modern-programming-technologies@0.1.0 build
-npm notice run next build
-▲ Next.js 16.3.6 (Turbopack)
-- Environments: .env.local
-⚠ Warning: Next.js ignored package-lock.json in /home/quocdai210 because it is outside the current Git repository (/home/quocdai210/Projects/ModernProgrammingTechnologies).
- To use this directory, set `turbopack.root` in your Next.js config.
+generated_at: 2026-11-05T10:39:07.917661+00:00
+git_head: 7f23fab0a3f3121c0e5d7d86f355f0da450594e8
+working_tree_dirty: True
+source_sha256: c5033ec1ff7993d30dd353356d6bc35ba14ebcd36ea5d0fc0ed5845e210655a6
+command: npm run build
+mode: normal production build; default environment; request-time TMDB fetching
 
-✓ Running next.config.ts took 45ms
+npm notice run modern-programming-technologies@0.1.0 build
+npm notice run next build --webpack
+▲ Next.js 16.3.6 (webpack)
+- Environments: .env.local
+✓ Running next.config.ts took 36ms
 
   Creating an optimized production build ...
-✓ Compiled successfully in 587ms
+✓ Compiled successfully in 2.6s
   Running TypeScript ...
-  Finished TypeScript in 1769ms ...
+  Finished TypeScript in 1874ms ...
   Collecting page data using 12 workers ...
   Generating static pages using 12 workers (0/10) ...
-  Generating static pages using 12 workers (2/10) 
-  Generating static pages using 12 workers (4/10) 
-  Generating static pages using 12 workers (7/10) 
-✓ Generating static pages using 12 workers (10/10) in 894ms
+  Generating static pages using 12 workers (2/10)
+  Generating static pages using 12 workers (4/10)
+  Generating static pages using 12 workers (7/10)
+✓ Generating static pages using 12 workers (10/10) in 1064ms
   Finalizing page optimization ...
+  Collecting build traces ...
 
-Route (app)       Revalidate  Expire
-┌ ○ /                    30m      1y
+Route (app)
+┌ ƒ /
 ├ ○ /_not-found
 ├ ƒ /api/search
 ├ ƒ /browse
 ├ ƒ /movie/[id]
 ├ ○ /robots.txt
 ├ ƒ /search
-├ ○ /sitemap.xml          1h      1y
+├ ƒ /sitemap.xml
 └ ƒ /watchlist
 
 
 ○  (Static)   prerendered as static content
 ƒ  (Dynamic)  server-rendered on demand
 
+
+exit_code: 0
+build_errors: 0
+build_warnings: 0

@@ -127,3 +127,36 @@ test("search service: searchQuickLive limits output to exactly 5 items", async (
     }
   }
 });
+
+test("search API bounds Unicode queries without breaking URL encoding", async (t) => {
+  const requests = [];
+  t.mock.method(globalThis, "fetch", async (input) => {
+    requests.push(new URL(input));
+    return new Response(JSON.stringify({ results: [{ id: 550, title: "Unicode result" }] }));
+  });
+  t.mock.method(console, "error", () => {});
+  const query = "a" + "😀".repeat(50);
+  const response = await searchRouteHandler(new Request(`http://localhost/api/search?q=${encodeURIComponent(query)}`));
+  assert.equal(response.status, 200);
+  assert.equal((await response.json()).results[0].id, 550);
+  const sentQuery = requests[0].searchParams.get("query");
+  assert.ok(sentQuery.startsWith("a😀"));
+  assert.ok(sentQuery.length <= 100);
+  assert.ok(sentQuery.isWellFormed());
+});
+
+
+test("search distinguishes upstream failure from valid empty results", async (t) => {
+  const originalFetch = globalThis.fetch;
+  t.after(() => { globalThis.fetch = originalFetch; });
+  process.env.TMDB_API_KEY = "test-api-key";
+  globalThis.fetch = async () => ({ ok: false, status: 503 });
+  const failed = await searchRouteHandler(new Request("http://localhost/api/search?q=Batman"));
+  assert.equal(failed.status, 500);
+  assert.equal(failed.headers.has("cache-control"), false);
+  assert.equal((await failed.json()).error, "Lỗi tìm kiếm");
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({ results: [] }) });
+  const empty = await searchRouteHandler(new Request("http://localhost/api/search?q=Batman"));
+  assert.equal(empty.status, 200);
+  assert.deepEqual(await empty.json(), { results: [] });
+});

@@ -1,14 +1,14 @@
 """Check production routes on localhost without printing movie data or secrets."""
 
-from pathlib import Path
 from urllib.error import HTTPError
 from urllib.request import urlopen
 import re
 
-home = Path(".next/server/app/index.html").read_text(encoding="utf-8")
+with urlopen("http://localhost:3000/", timeout=30) as response:
+    home = response.read().decode("utf-8", "replace")
 movie = re.search(r'href="/movie/(\d+)"', home)
 if movie is None:
-    raise SystemExit("No movie link found in prerendered home HTML.")
+    raise SystemExit("No movie link found in server-rendered home HTML.")
 
 routes = (
     ("/", 200),
