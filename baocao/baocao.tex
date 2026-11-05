@@ -397,7 +397,7 @@ Quán triệt tư tưởng chỉ đạo của học phần Các Công nghệ L�
 
 \paragraph*{3. Đối tượng và phạm vi nghiên cứu}
 \begin{itemize}[noitemsep]
-    \item \textbf{Đối tượng nghiên cứu:} Nền tảng Next.js phiên bản 16.3.6 (App Router), thư viện React 19.2.8, ngôn ngữ TypeScript, framework CSS tiện ích Tailwind CSS v4, và giao diện lập trình ứng dụng The Movie Database (TMDB) REST API v3.
+    \item \textbf{Đối tượng nghiên cứu:} Nền tảng Next.js phiên bản 16.4.5 (App Router), thư viện React 19.2.8, ngôn ngữ TypeScript, framework CSS tiện ích Tailwind CSS v4, và giao diện lập trình ứng dụng The Movie Database (TMDB) REST API v3.
     \item \textbf{Phạm vi ứng dụng:} Xây dựng ứng dụng web \textbf{MovieHub} phục vụ việc tra cứu, tìm kiếm, lọc đa tiêu chí, xem chi tiết và quản lý danh sách theo dõi phim ảnh. Ứng dụng tập trung khai thác và trình diễn các kỹ thuật Next.js; không đi sâu vào việc phát triển hạ tầng backend cơ sở dữ liệu riêng mà tận dụng nguồn dữ liệu phong phú từ TMDB.
     \item \textbf{Thời gian thực hiện:} Dự án được tiến hành trong thời gian 7 tuần theo kế hoạch đào tạo của học phần.
 \end{itemize}
@@ -659,7 +659,7 @@ Hình~\ref{fig:server_client_boundary} trực quan hóa cơ chế phân định 
 
 \subsection{Cơ chế Caching và Data Fetching đa tầng trong Next.js 16}
 
-Dự án MovieHub được xây dựng trên nền tảng \textbf{Next.js 16.3.6} và \textbf{React 19.2.8}. Một trong những thay đổi quan trọng nhất của Next.js kể từ phiên bản 15 và 16 là sự chuyển dịch mô hình bộ nhớ đệm: Hàm \texttt{fetch} mặc định không còn tự động lưu đệm vĩnh viễn (\texttt{force-cache}) như thời Next.js 14, mà chuyển sang mặc định \texttt{no-store} trừ khi lập trình viên chủ động khai báo chiến lược lưu trữ.
+Dự án MovieHub được xây dựng trên nền tảng \textbf{Next.js 16.4.5} và \textbf{React 19.2.8}. Một trong những thay đổi quan trọng nhất của Next.js kể từ phiên bản 15 và 16 là sự chuyển dịch mô hình bộ nhớ đệm: Hàm \texttt{fetch} mặc định không còn tự động lưu đệm vĩnh viễn (\texttt{force-cache}) như thời Next.js 14, mà chuyển sang mặc định \texttt{no-store} trừ khi lập trình viên chủ động khai báo chiến lược lưu trữ.
 
 \subsubsection{Tính hợp lệ của API \texttt{fetch} và tùy chọn \texttt{revalidate}}
 Một số quan điểm cho rằng cú pháp \texttt{fetch(url, \{ next: \{ revalidate: seconds \} \})} là cơ chế cũ của Next.js 13/14 và bị thay thế hoàn toàn trong Next.js 16. Tuy nhiên, theo tài liệu đặc tả chính thức của Vercel (\url{https://nextjs.org/docs/app/api-reference/functions/fetch}), đây vẫn là \textbf{API chuẩn mực, ổn định (Stable API) và hoàn toàn hợp lệ} trong Next.js 16 để điều khiển \textbf{Data Cache ở cấp độ yêu cầu mạng (Request-level Caching)}:
@@ -900,13 +900,10 @@ Mã nguồn dự án được tổ chức khoa học, tách bạch rõ ràng gi�
         \item \texttt{sitemap.ts}, \texttt{robots.ts}: Tệp siêu dữ liệu SEO chuẩn Metadata File Conventions.
         \item \path{actions/watchlist.ts}: Server Action ghi cookie; \path{api/search/route.ts}: Route Handler GET phục vụ Live Search.
     \end{itemize}
-    \item \texttt{components/}: Chứa các UI components được phân chia mô-đun hóa:
+    \item \texttt{components/}: Chứa các UI components được phân tách ranh giới rõ ràng theo hai thư mục con:
     \begin{itemize}[noitemsep]
-        \item \texttt{Header.tsx}, \texttt{NavbarDropdown.tsx}, \texttt{NavSearchBar.tsx}: Các thành phần thanh điều hướng cao cấp.
-        \item \texttt{HeroBanner.tsx}, \texttt{TrailerModal.tsx}: Banner chính và modal xem video trailer.
-        \item \texttt{MovieRow.tsx}, \texttt{CastSlider.tsx}, \path{SimilarMoviesSlider.tsx}: Các thanh cuộn carousel mượt mà chống kẹt biên.
-        \item \texttt{FilterBar.tsx}: Thanh công cụ lọc đa chiều linh hoạt.
-        \item \texttt{MovieCard.tsx}: Thẻ hiển thị áp phích phim chuẩn kích thước.
+        \item \path{components/client/}: Chứa các Client Component có tính tương tác cao (\texttt{"use client"}): \texttt{Header.tsx}, \texttt{NavbarDropdown.tsx}, \texttt{NavSearchBar.tsx} (thanh điều hướng và Live Search); \texttt{MovieRow.tsx}, \texttt{CastSlider.tsx}, \path{SimilarMoviesSlider.tsx} (các thanh cuộn phim và diễn viên); \texttt{FilterBar.tsx} (thanh lọc đa chiều); \texttt{TrailerModal.tsx} (dialog xem trailer); \texttt{WatchlistButton.tsx}, \texttt{ClearWatchlistButton.tsx} (tương tác danh sách yêu thích).
+        \item \path{components/server/}: Chứa các Server Component kết xuất trực tiếp trên máy chủ: \texttt{HeroBanner.tsx} (billboard banner), \texttt{MovieCard.tsx} (thẻ áp phích phim), \texttt{CastList.tsx} (danh sách diễn viên), \texttt{SimilarMovies.tsx} (danh sách phim tương tự), \texttt{Footer.tsx} (chân trang), cùng các skeleton loading trạng thái chờ (\texttt{CastSkeleton.tsx}, \texttt{MovieCardSkeleton.tsx}).
     \end{itemize}
     \item \path{services/client.ts}: Hàm \texttt{fetchTMDB}, cấu hình Data Cache và khử trùng lặp; \texttt{movies.ts}, \texttt{discover.ts}, \texttt{search.ts}, \texttt{videos.ts} chứa các lời gọi theo nghiệp vụ; \texttt{tmdb.ts} tái xuất các hàm cho trang.
     \item \texttt{types/}: Chứa toàn bộ các định nghĩa kiểu dữ liệu TypeScript.
@@ -936,10 +933,10 @@ Bảng 2.2 ghi thời hạn \texttt{next.revalidate} trong các hàm dịch vụ
 \toprule
 \textbf{Nhóm dữ liệu} & \textbf{Chiến lược Cache} & \textbf{Thời gian TTL} & \textbf{Mục đích và Lý do thiết kế} \\
 \midrule
-Phim thịnh hành và đề xuất kinh điển & \texttt{fetch} Data Cache & 3.600s & \texttt{getTrendingMovies}, \texttt{discoverMovies}. \\
+Phim thịnh hành trong tuần & \texttt{fetch} Data Cache & 3.600s & \texttt{getTrendingMovies} cập nhật định kỳ mỗi giờ. \\
 Phim đang chiếu / điểm cao & \texttt{fetch} Data Cache & 1.800s / 86.400s & \texttt{getNowPlayingMovies}, \texttt{getTopRatedMovies}. \\
 Chi tiết, diễn viên, phim tương tự & \texttt{fetch} Data Cache & 3.600s & Route chi tiết vẫn động vì đọc cookie; các phần phụ dùng Suspense. \\
-Khám phá / tìm kiếm & \texttt{fetch} Data Cache & 1.800s / 300s / 120s & Khám phá, tìm kiếm trang đầy đủ và Live Search lần lượt dùng các thời hạn này. \\
+Khám phá, kinh điển / tìm kiếm & \texttt{fetch} Data Cache & 1.800s / 300s / 120s & \texttt{discoverMovies} (1.800s cho khám phá và phim kinh điển), \texttt{searchMovies} (300s cho trang tìm kiếm) và \texttt{searchQuickLive} (120s cho Live Search). \\
 \bottomrule
 \end{tabularx}
 \end{table}
@@ -1005,7 +1002,7 @@ Hình 2.2 thể hiện sơ đồ luồng người dùng (User Navigation Flow) t
 Dự án được triển khai trên nền tảng phần mềm hiện đại và ổn định:
 \begin{itemize}[noitemsep]
     \item \textbf{Môi trường kiểm chứng (Runtime):} Node.js từ phiên bản 24; phiên bản thực tế của mỗi lượt kiểm chứng lưu trong \path{baocao/evidence/mock-runtime.json}. Dự án dùng API web stream và cơ chế phân giải tên miền mặc định của Node.js.
-    \item \textbf{Khung ứng dụng (Framework):} Next.js phiên bản 16.3.6 (App Router) kết hợp thư viện React 19.2.8.
+    \item \textbf{Khung ứng dụng (Framework):} Next.js phiên bản 16.4.5 (App Router) kết hợp thư viện React 19.2.8.
     \item \textbf{Ngôn ngữ và Công cụ quản lý gói:} TypeScript 5.x và npm (Node Package Manager).
     \item \textbf{Môi trường lập trình:} Visual Studio Code tích hợp tiện ích mở rộng ESLint, Tailwind CSS IntelliSense và GitLens.
     \item \textbf{Công cụ kiểm chứng:} ESLint, TypeScript, Node test runner và \texttt{next build}; dự án có cấu hình analyzer nhưng chưa lưu kết quả đo.
@@ -1038,18 +1035,18 @@ Thông tin phiên bản các gói phần mềm cốt lõi được cấu hình t
   "name": "modern-programming-technologies",
   "version": "0.1.0",
   "dependencies": {
-    "next": "16.3.6",
+    "next": "16.4.5",
     "react": "19.2.8",
     "react-dom": "19.2.8"
   },
   "devDependencies": {
-    "@next/bundle-analyzer": "^16.3.6",
+    "@next/bundle-analyzer": "16.4.5",
     "tailwindcss": "^4",
     "typescript": "^5"
   }
 }
 \end{lstlisting}
-Lệnh \texttt{npx next --version} xác nhận phiên bản \texttt{Next.js v16.3.6}; phiên bản \texttt{React v19.2.8} được xác nhận từ \texttt{package.json} và \texttt{npm ls react --depth=0}.
+Tệp \texttt{package.json} và \texttt{package-lock.json} xác nhận phiên bản \texttt{Next.js 16.4.5}; phiên bản \texttt{React v19.2.8} được xác nhận từ \texttt{package.json} và \texttt{npm ls react --depth=0}.
 
 \subsection{Hiện thực Tầng 1A: Các tính năng cốt lõi bắt buộc}
 
@@ -1148,14 +1145,14 @@ Component \texttt{TrailerModal.tsx} là Client Component, dùng phần tử HTML
 Component \texttt{MovieRow.tsx} mang lại trải nghiệm cuộn phim đặc trưng của Netflix:
 \begin{itemize}[noitemsep]
     \item Tích hợp hai nút điều hướng mũi tên trái và phải, tự động ẩn hiện thông minh khi người dùng rê chuột vào hàng phim.
-    \item Áp dụng thuật toán kiểm tra biên dính (\texttt{wasStuck}): Khi cuộn đến điểm cuối của danh sách, hệ thống tự động tính toán để chuyển hướng mượt mà, tạo cảm giác danh sách nối tiếp không giới hạn.
+    \item Áp dụng thuật toán kiểm tra ngưỡng biên cuộn (\texttt{scrollLeft} và \texttt{maxScrollLeft}): Khi cuộn đến gần cuối danh sách (ngưỡng 80px), hệ thống tự động cuộn mượt trở về đầu và ngược lại, tạo cảm giác danh sách lặp vòng vô tận (Infinite Loop) không giới hạn.
     \item Hỗ trợ thao tác vuốt cảm ứng (touch swipe) tự nhiên trên các thiết bị máy tính bảng và điện thoại di động.
 \end{itemize}
 
 \subsubsection{Module FilterBar \& Trang Khám phá \texttt{/browse}}
 Trang \texttt{/browse} cung cấp bộ công cụ tìm kiếm điện ảnh chuyên sâu:
 \begin{itemize}[noitemsep]
-    \item Thanh công cụ \texttt{FilterBar} cho phép kết hợp đồng thời các tiêu chí điện ảnh độc lập: (1) Thể loại (\texttt{genre}: 19 thể loại phim TMDB), (2) Quốc gia (\texttt{country}: 7 quốc gia chọn lọc), (3) Năm phát hành (\texttt{year}: từ 2026 trở về trước), và (4) Sắp xếp (\texttt{sortBy}: độ phổ biến, điểm số, ngày ra mắt, doanh thu).
+    \item Thanh công cụ \texttt{FilterBar} cho phép kết hợp đồng thời các tiêu chí điện ảnh độc lập: (1) Thể loại (\texttt{genre}: 19 thể loại phim TMDB), (2) Quốc gia (\texttt{country}: 12 quốc gia và khu vực chọn lọc: Âu Mỹ, Hàn Quốc, Trung Quốc, Nhật Bản, Việt Nam...), (3) Năm phát hành (\texttt{year}: từ 2026 trở về trước), và (4) Sắp xếp (\texttt{sortBy}: độ phổ biến, điểm số, ngày ra mắt, doanh thu).
     \item \textbf{Phân trang:} \texttt{services/discover.ts} lấy đúng một trang TMDB, tối đa 20 phim và giới hạn 500 trang; chỉ loại ID trùng trong trang đó. TMDB có thể đổi thứ tự giữa các lượt tải, nên không cam kết danh sách bất biến hoặc không trùng xuyên trang.
 \end{itemize}
 
@@ -1293,7 +1290,7 @@ Nhóm đánh giá hai loại bằng chứng: (1) mã nguồn và lệnh kiểm t
 \midrule
 \texttt{npm run lint} & Quy tắc ESLint của dự án Next.js. & Exit code 0 \\
 \texttt{npx tsc --noEmit} & Kiểu dữ liệu TypeScript ở chế độ \texttt{strict}. & Exit code 0 \\
-\texttt{npm test} & Các test Node về dữ liệu phim, ranh giới Server/Client, cache, tìm kiếm và Watchlist. & Xem log test \\
+\texttt{npm test} & Toàn bộ 43 ca kiểm thử Node test runner về dữ liệu phim, ranh giới Server/Client, cache, tìm kiếm và Watchlist. & 43/43 passed \\
 \texttt{npm run evidence} & Lint, test, build Webpack production, type-check và kiểm chứng HTTP bằng mock. & Xem log cùng lượt \\
 \bottomrule
 \end{tabularx}
@@ -1379,7 +1376,7 @@ Cookie đầu vào chỉ giữ ID số nguyên dương an toàn, loại trùng v
 1B & Server Action và Route Handler & \path{app/actions/watchlist.ts} xử lý ghi cookie; \texttt{app/api/search/route.ts} xử lý GET. \\
 1B & Suspense, image, font, metadata & \path{app/movie/[id]/page.tsx}; \texttt{MovieCard.tsx} dùng \texttt{next/image}; \texttt{app/layout.tsx} dùng \texttt{next/font}; \texttt{next.config.ts} có \texttt{remotePatterns}; \texttt{generateMetadata} theo phim. \\
 2 & Git, chạy lại, cấu hình bí mật & Lịch sử 7 merge PR trong Git; \texttt{README.md}, \texttt{.env.example}, \texttt{package.json}. Không đưa khóa thật vào báo cáo. \\
-2 & Test và CI & \texttt{tests/*.test.mjs}, script \texttt{npm test}, \path{.github/workflows/check.yml}; log \path{baocao/evidence/test-output.txt}. \\
+2 & Test và CI & \texttt{tests/*.test.mjs} (43/43 pass), script \texttt{npm test}, \path{.github/workflows/check.yml}; log \path{baocao/evidence/test-output.txt}. \\
 2 & Bảo mật và xử lý lỗi & Xác thực đầu vào ở Route Handler/Server Action; \texttt{app/error.tsx}, \texttt{global-error.tsx}, \texttt{not-found.tsx}; Security Headers trong \texttt{next.config.ts}. \\
 3 & Đo hiệu năng nâng cao & Có bộ kiểm chứng cache và streaming production cục bộ bằng mock. Chưa có dữ liệu gốc về Lighthouse, bundle hoặc shared cache tại CDN. \\
 \end{longtable}
