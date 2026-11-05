@@ -35,6 +35,7 @@ export default function FilterBar({ hideType = false, showSearch = false }: Filt
         const externalNavigation = previousQuery.current !== committedQuery && !ownNavigations.current.has(committedQuery);
         if (externalNavigation) {
             if (debounceRef.current) clearTimeout(debounceRef.current);
+            debounceRef.current = null;
             if (inputRef.current) inputRef.current.value = searchParams.get("q") ?? "";
         }
         previousQuery.current = committedQuery;
@@ -56,21 +57,30 @@ export default function FilterBar({ hideType = false, showSearch = false }: Filt
         });
     };
 
+    const applySearch = (term: string) => {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        debounceRef.current = null;
+        const next = new URLSearchParams(latestParams.current);
+        const trimmed = term.trim();
+        if (trimmed) {
+            next.set("q", trimmed);
+            next.delete("country");
+            if (next.get("sortBy") === "revenue.desc") next.delete("sortBy");
+        } else {
+            next.delete("q");
+        }
+        next.delete("page");
+        navigate(next, true);
+    };
+
     const handleSearch = (term: string) => {
         if (debounceRef.current) clearTimeout(debounceRef.current);
-        debounceRef.current = setTimeout(() => {
-            const next = new URLSearchParams(latestParams.current);
-            const trimmed = term.trim();
-            if (trimmed) {
-                next.set("q", trimmed);
-                next.delete("country");
-                if (next.get("sortBy") === "revenue.desc") next.delete("sortBy");
-            } else {
-                next.delete("q");
-            }
-            next.delete("page");
-            navigate(next, true);
-        }, 400);
+        debounceRef.current = setTimeout(() => applySearch(term), 400);
+    };
+
+    const flushSearch = () => {
+        // Hoàn tất bản nháp trước khi focus chuyển sang điều khiển điều hướng khác.
+        if (debounceRef.current && inputRef.current) applySearch(inputRef.current.value);
     };
 
     const hasQuery = Boolean(params.get("q")?.trim());
@@ -112,7 +122,7 @@ export default function FilterBar({ hideType = false, showSearch = false }: Filt
     return (
         <>
         {showSearch && <div className="mb-6">
-            <SearchBar query={searchParams.get("q") ?? ""} inputRef={inputRef} onSearch={handleSearch} isPending={isPending} />
+            <SearchBar query={searchParams.get("q") ?? ""} inputRef={inputRef} onSearch={handleSearch} onBlur={flushSearch} isPending={isPending} />
         </div>}
         <div className="bg-[#181818]/90 border border-[#2E2E2E] rounded-lg p-3 sm:p-4 mb-8 backdrop-blur-sm shadow-xl shadow-black/40">
             <div className="flex flex-wrap items-center justify-between gap-3 mb-3">

@@ -15,6 +15,7 @@ export default function NavSearchBar() {
     const [searchFailed, setSearchFailed] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
+    const triggerRef = useRef<HTMLButtonElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
     const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
     const abortControllerRef = useRef<AbortController | null>(null);
@@ -45,7 +46,7 @@ export default function NavSearchBar() {
 
     // Xử lý gõ phím, debounce và AbortController với Route Handler GET /api/search?q=...
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const val = e.target.value;
+        const val = e.target.value.toWellFormed();
         setQuery(val);
         setSearchFailed(false);
 
@@ -107,6 +108,7 @@ export default function NavSearchBar() {
             router.push(`/search?q=${encodeURIComponent(query.trim())}`);
         } else if (e.key === "Escape") {
             setIsOpen(false);
+            triggerRef.current?.focus();
         }
     };
 
@@ -124,22 +126,24 @@ export default function NavSearchBar() {
     };
 
     return (
-        <div ref={containerRef} className="relative flex items-center">
+        <div ref={containerRef} className={`flex items-center ${isOpen ? "absolute inset-x-4 top-3 z-50 2xl:relative 2xl:inset-auto" : "relative"}`}>
             {/* Thanh Input Co Giãn */}
             <div
                 className={`flex items-center rounded-full transition-all duration-300 ease-in-out ${
                     isOpen
-                        ? "w-52 sm:w-72 md:w-80 bg-black/85 border border-[#E50914] px-3 py-1.5 shadow-lg shadow-black/80"
+                        ? "w-full 2xl:w-80 bg-black/85 border border-[#E50914] px-3 py-1.5 shadow-lg shadow-black/80"
                         : "w-8 h-8 justify-center bg-transparent border-transparent"
                 }`}
             >
                 {/* Nút Kính Lúp */}
                 <button
+                    ref={triggerRef}
                     type="button"
                     onClick={() => setIsOpen((prev) => !prev)}
-                    className="text-gray-300 hover:text-white transition-colors focus:outline-none flex-shrink-0"
+                    className="text-gray-300 hover:text-white transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#E50914] rounded flex-shrink-0"
                     title="Tìm kiếm phim"
                     aria-label="Tìm kiếm phim"
+                    aria-expanded={isOpen}
                 >
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -157,7 +161,7 @@ export default function NavSearchBar() {
                             onChange={handleInputChange}
                             onKeyDown={handleKeyDown}
                             placeholder="Tìm kiếm phim, thể loại..."
-                            className="w-full bg-transparent text-white text-xs sm:text-sm pl-2 pr-1 focus:outline-none placeholder-zinc-500"
+                            className="min-w-0 flex-1 bg-transparent text-white text-xs sm:text-sm pl-2 pr-1 focus:outline-none placeholder-zinc-500"
                         />
 
                         {isLoading && (
@@ -180,7 +184,7 @@ export default function NavSearchBar() {
 
             {/* Live Preview Dropdown Popover */}
             {isOpen && query.trim().length >= 2 && (
-                <div className="absolute top-full right-0 mt-2.5 w-72 sm:w-84 md:w-96 bg-[#181818] border border-[#2E2E2E] rounded-md shadow-2xl shadow-black/95 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
+                <div className="absolute top-full right-0 mt-2.5 w-full 2xl:w-96 bg-[#181818] border border-[#2E2E2E] rounded-md shadow-2xl shadow-black/95 overflow-hidden z-50 animate-in fade-in slide-in-from-top-1 duration-150">
                     <div className="px-3 py-2 border-b border-[#2E2E2E] flex items-center justify-between text-xs text-zinc-400">
                         <span>Gợi ý xem trước</span>
                         <span>{results.length} kết quả</span>

@@ -130,7 +130,8 @@ try {
     assert.ok(home.includes(heading), `Missing server-rendered row: ${heading}`);
   }
   assert.ok(!home.includes("api_key="), "Home HTML must not expose the API key");
-  assert.ok((await getHTML("/search?q=Batman&q=Avatar")).includes("Batman"));
+  const repeatedQuery = await getHTML("/search?q=Batman&q=Avatar");
+  assert.ok(repeatedQuery.includes('href="/movie/1001"') && !repeatedQuery.includes('href="/movie/1002"'), "Repeated query must fetch results for the first keyword");
   const search = await fetch(`${baseURL}/api/search?q=Batman`);
   assert.equal(search.status, 200);
   assert.ok((await search.json()).results.length > 0);

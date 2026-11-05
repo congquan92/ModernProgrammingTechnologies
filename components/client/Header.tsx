@@ -56,7 +56,7 @@ export default function Header() {
 
     return (
         <header
-            className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-300 ease-in-out ${
+            className={`fixed top-0 left-0 right-0 z-50 w-full transition-all duration-500 ease-in-out ${
                 isSolid
                     ? "bg-[#141414] py-3 shadow-xl shadow-black/80"
                     : "bg-gradient-to-b from-black/80 via-black/30 to-transparent py-3.5 sm:py-4"
@@ -69,8 +69,10 @@ export default function Header() {
                     <button
                         type="button"
                         onClick={() => setIsMobileMenuOpen((prev) => !prev)}
-                        className="md:hidden text-gray-300 hover:text-white p-1"
+                        className="xl:hidden text-gray-300 hover:text-white p-1"
                         aria-label="Mở menu"
+                        aria-expanded={isMobileMenuOpen}
+                        aria-controls="mobile-navigation"
                     >
                         <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             {isMobileMenuOpen ? (
@@ -89,7 +91,7 @@ export default function Header() {
                     </Link>
 
                     {/* Menu điều hướng chính trên Desktop */}
-                    <nav className="hidden md:flex items-center gap-4 lg:gap-5 text-sm font-medium">
+                    <nav className="hidden xl:flex items-center gap-4 lg:gap-5 text-sm font-medium">
                         <Link
                             href="/"
                             className={`transition-colors ${
@@ -176,7 +178,7 @@ export default function Header() {
 
             {/* Menu Drawer cho Mobile */}
             {isMobileMenuOpen && (
-                <div className="md:hidden bg-[#181818] border-b border-[#2E2E2E] px-4 py-4 space-y-3 max-h-[80vh] overflow-y-auto">
+                <div id="mobile-navigation" className="xl:hidden bg-[#181818] border-b border-[#2E2E2E] px-4 py-4 space-y-3 max-h-[80vh] overflow-y-auto">
                     <div className="flex flex-col space-y-2 text-sm font-medium">
                         <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="py-1 text-white hover:text-[#E50914]">
                             Trang chủ

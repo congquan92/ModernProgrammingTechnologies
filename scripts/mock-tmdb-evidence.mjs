@@ -21,8 +21,8 @@ const movie = (id = 550) => ({
 const list = () => ({
   page: 1,
   total_pages: 1,
-  total_results: 1,
-  results: [movie()],
+  total_results: 20,
+  results: Array.from({ length: 20 }, (_, index) => movie(550 + index)),
 });
 
 createServer(async (request, response) => {
@@ -53,13 +53,15 @@ createServer(async (request, response) => {
     delay = 2500;
     data = {
       id: Number(credits[1]),
-      cast: [{ id: 1, name: "Diễn viên minh chứng", character: "Vai A", profile_path: null }],
+      cast: Array.from({ length: 20 }, (_, index) => ({ id: index + 1, name: `Diễn viên ${index + 1}`, character: `Vai ${index + 1}`, profile_path: null })),
     };
   } else if (similar) {
     delay = 4000;
-    data = { ...list(), results: [movie(551)] };
+    data = list();
   } else if (videos) {
     data = { id: Number(videos[1]), results: [] };
+  } else if (path === "/search/movie" && ["Batman", "Avatar"].includes(url.searchParams.get("query"))) {
+    data = { ...list(), total_results: 1, results: [movie(url.searchParams.get("query") === "Batman" ? 1001 : 1002)] };
   } else {
     data = list();
   }

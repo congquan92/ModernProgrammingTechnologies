@@ -1,6 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { discoverMovies } from "@/services/tmdb";
 import MovieCard from "@/components/server/MovieCard";
 import FilterBar from "@/components/client/FilterBar";
@@ -101,6 +102,8 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         current.set("page", pageNumber.toString());
         return `/browse?${current.toString()}`;
     };
+
+    if (currentPage > totalPages) redirect(buildPaginationUrl(totalPages));
 
     const paginationPages = getPageRange(currentPage, totalPages);
 

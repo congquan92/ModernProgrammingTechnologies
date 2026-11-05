@@ -9,7 +9,7 @@ interface MovieCardProps {
 /**
  * MovieCard - Server Component thẻ phim phong cách Netflix (Tầng 1A & Tầng 1B)
  * Đảm bảo:
- * 1. Khung aspect-[2/3] cố định chống giật màn hình (CLS = 0)
+ * 1. Khung aspect-[2/3] giữ chỗ cho ảnh để hạn chế dịch chuyển bố cục
  * 2. Thẻ Image của Next.js với WebP tự động và sizes responsive
  * 3. Hiệu ứng phóng to mượt mà chuẩn giao diện streaming
  */

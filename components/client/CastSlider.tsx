@@ -15,7 +15,6 @@ interface CastSliderProps {
  */
 export default function CastSlider({ cast }: CastSliderProps) {
     const rowRef = useRef<HTMLDivElement>(null);
-    const lastScrollPosRef = useRef<{ left: number; time: number }>({ left: 0, time: 0 });
 
     if (!cast || cast.length === 0) return null;
 
@@ -26,28 +25,19 @@ export default function CastSlider({ cast }: CastSliderProps) {
             const maxScrollLeft = scrollWidth - clientWidth;
             const scrollStep = Math.max(clientWidth * 0.6, 280);
 
-            const now = Date.now();
-            const wasStuck =
-                Math.abs(scrollLeft - lastScrollPosRef.current.left) < 15 &&
-                now - lastScrollPosRef.current.time < 1500;
-
             if (direction === "right") {
-                if (scrollLeft >= maxScrollLeft - 80 || wasStuck) {
+                if (scrollLeft >= maxScrollLeft - 80) {
                     el.scrollTo({ left: 0, behavior: "smooth" });
-                    lastScrollPosRef.current = { left: 0, time: now };
                 } else {
                     const scrollTo = Math.min(scrollLeft + scrollStep, maxScrollLeft);
                     el.scrollTo({ left: scrollTo, behavior: "smooth" });
-                    lastScrollPosRef.current = { left: scrollLeft, time: now };
                 }
             } else {
-                if (scrollLeft <= 80 || wasStuck) {
+                if (scrollLeft <= 80) {
                     el.scrollTo({ left: maxScrollLeft, behavior: "smooth" });
-                    lastScrollPosRef.current = { left: maxScrollLeft, time: now };
                 } else {
                     const scrollTo = Math.max(scrollLeft - scrollStep, 0);
                     el.scrollTo({ left: scrollTo, behavior: "smooth" });
-                    lastScrollPosRef.current = { left: scrollLeft, time: now };
                 }
             }
         }
@@ -59,7 +49,7 @@ export default function CastSlider({ cast }: CastSliderProps) {
             <button
                 type="button"
                 onClick={() => handleScroll("left")}
-                className="absolute top-0 bottom-0 left-0 z-30 m-auto h-full w-9 sm:w-11 bg-black/60 hover:bg-black/85 text-white flex items-center justify-center opacity-0 group-hover/cast:opacity-100 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
+                className="absolute top-0 bottom-0 left-0 z-30 m-auto h-full w-9 sm:w-11 bg-black/60 hover:bg-black/85 text-white flex items-center justify-center opacity-0 group-hover/cast:opacity-100 transition-all duration-300 hover:scale-110 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E50914] cursor-pointer"
                 aria-label="Cuộn sang trái"
                 title="Cuộn sang trái"
             >
@@ -74,16 +64,16 @@ export default function CastSlider({ cast }: CastSliderProps) {
                 {cast.map((actor: CastMember) => (
                     <div
                         key={actor.id}
-                        className="w-24 sm:w-28 shrink-0 text-center space-y-1.5 group/actor"
+                        className="w-28 sm:w-32 shrink-0 text-center space-y-1.5 group/actor"
                     >
                         {/* Khung ảnh diễn viên tỷ lệ 3:4 chuẩn DESIGN.md */}
-                        <div className="relative w-24 sm:w-28 aspect-[3/4] rounded-md overflow-hidden bg-[#202020] border border-zinc-800/80 group-hover/actor:border-zinc-700 transition-colors">
+                        <div className="relative w-28 sm:w-32 aspect-[3/4] rounded-md overflow-hidden bg-[#202020] border border-zinc-800/80 group-hover/actor:border-zinc-700 transition-colors">
                             {actor.profile_path ? (
                                 <Image
                                     src={`https://image.tmdb.org/t/p/w185${actor.profile_path}`}
                                     alt={actor.name}
                                     fill
-                                    sizes="112px"
+                                    sizes="(max-width: 640px) 112px, 128px"
                                     className="object-cover transition-transform duration-300 group-hover/actor:scale-105"
                                 />
                             ) : (
@@ -115,7 +105,7 @@ export default function CastSlider({ cast }: CastSliderProps) {
             <button
                 type="button"
                 onClick={() => handleScroll("right")}
-                className="absolute top-0 bottom-0 right-0 z-30 m-auto h-full w-9 sm:w-11 bg-black/60 hover:bg-black/85 text-white flex items-center justify-center opacity-0 group-hover/cast:opacity-100 transition-all duration-300 hover:scale-110 focus:outline-none cursor-pointer"
+                className="absolute top-0 bottom-0 right-0 z-30 m-auto h-full w-9 sm:w-11 bg-black/60 hover:bg-black/85 text-white flex items-center justify-center opacity-0 group-hover/cast:opacity-100 transition-all duration-300 hover:scale-110 focus:outline-none focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#E50914] cursor-pointer"
                 aria-label="Cuộn sang phải"
                 title="Cuộn sang phải"
             >

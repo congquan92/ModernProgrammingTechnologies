@@ -18,7 +18,7 @@ export async function searchMovies(query: string, limit: number = 48): Promise<M
                 ? fetchTMDB<MovieListResponse>(
                       `/search/movie?query=${encodeURIComponent(query)}&page=2`,
                       300
-                  ).catch(() => ({ results: [] as Movie[], page: 2, total_pages: 0, total_results: 0 }))
+                  )
                 : Promise.resolve({ results: [] as Movie[], page: 2, total_pages: 0, total_results: 0 }),
         ]);
         const combined = deduplicateMovies([...(page1.results || []), ...(page2.results || [])]);

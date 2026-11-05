@@ -3,9 +3,10 @@ import { MOVIE_GENRES, COUNTRIES, YEARS, SORT_OPTIONS, CONTENT_TYPES } from "./c
 export type MovieSearchParams = Record<string, string | string[] | undefined>;
 
 export function normalizeMovieParams(params: MovieSearchParams): Record<string, string> {
+    // maxlength đếm UTF-16; sửa surrogate bị cắt trước khi mã hóa URL.
     const values = Object.fromEntries(Object.entries(params).map(([key, value]) => [
         key,
-        ((Array.isArray(value) ? value[0] : value) ?? "").replace(/[\x00-\x1F\x7F]/g, "").trim().slice(0, 100),
+        ((Array.isArray(value) ? value[0] : value) ?? "").replace(/[\x00-\x1F\x7F]/g, "").trim().slice(0, 100).toWellFormed(),
     ]));
     for (const [key, options] of [
         ["genre", MOVIE_GENRES], ["country", COUNTRIES], ["year", YEARS],

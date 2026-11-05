@@ -26,6 +26,7 @@
     - TypeScript strict mode, ESLint chuẩn Next.js.
     - Quản lý biến môi trường với `.env.example` và `.env.local`.
     - Test Node kiểm tra logic và render các trang thật; GitHub Actions chạy `npm run evidence` bằng mock, không cần secret TMDB.
+    - Codex hỗ trợ rà soát và sửa mã nguồn. Thay đổi được kiểm chứng bằng lint, test, build và kiểm tra trình duyệt; nhóm vẫn chịu trách nhiệm khai báo theo quy định môn học và giải thích code độc lập.
 - **Tầng 3 (Đo Lường & Đào Sâu Hiệu Năng):** Chưa có tệp Lighthouse, bundle analyzer hoặc trace đối chứng gốc; không công bố các chỉ số đó như kết quả đã đạt.
 
 ---
@@ -35,6 +36,7 @@
 ### Yêu Cầu Hệ Thống:
 
 - **Node.js:** `>= 24.0.0` (CI dùng Node.js 24; bộ test dùng khả năng chạy TypeScript của Node)
+- **Framework:** Next.js `16.4.5`, React/React DOM `19.2.8`; phiên bản cài lại được chốt trong `package-lock.json`.
 - **Trình quản lý gói:** `npm` (khuyến nghị) hoặc `pnpm`/`yarn`
 - **Kiểm tra trình duyệt:** Chrome/Chromium; nếu không ở đường dẫn Linux thông dụng, đặt `CHROME_BIN` thành đường dẫn tệp thực thi. CI dùng Chrome có sẵn trên `ubuntu-latest`.
 
@@ -87,11 +89,14 @@
 | `npm run dev`      | Khởi chạy môi trường phát triển (Hot reload) tại `http://localhost:3000` |
 | `npm run lint`     | Chạy ESLint, thất bại nếu có bất kỳ warning nào                           |
 | `npm test`         | Chạy bộ kiểm thử chính trong `tests/` bằng Node.js                         |
+| `npm audit --audit-level=moderate` | Kiểm tra cảnh báo dependency; CI chặn từ mức moderate trở lên       |
 | `npx tsc --noEmit` | Kiểm tra toàn bộ kiểu dữ liệu TypeScript (Type-check)                    |
 | `npm run build`    | Biên dịch production bằng Webpack, không gọi TMDB                         |
 | `npm run start`    | Khởi chạy Production Server sau khi đã build                             |
 
 Các script cũ `scripts/test-suite.mjs` và `scripts/adversarial-probe.mjs` đã được thay thế bởi bộ test và quy trình minh chứng hiện tại. Dùng `npm test` cho kiểm thử logic; dùng `npm run evidence` cho kiểm chứng HTTP production với mock TMDB.
+
+`package.json` chỉ override `minimatch` của `@typescript-eslint/typescript-estree` lên `11.0.1` để vá GHSA-g3hv-75wg-m249; upstream hiện vẫn yêu cầu bản 10 chưa vá. Bỏ override khi upstream dùng phiên bản đã vá. Callsite `minimatch(filePath, pattern, { dot: true })` giữ nguyên API; lint xác minh parser trên source thật.
 
 ---
 
@@ -124,7 +129,7 @@ Lệnh chạy lint/test, tạo build production Webpack riêng trong `.next-evid
 - `baocao/evidence/streaming-mock.json`: thời điểm và số thứ tự chunk HTML của nội dung chính, hai fallback và hai kết quả. Với mock trì hoãn 2,5/4 giây, kết quả phải tới ở chunk sau và ít nhất 1 giây sau nội dung chính; gửi dồn nhiều chunk cùng lúc cũng bị từ chối.
 - `baocao/evidence/cache-mock.json`: bộ đếm origin trước request, sau miss, hit, hết TTL và hit sau khi revalidate. Mỗi endpoint phải có chuỗi `0 → 1 → 1 → 2 → 2`; nội dung đổi từ “Phiên bản 1” sang “Phiên bản 2” sau revalidation.
 - `baocao/evidence/watchlist-http.json`: POST Server Action thật, cờ cookie, thêm/xóa, tải lại `/watchlist` và kiểm tra phiên cookie khác vẫn trống. Không ghi giá trị cookie.
-- `baocao/evidence/browser-interactions.json`: Chrome kiểm tra đổi bộ lọc liên tiếp, tìm kiếm chậm, đồng bộ URL/Back/Forward, debounce kết hợp bộ lọc, rollback Watchlist khi mất mạng và focus bàn phím của trailer. Chạy qua Chrome DevTools Protocol bằng Node, không thêm thư viện test.
+- `baocao/evidence/browser-interactions.json`: Chrome kiểm tra đổi bộ lọc liên tiếp, tìm kiếm chậm/Unicode, đồng bộ URL/Back/Forward, debounce kết hợp bộ lọc, rollback Watchlist, focus bàn phím, responsive header, carousel có nhiều thẻ và kích thước skeleton trước/sau streaming. Chạy qua Chrome DevTools Protocol bằng Node, không thêm thư viện test.
 
 TTL ngắn chỉ được phép khi `TMDB_BASE_URL` là HTTP tại `127.0.0.1`; cấu hình này bị từ chối với TMDB thật. Đây là kiểm chứng HTTP với dữ liệu giả có độ trễ chủ động, không phải số đo Lighthouse, thời gian vẽ của trình duyệt, video giao diện hoặc shared cache tại CDN. Đọc ngày/commit trong từng log; các lượt build thường, mock và ảnh trình duyệt phải được phân biệt, không ghép thành cùng một lượt đo.
 

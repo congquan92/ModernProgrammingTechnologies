@@ -7,6 +7,7 @@ import { getMovieDetails, getMovieVideos, selectBestTrailer, TMDBError } from "@
 import { formatRuntime } from "@/utils/formatRuntime";
 import CastList from "@/components/server/CastList";
 import CastSkeleton from "@/components/server/CastSkeleton";
+import MovieCardSkeleton from "@/components/server/MovieCardSkeleton";
 import SimilarMovies from "@/components/server/SimilarMovies";
 import { isMovieSaved } from "@/app/actions/watchlist";
 import WatchlistButton from "@/components/client/WatchlistButton";
@@ -247,12 +248,14 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
           {/* Suspense độc lập thứ 2: Chạy song song không block CastList */}
           <Suspense
             fallback={
-              <div data-stream="similar-fallback" className="flex gap-3 sm:gap-4 overflow-hidden pb-2">
+              <div data-stream="similar-fallback" className="flex items-center gap-2.5 sm:gap-3.5 overflow-x-auto no-scrollbar py-2">
                 {Array.from({ length: 6 }).map((_, i) => (
                   <div
                     key={i}
-                    className="w-36 sm:w-44 aspect-[2/3] shrink-0 rounded-md bg-zinc-800/80 animate-pulse"
-                  />
+                    className="w-36 sm:w-44 md:w-52 shrink-0"
+                  >
+                    <MovieCardSkeleton />
+                  </div>
                 ))}
               </div>
             }

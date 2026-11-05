@@ -3,7 +3,9 @@
 > **Dự án:** MovieHub – Hệ sinh thái ứng dụng Web điện ảnh (Next.js 16 + React 19)  
 > **Thời gian thực hiện:** Tháng 10/2026  
 > **Phạm vi xử lý:** Mã nguồn ứng dụng (`app/`, `services/`, `components/`) và Báo cáo học thuật LaTeX (`baocao/baocao.tex`)  
-> **Trạng thái:** ✅ **HOÀN THÀNH TOÀN DIỆN 8/8 VẤN ĐỀ (100% RESOLVED & VERIFIED)**
+> **Trạng thái:** Nhật ký lịch sử tháng 10/2026; các kết quả bên dưới không phải chứng nhận cho source hiện tại.
+>
+> **Đối chiếu hiện tại:** Đọc phiên bản trong `package.json` và kết quả mới từ `npm run evidence`. Trang chủ và sitemap dùng `await connection()` để SSR với Data Cache; route `/tv` và DNS monkey-patching đã bị xóa. Chưa có phép đo để công bố CLS bằng không hay chứng nhận WCAG toàn ứng dụng. Tệp này giữ mô tả và log cũ để truy lịch sử, không hướng dẫn thêm lại các cơ chế đã bỏ.
 
 ---
 
@@ -37,7 +39,7 @@
 - **Cập nhật báo cáo `baocao/baocao.tex` (Mục 1.3):**
   - Khẳng định tính pháp lý và độ ổn định của API `fetch(url, { next: { revalidate } })`.
   - Phân tích chi tiết: Khi `cacheComponents: false` (mặc định), `fetch` kiểm soát việc ghi nhớ response vào Data Cache trên ổ đĩa. Nếu trong tương lai bật `cacheComponents: true`, hệ thống sẽ cho phép dùng `use cache` ở cấp component hoặc hàm tự do với các profile định sẵn (`cacheLife("hours")`, `cacheLife("days")`).
-  - Thêm **Bảng 4.2 (Bảng phân loại tuyến đường xuất ra từ lệnh `next build`)**:
+  - Đã thêm **Bảng 4.2 theo bản build lịch sử Next.js 16.3.6** (trang chủ Static ISR và `/tv` dưới đây không còn phản ánh source hiện tại):
     - `○ /` (Trang chủ): Tĩnh (Static ISR), chu kỳ revalidate 30 phút (`30m`), tự động tổng hợp chu kỳ bé nhất từ `getNowPlayingMovies` (1800s).
     - `○ /_not-found`: Tĩnh hoàn toàn.
     - `ƒ /api/search`: Động (Dynamic Route Handler), trả về JSON kèm header `Cache-Control: public, s-maxage=120`.
@@ -161,7 +163,7 @@
 
 ---
 
-### VẤN ĐỀ 6 (P6): ĐẶC TẢ VÀ CHỨNG MINH CƠ CHẾ DNS FALLBACK RESOLVER
+### VẤN ĐỀ 6 (P6): DNS FALLBACK RESOLVER TRONG BẢN CŨ — ĐÃ LOẠI BỎ
 
 #### 1. Nguyên nhân gốc rễ (Root Cause)
 - Báo cáo cũ mô tả cơ chế DNS Fallback dùng hàm `dns.setServers(["8.8.8.8"])`. Trong Node.js, `dns.setServers()` chỉ tác động lên các phương thức `dns.resolve*`, hoàn toàn không ảnh hưởng đến `dns.lookup` (vốn là hàm phân giải socket mặc định mà `fetch()` của Node.js sử dụng). Do đó, đoạn code cũ trong báo cáo không phản ánh đúng thực tế hoạt động.
@@ -261,4 +263,4 @@
 
 ---
 
-> **Kết luận nghiệm thu:** Tất cả 8/8 vấn đề ghi nhận trong `PROBLEM.md` đã được xử lý triệt để, đảm bảo tính nhất quán tuyệt đối giữa mã nguồn thực thi và báo cáo kỹ thuật học thuật.
+> **Kết luận được ghi ở lượt lịch sử:** Nhóm từng đánh dấu 8/8 vấn đề đã xử lý. Source đã thay đổi sau đó; phải đối chiếu từng yêu cầu với code và log cùng lượt chạy, không dùng kết luận này để xác nhận phiên bản hiện tại.

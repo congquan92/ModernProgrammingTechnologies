@@ -1,19 +1,19 @@
 /**
  * MovieCardSkeleton - Khung xương loading cho MovieCard
- * Đảm bảo kích thước trùng khớp 100% với MovieCard thực tế để tránh nhảy giật giao diện (CLS = 0)
+ * Giữ tỷ lệ poster và chiều cao caption như MovieCard.
  */
 export default function MovieCardSkeleton() {
     return (
-        <div className="overflow-hidden rounded-xl bg-gray-900/60 border border-gray-800 animate-pulse">
+        <div aria-hidden="true" className="overflow-hidden rounded-md bg-[#181818] animate-pulse">
             {/* Khung poster aspect-[2/3] */}
-            <div className="aspect-[2/3] w-full bg-gray-800/80" />
+            <div className="aspect-[2/3] w-full bg-[#202020]" />
 
             {/* Dòng chữ skeleton */}
-            <div className="p-3.5 space-y-2.5">
-                <div className="h-4 bg-gray-700/80 rounded w-4/5" />
-                <div className="flex justify-between items-center pt-1">
-                    <div className="h-3 bg-gray-800 rounded w-1/4" />
-                    <div className="h-3 bg-gray-800 rounded w-1/3" />
+            <div className="p-2 sm:p-2.5 space-y-1">
+                <div className="text-xs sm:text-sm font-bold bg-zinc-700 rounded w-4/5">&nbsp;</div>
+                <div className="flex justify-between items-center text-[10px] sm:text-xs">
+                    <span className="bg-zinc-800 rounded w-1/4">&nbsp;</span>
+                    <span className="border border-zinc-700 px-1 rounded text-[9px] bg-zinc-800 w-1/3">&nbsp;</span>
                 </div>
             </div>
         </div>

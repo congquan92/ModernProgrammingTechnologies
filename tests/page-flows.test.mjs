@@ -13,9 +13,10 @@ const { default: HomePage } = await import("../app/page.tsx");
 const { default: SearchPage, generateMetadata } = await import("../app/search/page.tsx");
 const { default: BrowsePage } = await import("../app/browse/page.tsx");
 const { default: WatchlistPage } = await import("../app/watchlist/page.tsx");
+const { default: sitemap } = await import("../app/sitemap.ts");
 const { default: FilterBar } = await import("../components/client/FilterBar.tsx");
 const { discoverMovies } = await import("../services/discover.ts");
-const { toggleWatchlist } = await import("../app/actions/watchlist.ts");
+const { toggleWatchlist, clearAllWatchlist, getWatchlistIds } = await import("../app/actions/watchlist.ts");
 const { resetMockCookies } = await import("../scripts/mock-headers.mjs");
 
 const movie = (id, release_date = "2024-01-01") => ({
@@ -51,9 +52,24 @@ test("search accepts repeated query parameters and bounds the keyword", async (t
   const params = { q: ["Batman", "Avatar"], genre: ["28", "35"] };
   const html = render(await SearchPage({ searchParams: Promise.resolve(params) }));
   assert.match(html, /href="\/movie\/1"/);
+  assert.deepEqual(requests.map((url) => url.searchParams.get("query")), ["Batman", "Batman"]);
   assert.match((await generateMetadata({ searchParams: Promise.resolve(params) })).title, /Batman/);
   await SearchPage({ searchParams: Promise.resolve({ q: "x".repeat(125) }) });
   assert.equal(requests.at(-1).searchParams.get("query").length, 100);
+});
+
+test("search page renders Unicode queries at the input length boundary", async (t) => {
+  const requests = mockFetch(t, () => ({ results: [movie(1)] }));
+  const query = "a" + "😀".repeat(50);
+  const html = render(await SearchPage({ searchParams: Promise.resolve({ q: query }) }));
+  assert.match(html, /href="\/movie\/1"/);
+  assert.equal(requests.length, 2);
+  for (const request of requests) {
+    const sentQuery = request.searchParams.get("query");
+    assert.ok(sentQuery.startsWith("a😀"));
+    assert.ok(sentQuery.length <= 100);
+    assert.ok(sentQuery.isWellFormed());
+  }
 });
 
 test("classic keyword search keeps old films and excludes newer or undated ones", async (t) => {
@@ -62,6 +78,12 @@ test("classic keyword search keeps old films and excludes newer or undated ones"
   const html = render(await SearchPage({ searchParams: Promise.resolve(query) }), query);
   assert.match(html, /href="\/movie\/1"/);
   assert.doesNotMatch(html, /href="\/movie\/[23]"/);
+});
+
+test("search propagates a failed second page instead of reporting no matches", async (t) => {
+  const requests = mockFetch(t, (url) => url.searchParams.get("page") === "2" ? 503 : { results: [movie(1)] });
+  await assert.rejects(() => SearchPage({ searchParams: Promise.resolve({ q: "Batman", genre: "18" }) }), /Lỗi gọi API TMDB \[503\]/);
+  assert.equal(requests.length, 2);
 });
 
 test("unsupported keyword filters redirect to a URL that matches the results", async () => {
@@ -93,6 +115,17 @@ test("browse normalizes repeated filters and invalid page numbers", async (t) =>
   assert.equal(requests[0].searchParams.get("with_genres"), "28");
 });
 
+test("browse redirects pages beyond the last page and preserves supported filters", async (t) => {
+  mockFetch(t, (url) => ({ results: url.searchParams.get("page") === "2" ? [movie(1)] : [], total_pages: 2, total_results: 21 }));
+  const filters = { type: "movie", genre: "28", country: "JP", year: "2024", sortBy: "vote_average.desc" };
+  const expected = new URLSearchParams({ ...filters, page: "2" });
+  await assert.rejects(() => BrowsePage({ searchParams: Promise.resolve({ ...filters, page: "10", unknown: "ignored" }) }),
+    (error) => error.digest === `NEXT_REDIRECT;replace;/browse?${expected};307;`);
+  const html = render(await BrowsePage({ searchParams: Promise.resolve({ ...filters, page: "2" }) }), filters, "/browse");
+  assert.match(html, /href="\/movie\/1"/);
+  assert.match(html, /title="Trang trước"/);
+});
+
 test("watchlist add, reload and remove render the state from the Server Action", async (t) => {
   resetMockCookies();
   mockFetch(t, () => movie(1));
@@ -109,7 +142,30 @@ test("watchlist propagates service errors but skips deleted movies", async (t) =
   mockFetch(t, () => status);
   await assert.rejects(WatchlistPage, /Lỗi gọi API TMDB/);
   status = 404;
-  assert.match(render(await WatchlistPage()), /Danh sách xem sau của bạn đang trống/);
+  assert.match(render(await WatchlistPage()), /Phim đã lưu không còn khả dụng/);
+});
+
+test("a full watchlist of deleted movies can be cleared and used again", async (t) => {
+  resetMockCookies(new Map([["mh_watchlist", JSON.stringify(Array.from({ length: 200 }, (_, i) => i + 1))]]));
+  mockFetch(t, () => 404);
+  const html = render(await WatchlistPage());
+  assert.match(html, /Phim đã lưu không còn khả dụng/);
+  assert.match(html, /Xóa tất cả/);
+  assert.doesNotMatch(html, /Danh sách xem sau của bạn đang trống/);
+  assert.equal((await getWatchlistIds()).length, 200);
+  await clearAllWatchlist();
+  assert.deepEqual(await getWatchlistIds(), []);
+  assert.deepEqual(await toggleWatchlist(201), { isSaved: true });
+});
+
+test("sitemap lists public routes and keeps them when TMDB fails", async (t) => {
+  let failed = false;
+  mockFetch(t, () => failed ? 503 : { results: [movie(1)] });
+  t.mock.method(console, "warn", () => {});
+  const baseURL = process.env.NEXT_PUBLIC_SITE_URL || "https://moviehub.vn";
+  assert.deepEqual((await sitemap()).map((route) => route.url), [baseURL, `${baseURL}/browse`, `${baseURL}/movie/1`]);
+  failed = true;
+  assert.deepEqual((await sitemap()).map((route) => route.url), [baseURL, `${baseURL}/browse`]);
 });
 
 test("keyword filters have accessible labels and offer only supported choices", () => {
