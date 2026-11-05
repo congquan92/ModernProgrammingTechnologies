@@ -1,7 +1,8 @@
-generated_at: 2026-10-29T10:35:22.891Z
-git_head: 974f24f490524cfcf4c894280ed8c1bd95002520
+generated_at: 2026-10-30T15:24:20.732Z
+git_head: 2b6cea57201a1f451975c40b1e24859ae9c0dd0b
 working_tree_dirty: true
-source_sha256: b6249d3ab56359ba3e6daea126e7845d71c48b652d758930ecf735164961f495
+source_sha256: 72bc35aebfca01869f0aee47db08ee450f440c4917c0fb62aa3cac1c83de5f76
+run_id: 2026-10-30T15:24:20.756Z
 node: v26.12.1
 next: 16.3.6
 platform: linux
@@ -9,39 +10,62 @@ mode: production; controlled loopback TMDB mock; Cache Components disabled
 scope: HTTP HTML streaming, upstream Data Cache counts and Server Action cookies; no browser paint/CWV/CDN claims
 command: node --disable-warning=DEP0205 --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs
 
-✔ route GET /api/search: returns empty results for empty or short queries (13.693046ms)
-✔ route GET /api/search: includes standard Cache-Control header and returns results (1.877699ms)
-✔ route GET /api/search: sanitizes control characters and truncates queries to 100 chars (1.470638ms)
-✔ search service: searchQuickLive limits output to exactly 5 items (0.511984ms)
-✔ architecture: FilterBar implements all 5 independent criteria (2.76218ms)
-✔ architecture: services/client.ts contains no 'as any' type bypasses (0.821739ms)
-✔ deduplicateMovies retains the first movie for each positive ID (3.618313ms)
-✔ short evidence TTL is allowed only for the loopback mock (97.662806ms)
-✔ R1: Dead code and TV subsystem files are pruned (4.54983ms)
-✔ R1: searchQuickLive queries /search/movie for pure movie results (0.749388ms)
-✔ R2: robots.ts provides correct crawler directives and sitemap URL (86.417902ms)
-✔ R2: sitemap.ts provides valid sitemap configuration with fallback (1.539825ms)
-✔ R2: next.config.ts configures mandatory HTTP security headers (6.604215ms)
-✔ R2: error boundaries and 404 components exist and export default (0.684764ms)
-✔ client sliders receive rendered cards instead of importing MovieCard (2.230467ms)
-✔ fetchTMDB keeps the key in the server request and configures revalidation (82.789015ms)
-✔ streaming verifier rejects a buffered response split into multiple chunks (67.232286ms)
-✔ watchlist: rejects invalid movieId inputs with exact error (5.132594ms)
-✔ watchlist: untrusted cookies accept only unique positive safe integers (1.437948ms)
-✔ watchlist: incoming cookies cannot bypass item and byte limits (0.695882ms)
-✔ watchlist: byte limit includes cookie percent encoding (0.994165ms)
-✔ watchlist: toggleWatchlist adds and removes movie authentic state (0.739462ms)
-✔ watchlist: capacity boundary allows 200 items, rejects 201st (1.904849ms)
-✔ watchlist: 200 serialized IDs byte size safely under RFC 6265 limit (0.35797ms)
-✔ watchlist: resilience to malformed or dirty cookie data (0.582229ms)
-ℹ tests 25
+Lỗi searchQuickLive: TMDBError: Lỗi gọi API TMDB [503]
+    at fetchTMDB (file:///home/quocdai210/Projects/ModernProgrammingTechnologies/services/client.ts:54:28)
+    at async searchQuickLive (file:///home/quocdai210/Projects/ModernProgrammingTechnologies/services/search.ts:40:22)
+    at async GET (file:///home/quocdai210/Projects/ModernProgrammingTechnologies/app/api/search/route.ts:28:25)
+    at async TestContext.<anonymous> (file:///home/quocdai210/Projects/ModernProgrammingTechnologies/tests/api-search.test.mjs:137:18)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+  status: 503
+}
+[RouteHandler GET /api/search] Error: TMDBError: Lỗi gọi API TMDB [503]
+    at fetchTMDB (file:///home/quocdai210/Projects/ModernProgrammingTechnologies/services/client.ts:54:28)
+    at async searchQuickLive (file:///home/quocdai210/Projects/ModernProgrammingTechnologies/services/search.ts:40:22)
+    at async GET (file:///home/quocdai210/Projects/ModernProgrammingTechnologies/app/api/search/route.ts:28:25)
+    at async TestContext.<anonymous> (file:///home/quocdai210/Projects/ModernProgrammingTechnologies/tests/api-search.test.mjs:137:18)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+  status: 503
+}
+✔ route GET /api/search: returns empty results for empty or short queries (11.70432ms)
+✔ route GET /api/search: includes standard Cache-Control header and returns results (1.831023ms)
+✔ route GET /api/search: sanitizes control characters and truncates queries to 100 chars (1.378808ms)
+✔ search service: searchQuickLive limits output to exactly 5 items (0.489823ms)
+✔ search distinguishes upstream failure from valid empty results (4.173639ms)
+✔ architecture: FilterBar implements all 5 independent criteria (2.679429ms)
+✔ architecture: services/client.ts contains no 'as any' type bypasses (0.843074ms)
+✔ deduplicateMovies retains the first movie for each positive ID (2.636934ms)
+✔ short evidence TTL is allowed only for the loopback mock (93.049479ms)
+✔ R1: Dead code and TV subsystem files are pruned (6.931758ms)
+✔ R1: searchQuickLive queries /search/movie for pure movie results (0.741647ms)
+✔ R2: robots.ts provides correct crawler directives and sitemap URL (72.459012ms)
+✔ R2: sitemap.ts provides valid sitemap configuration with fallback (1.183671ms)
+✔ R2: next.config.ts configures mandatory HTTP security headers (5.999936ms)
+✔ R2: error boundaries and 404 components exist and export default (2.286235ms)
+✔ client sliders receive rendered cards instead of importing MovieCard (3.23738ms)
+[TMDB] Request failed /movie/7
+[TMDB] Request failed /movie/7
+[TMDB Service] Cảnh báo: TMDB_API_KEY chưa được cấu hình hợp lệ trong .env.local!
+✔ fetchTMDB keeps the key in the server request and configures revalidation (83.662781ms)
+✔ TMDB failures preserve HTTP status, hide secrets and reject missing configuration (5.883404ms)
+✔ streaming verifier rejects a buffered response split into multiple chunks (75.285703ms)
+✔ watchlist: rejects invalid movieId inputs with exact error (5.32398ms)
+✔ watchlist: untrusted cookies accept only unique positive safe integers (1.374598ms)
+✔ watchlist: incoming cookies cannot bypass item and byte limits (0.590223ms)
+✔ watchlist: byte limit includes cookie percent encoding (0.911473ms)
+✔ watchlist: toggleWatchlist adds and removes movie authentic state (0.720915ms)
+✔ watchlist: capacity boundary allows 200 items, rejects 201st (0.877083ms)
+✔ watchlist: 200 serialized IDs byte size safely under RFC 6265 limit (0.297515ms)
+✔ watchlist: resilience to malformed or dirty cookie data (0.590368ms)
+ℹ tests 27
 ℹ suites 0
-ℹ pass 25
+ℹ pass 27
 ℹ fail 0
 ℹ cancelled 0
 ℹ skipped 0
 ℹ todo 0
-ℹ duration_ms 425.480917
+ℹ duration_ms 391.102734
 
 exit_code: 0
 signal: none

@@ -10,7 +10,12 @@ interface CastListProps {
  * Fetch getMovieCredits() độc lập — không chặn thông tin phim chính hiển thị trước
  */
 export default async function CastList({ movieId }: CastListProps) {
-  const credits = await getMovieCredits(movieId);
+  let credits;
+  try {
+    credits = await getMovieCredits(movieId);
+  } catch {
+    return <p role="alert" className="text-gray-300 py-2">Không thể tải dàn diễn viên. Vui lòng thử tải lại trang.</p>;
+  }
   const cast = credits.cast?.slice(0, 20) || [];
 
   if (cast.length === 0) {

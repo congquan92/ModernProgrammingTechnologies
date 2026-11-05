@@ -18,7 +18,7 @@ export async function getTrendingMovies(limit: number = 24): Promise<Movie[]> {
         return combined.slice(0, limit);
     } catch (error) {
         console.error("Lỗi getTrendingMovies:", error);
-        return [];
+        throw error;
     }
 }
 
@@ -39,7 +39,7 @@ export async function getNowPlayingMovies(limit: number = 24): Promise<Movie[]> 
         return combined.slice(0, limit);
     } catch (error) {
         console.error("Lỗi getNowPlayingMovies:", error);
-        return [];
+        throw error;
     }
 }
 
@@ -53,7 +53,7 @@ export async function getTopRatedMovies(): Promise<Movie[]> {
         return data.results || [];
     } catch (error) {
         console.error("Lỗi getTopRatedMovies:", error);
-        return [];
+        throw error;
     }
 }
 
@@ -81,6 +81,6 @@ export async function getSimilarMovies(id: string): Promise<Movie[]> {
         return data.results || [];
     } catch (error) {
         console.error("Lỗi getSimilarMovies:", error);
-        return [];
+        throw error;
     }
 }

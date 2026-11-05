@@ -12,6 +12,7 @@ export default function NavSearchBar() {
     const [query, setQuery] = useState("");
     const [results, setResults] = useState<Movie[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [searchFailed, setSearchFailed] = useState(false);
 
     const containerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -46,6 +47,7 @@ export default function NavSearchBar() {
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const val = e.target.value;
         setQuery(val);
+        setSearchFailed(false);
 
         if (debounceRef.current) clearTimeout(debounceRef.current);
 
@@ -67,10 +69,12 @@ export default function NavSearchBar() {
                         signal: controller.signal,
                     });
 
+                    if (controller.signal.aborted) return;
                     if (res.ok) {
                         const data: { results?: Movie[] } = await res.json();
                         setResults(data.results || []);
                     } else {
+                        setSearchFailed(true);
                         setResults([]);
                     }
                 } catch (error: unknown) {
@@ -78,6 +82,8 @@ export default function NavSearchBar() {
                         // Bỏ qua lỗi abort do người dùng gõ tiếp
                         return;
                     }
+                    if (controller.signal.aborted) return;
+                    setSearchFailed(true);
                     console.error("[NavSearchBar] Lỗi tìm kiếm:", error);
                     setResults([]);
                 } finally {
@@ -110,6 +116,7 @@ export default function NavSearchBar() {
             abortControllerRef.current.abort();
             abortControllerRef.current = null;
         }
+        setSearchFailed(false);
         setQuery("");
         setResults([]);
         setIsLoading(false);
@@ -178,7 +185,9 @@ export default function NavSearchBar() {
                     </div>
 
                     <div className="max-h-80 overflow-y-auto divide-y divide-zinc-800">
-                        {results.length > 0 ? (
+                        {searchFailed ? (
+                            <p role="alert" className="p-4 text-sm text-gray-300">Không thể tải gợi ý. Vui lòng thử lại hoặc nhấn Enter để tìm kiếm.</p>
+                        ) : results.length > 0 ? (
                             results.map((movie) => {
                                 const poster = movie.poster_path
                                     ? `https://image.tmdb.org/t/p/w92${movie.poster_path}`

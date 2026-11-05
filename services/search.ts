@@ -13,7 +13,7 @@ export async function searchMovies(query: string, limit: number = 48): Promise<M
             fetchTMDB<MovieListResponse>(
                 `/search/movie?query=${encodeURIComponent(query)}&page=1`,
                 300 // Cache 5 phút
-            ).catch(() => ({ results: [] as Movie[], page: 1, total_pages: 0, total_results: 0 })),
+            ),
             limit > 20
                 ? fetchTMDB<MovieListResponse>(
                       `/search/movie?query=${encodeURIComponent(query)}&page=2`,
@@ -25,7 +25,7 @@ export async function searchMovies(query: string, limit: number = 48): Promise<M
         return combined.slice(0, limit);
     } catch (error) {
         console.error("Lỗi searchMovies:", error);
-        return [];
+        throw error;
     }
 }
 
@@ -52,6 +52,6 @@ export async function searchQuickLive(query: string): Promise<Movie[]> {
         return filtered;
     } catch (error) {
         console.error("Lỗi searchQuickLive:", error);
-        return [];
+        throw error;
     }
 }

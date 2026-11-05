@@ -127,3 +127,19 @@ test("search service: searchQuickLive limits output to exactly 5 items", async (
     }
   }
 });
+
+
+test("search distinguishes upstream failure from valid empty results", async (t) => {
+  const originalFetch = globalThis.fetch;
+  t.after(() => { globalThis.fetch = originalFetch; });
+  process.env.TMDB_API_KEY = "test-api-key";
+  globalThis.fetch = async () => ({ ok: false, status: 503 });
+  const failed = await searchRouteHandler(new Request("http://localhost/api/search?q=Batman"));
+  assert.equal(failed.status, 500);
+  assert.equal(failed.headers.has("cache-control"), false);
+  assert.equal((await failed.json()).error, "Lỗi tìm kiếm");
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({ results: [] }) });
+  const empty = await searchRouteHandler(new Request("http://localhost/api/search?q=Batman"));
+  assert.equal(empty.status, 200);
+  assert.deepEqual(await empty.json(), { results: [] });
+});

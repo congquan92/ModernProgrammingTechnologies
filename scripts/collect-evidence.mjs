@@ -27,6 +27,7 @@ const metadata = {
   git_head: git("rev-parse", "HEAD"),
   working_tree_dirty: git("status", "--porcelain").length > 0,
   source_sha256: await fingerprint(),
+  run_id: new Date().toISOString(),
   node: process.version,
   next: JSON.parse(await readFile("node_modules/next/package.json", "utf8")).version,
   platform: process.platform,
@@ -153,7 +154,13 @@ try {
   await getHTML(`/movie/${id}`);
   const warm = await snapshot();
   assert.deepEqual(warm, refreshed, "Refreshed data must be cached again");
-  await saveJSON("cache-mock.json", { base_url: baseURL, ttl_seconds: 15, cache_components: false, before, miss, hit, after_expiry: refreshed, warm_after_refresh: warm });
+  await saveJSON("cache-mock.json", { base_url: baseURL, ttl_seconds: 15, cache_components: false, before, miss, hit, after_expiry: refreshed, warm_after_refresh: warm,
+    steps: [
+      { input: `GET /movie/${id} (cold, HTTP stream)`, counts: miss, result: "miss; main and fallbacks before auxiliary content" },
+      { input: `GET /movie/${id} (within TTL)`, counts: hit, result: "hit; no additional upstream requests" },
+      { input: `wait 16s; GET /movie/${id}; wait for refresh`, counts: refreshed, result: "one background refresh per endpoint" },
+      { input: `GET /movie/${id} (after refresh)`, counts: warm, result: "hit; refreshed data cached" },
+    ] });
 
   // Resolve build-specific action IDs, never hard-code them or log cookie values.
   const manifest = JSON.parse(await readFile(".next-evidence/server/server-reference-manifest.json", "utf8"));
@@ -184,7 +191,8 @@ try {
   assert.ok(!(await getHTML("/watchlist")).includes(`Phim minh chứng ${id}`), "A separate cookie jar must remain empty");
   await action();
   assert.ok(!(await getHTML("/watchlist", cookie)).includes(`Phim minh chứng ${id}`), "Removed movie must disappear");
-  await saveJSON("watchlist-http.json", { route: `/movie/${id}`, add_post: 200, cookie_flags: ["HttpOnly", "SameSite=Lax"], saved_on_watchlist: true, persisted_after_reload: true, separate_cookie_jar_empty: true, removed_on_watchlist: true, cookie_values: "omitted", scope: "real production Server Action HTTP requests; browser interaction/video not measured" });
+  assert.ok(!(await getHTML("/watchlist", cookie)).includes(`Phim minh chứng ${id}`), "Removal must persist after reload");
+  await saveJSON("watchlist-http.json", { route: `/movie/${id}`, add_post: 200, cookie_flags: ["HttpOnly", "SameSite=Lax"], saved_on_watchlist: true, persisted_after_reload: true, separate_cookie_jar_empty: true, removed_on_watchlist: true, removal_persisted_after_reload: true, cookie_values: "omitted", scope: "real production Server Action HTTP requests; browser interaction/video not measured" });
   assert.equal(await fingerprint(), metadata.source_sha256, "Source files changed during verification; rerun npm run evidence");
   await saveJSON("mock-runtime.json", { status: "passed", base_url: baseURL, tmdb_origin: env.TMDB_BASE_URL, mock_ttl_seconds: 15, build_directory: ".next-evidence", artifacts: ["build-mock-output.txt", "streaming-mock.json", "cache-mock.json", "watchlist-http.json"] });
   console.log("Evidence saved in baocao/evidence. Mock measurements are not TMDB/CWV benchmarks.");

@@ -11,7 +11,12 @@ interface SimilarMoviesProps {
  * Fetch song song (parallel streaming) với CastList, không chờ nhau
  */
 export default async function SimilarMovies({ movieId }: SimilarMoviesProps) {
-  const movies = await getSimilarMovies(movieId);
+  let movies;
+  try {
+    movies = await getSimilarMovies(movieId);
+  } catch {
+    return <p role="alert" className="text-gray-300 py-2">Không thể tải phim tương tự. Vui lòng thử tải lại trang.</p>;
+  }
 
   if (!movies || movies.length === 0) {
     return (

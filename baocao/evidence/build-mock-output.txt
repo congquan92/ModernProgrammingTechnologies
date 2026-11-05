@@ -1,7 +1,8 @@
-generated_at: 2026-10-29T10:35:22.891Z
-git_head: 974f24f490524cfcf4c894280ed8c1bd95002520
+generated_at: 2026-10-30T15:24:20.732Z
+git_head: 2b6cea57201a1f451975c40b1e24859ae9c0dd0b
 working_tree_dirty: true
-source_sha256: b6249d3ab56359ba3e6daea126e7845d71c48b652d758930ecf735164961f495
+source_sha256: 72bc35aebfca01869f0aee47db08ee450f440c4917c0fb62aa3cac1c83de5f76
+run_id: 2026-10-30T15:24:20.756Z
 node: v26.12.1
 next: 16.3.6
 platform: linux
@@ -11,18 +12,21 @@ command: node node_modules/next/dist/bin/next build
 
 ▲ Next.js 16.3.6 (Turbopack)
 - Environments: .env.local
-✓ Running next.config.ts took 37ms
+⚠ Warning: Next.js ignored package-lock.json in /home/quocdai210 because it is outside the current Git repository (/home/quocdai210/Projects/ModernProgrammingTechnologies).
+ To use this directory, set `turbopack.root` in your Next.js config.
+
+✓ Running next.config.ts took 34ms
 
   Creating an optimized production build ...
-✓ Compiled successfully in 637ms
+✓ Compiled successfully in 563ms
   Running TypeScript ...
-  Finished TypeScript in 2.1s ...
+  Finished TypeScript in 2.3s ...
   Collecting page data using 12 workers ...
   Generating static pages using 12 workers (0/10) ...
   Generating static pages using 12 workers (2/10) 
   Generating static pages using 12 workers (4/10) 
   Generating static pages using 12 workers (7/10) 
-✓ Generating static pages using 12 workers (10/10) in 1001ms
+✓ Generating static pages using 12 workers (10/10) in 805ms
   Finalizing page optimization ...
 
 Route (app)       Revalidate  Expire

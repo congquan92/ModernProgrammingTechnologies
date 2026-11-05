@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
-import { getMovieDetails, getMovieVideos, selectBestTrailer } from "@/services/tmdb";
+import { getMovieDetails, getMovieVideos, selectBestTrailer, TMDBError } from "@/services/tmdb";
 import { formatRuntime } from "@/utils/formatRuntime";
 import CastList from "@/components/server/CastList";
 import CastSkeleton from "@/components/server/CastSkeleton";
@@ -45,11 +45,9 @@ export async function generateMetadata(
           : [],
       },
     };
-  } catch {
-    return {
-      title: "Không tìm thấy phim | MovieHub",
-      description: "Bộ phim bạn tìm kiếm không tồn tại hoặc đã bị gỡ bỏ.",
-    };
+  } catch (error) {
+    if (error instanceof TMDBError && error.status === 404) notFound();
+    throw error;
   }
 }
 
@@ -64,15 +62,16 @@ export default async function MovieDetailPage({ params }: MovieDetailPageProps) 
   const { id } = await params;
   if (!/^[1-9]\d*$/.test(id)) notFound();
 
-  // Lấy thông tin phim chính — nếu lỗi hoặc không tồn tại sẽ chuyển sang 404
+  // Chỉ trả 404 khi phim không tồn tại; lỗi dịch vụ tới error boundary.
   let movie;
   try {
     movie = await getMovieDetails(id);
     if (!movie || !movie.id) {
       notFound();
     }
-  } catch {
-    notFound();
+  } catch (error) {
+    if (error instanceof TMDBError && error.status === 404) notFound();
+    throw error;
   }
 
   const backdropUrl = movie.backdrop_path

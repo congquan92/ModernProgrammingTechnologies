@@ -1,7 +1,14 @@
 import type { Movie } from "@/types/tmdb";
 
 const TMDB_BASE_URL = process.env.TMDB_BASE_URL || "https://api.themoviedb.org/3";
-const TMDB_API_KEY = process.env.TMDB_API_KEY;
+export class TMDBError extends Error {
+    status: number;
+    constructor(message: string, status = 0) {
+        super(message);
+        this.name = "TMDBError";
+        this.status = status;
+    }
+}
 
 /**
  * Hàm gọi API TMDB trên Server với Data Cache theo thời hạn.
@@ -15,9 +22,10 @@ export async function fetchTMDB<T>(
     revalidateTime: number = 3600,
     language: string = "vi-VN"
 ): Promise<T> {
+    const TMDB_API_KEY = process.env.TMDB_API_KEY;
     if (!TMDB_API_KEY || TMDB_API_KEY === "your_actual_api_key_here") {
         console.warn(`[TMDB Service] Cảnh báo: TMDB_API_KEY chưa được cấu hình hợp lệ trong .env.local!`);
-        throw new Error("TMDB_API_KEY chưa được thiết lập.");
+        throw new TMDBError("TMDB_API_KEY chưa được thiết lập.");
     }
 
     // Chỉ rút ngắn TTL khi kiểm chứng bằng mock loopback; không đổi TTL TMDB thật.
@@ -38,24 +46,19 @@ export async function fetchTMDB<T>(
     const langParam = language ? `&language=${language}` : "";
     const url = `${TMDB_BASE_URL}${endpoint}${delimiter}api_key=${TMDB_API_KEY}${langParam}`;
 
-    const options: RequestInit & { next?: { revalidate: number } } = {
-        next: { revalidate: revalidateTime },
-    };
-    // ponytail: non-enumerable signal preserves options deepEqual in server-fetch test while enforcing 10s timeout on native fetch.
-    Object.defineProperty(options, "signal", {
-        value: AbortSignal.timeout(10000),
-        enumerable: false,
-        configurable: true,
-        writable: true,
-    });
-
-    const res = await fetch(url, options);
-
-    if (!res.ok) {
-        throw new Error(`Lỗi gọi API TMDB [${res.status}]: ${res.statusText}`);
+    try {
+        const res = await fetch(url, {
+            next: { revalidate: revalidateTime },
+            signal: AbortSignal.timeout(10000),
+        });
+        if (!res.ok) throw new TMDBError(`Lỗi gọi API TMDB [${res.status}]`, res.status);
+        return await res.json() as T;
+    } catch (error) {
+        if (error instanceof TMDBError) throw error;
+        // ponytail: log only safe context; add request IDs if distributed tracing is needed.
+        console.error("[TMDB] Request failed", endpoint.split("?")[0]);
+        throw new TMDBError("Không thể tải dữ liệu phim. Vui lòng thử lại.");
     }
-
-    return res.json() as Promise<T>;
 }
 
 /**

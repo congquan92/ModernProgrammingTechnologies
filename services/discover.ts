@@ -61,10 +61,7 @@ export async function discoverMovies(params: DiscoverParams): Promise<{ results:
         };
 
         const [firstData, secondData] = await Promise.all([
-            fetchPage(firstTmdbPage).catch((err) => {
-                console.error(`Lỗi fetchTMDB page ${firstTmdbPage}:`, err);
-                return { page: firstTmdbPage, results: [] as Movie[], total_pages: 0, total_results: 0 };
-            }),
+            fetchPage(firstTmdbPage),
             secondTmdbPage !== firstTmdbPage && secondTmdbPage <= 500
                 ? fetchPage(secondTmdbPage).catch((err) => {
                       console.error(`Lỗi fetchTMDB page ${secondTmdbPage}:`, err);
@@ -112,6 +109,6 @@ export async function discoverMovies(params: DiscoverParams): Promise<{ results:
         };
     } catch (error) {
         console.error("Lỗi discoverMovies:", error);
-        return { results: [], totalPages: 1, totalResults: 0 };
+        throw error;
     }
 }
