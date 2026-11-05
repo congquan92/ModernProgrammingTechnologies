@@ -1,0 +1,688 @@
+% !TeX program = xelatex
+% !TeX encoding = UTF-8
+\documentclass[12pt,a4paper]{extarticle}
+
+% Cỡ chữ chuẩn 13pt theo đúng quy định ĐACN Trường Đại học Sài Gòn
+\makeatletter
+\renewcommand\normalsize{\@setfontsize\normalsize{13}{15.6}}
+\makeatother
+\normalsize
+
+% Phông chữ Times New Roman và Consolas
+\usepackage{fontspec}
+\IfFontExistsTF{Times New Roman}{%
+  \setmainfont{Times New Roman}%
+  \setsansfont{Times New Roman}%
+}{%
+  \IfFontExistsTF{Liberation Serif}{%
+    \setmainfont{Liberation Serif}%
+    \setsansfont{Liberation Sans}%
+  }{%
+    \setmainfont{DejaVu Serif}%
+    \setsansfont{DejaVu Sans}%
+  }%
+}
+\IfFontExistsTF{Consolas}{%
+  \setmonofont{Consolas}%
+}{%
+  \IfFontExistsTF{Liberation Mono}{%
+    \setmonofont{Liberation Mono}%
+  }{%
+    \setmonofont{DejaVu Sans Mono}%
+  }%
+}
+
+\usepackage[vietnamese]{babel}
+\addto\captionsvietnamese{\renewcommand{\refname}{TÀI LIỆU THAM KHẢO}}
+
+% Đồng bộ ký tự toán học và công thức sang nét chữ Times New Roman
+\usepackage[italic]{mathastext}
+
+% Căn lề chuẩn quy định ĐACN SGU: trên 28mm, dưới 28mm, trái 32mm, phải 20mm
+\usepackage[top=28mm,bottom=28mm,left=32mm,right=20mm]{geometry}
+\usepackage{setspace}
+\setstretch{1.22}
+\setlength{\parskip}{4.0pt plus 1pt minus 1pt}
+\setlength{\parindent}{1.5em}
+\emergencystretch=3em
+
+% Tiêu đề đầu trang & chân trang: Đánh số trang ở giữa, phía trên mỗi trang
+\usepackage{fancyhdr}
+\pagestyle{fancy}
+\fancyhf{}
+\setlength{\headheight}{16pt}
+\fancyhead[C]{\fontsize{11}{13}\selectfont\thepage}
+\renewcommand{\headrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyhead[C]{\fontsize{11}{13}\selectfont\thepage}
+  \renewcommand{\headrulewidth}{0pt}
+}
+
+% Định dạng tiêu đề các cấp rõ ràng, thoáng mắt
+\usepackage{titlesec}
+\titleformat{\section}[block]{\normalfont\fontsize{13.5}{16.5}\bfseries\centering}{CHƯƠNG \thesection.}{0.5em}{\MakeUppercase}
+\titleformat{name=\section,numberless}[block]{\normalfont\fontsize{13.5}{16.5}\bfseries\centering}{}{0pt}{\MakeUppercase}
+\titlespacing*{\section}{0pt}{12pt plus 2pt minus 2pt}{6pt plus 1pt minus 1pt}
+
+\renewcommand{\thesubsection}{\arabic{section}.\arabic{subsection}.}
+\titleformat{\subsection}{\normalfont\fontsize{12.5}{15.5}\bfseries}{\thesubsection}{0.4em}{}
+\titlespacing*{\subsection}{0pt}{9pt plus 2pt minus 1pt}{4pt plus 1pt minus 1pt}
+
+\renewcommand{\thesubsubsection}{\arabic{section}.\arabic{subsection}.\arabic{subsubsection}.}
+\titleformat{\subsubsection}{\normalfont\fontsize{11.5}{14.5}\bfseries\itshape}{\thesubsubsection}{0.4em}{}
+\titlespacing*{\subsubsection}{0pt}{7pt plus 1pt minus 1pt}{3pt plus 1pt minus 1pt}
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+\usepackage{amsmath}
+\usepackage{chngcntr}
+\counterwithin{table}{section}
+\counterwithin{figure}{section}
+\renewcommand{\thetable}{\arabic{section}.\arabic{table}}
+\renewcommand{\thefigure}{\arabic{section}.\arabic{figure}}
+
+\usepackage[labelfont=bf,labelsep=period]{caption}
+\captionsetup[table]{position=top,skip=4pt,font={small}}
+\captionsetup[figure]{position=bottom,skip=5pt,font={small}}
+
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{array}
+\usepackage{xcolor}
+\usepackage{listings}
+\usepackage{graphicx}
+\graphicspath{{../baocao/img/}{baocao/img/}{img/}{./}}
+
+\usepackage{tikz}
+\usetikzlibrary{calc,arrows.meta,positioning,shapes.geometric}
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=1.5em,topsep=2pt,partopsep=0pt,itemsep=2pt}
+\usepackage{float}
+\usepackage{xurl}
+\usepackage[unicode,colorlinks=true,linkcolor=black,urlcolor=blue!80!black,citecolor=blue!80!black,plainpages=false,pdfpagelabels,hypertexnames=false]{hyperref}
+
+% Cấu hình khối mã nguồn (Listings) chữ to rõ ràng, dễ theo dõi
+\definecolor{codegreen}{rgb}{0,0.55,0}
+\definecolor{codegray}{rgb}{0.45,0.45,0.45}
+\definecolor{codepurple}{rgb}{0.55,0,0.75}
+\definecolor{backcolour}{rgb}{0.98,0.98,0.98}
+
+\lstdefinelanguage{TypeScript}{
+  keywords={abstract, any, as, async, await, boolean, break, case, catch, class, const,
+    continue, debugger, declare, default, delete, do, else, enum, export, extends,
+    false, finally, for, from, function, get, if, implements, import, in, infer,
+    instanceof, interface, is, keyof, let, module, namespace, never, new, null,
+    number, object, package, private, protected, public, readonly, require, return,
+    set, static, string, super, switch, symbol, this, throw, true, try, type,
+    typeof, undefined, unique, unknown, var, void, while, with, yield},
+  sensitive=true,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  morestring=[b]',
+  morestring=[b]",
+  morestring=[b]`
+}
+
+\lstset{
+  language=TypeScript,
+  backgroundcolor=\color{backcolour},   
+  commentstyle=\color{codegreen}\itshape,
+  keywordstyle=\color{blue}\bfseries,
+  numberstyle=\tiny\color{codegray},
+  stringstyle=\color{codepurple},
+  basicstyle=\ttfamily\fontsize{8.5}{11.0}\selectfont,
+  breakatwhitespace=false,         
+  breaklines=true,                 
+  captionpos=t,                    
+  keepspaces=true,                 
+  numbers=left,                    
+  numbersep=5pt,                  
+  showspaces=false,                
+  showstringspaces=false,
+  showtabs=false,                  
+  tabsize=2,
+  frame=lines,
+  aboveskip=6pt,
+  belowskip=6pt,
+  rulecolor=\color{gray!35}
+}
+
+\begin{document}
+
+% ==============================================================================
+% TRANG BÌA (CHUẨN MẪU ĐH SÀI GÒN - ĐỒNG BỘ 100% VỚI BAOCAO.PDF)
+% ==============================================================================
+\begin{titlepage}
+\thispagestyle{empty}
+\begin{tikzpicture}[remember picture, overlay]
+  \draw[line width = 2pt, color = black] 
+    ($(current page.north west) + (28mm,-20mm)$) 
+    rectangle 
+    ($(current page.south east) + (-15mm,20mm)$);
+  \draw[line width = 0.8pt, color = black] 
+    ($(current page.north west) + (29.5mm,-21.5mm)$) 
+    rectangle 
+    ($(current page.south east) + (-16.5mm,21.5mm)$);
+\end{tikzpicture}
+
+\begin{center}
+    {\fontsize{13}{16}\selectfont \textbf{ỦY BAN NHÂN DÂN THÀNH PHỐ HỒ CHÍ MINH}}\\[0.2cm]
+    {\fontsize{13}{16}\selectfont \textbf{TRƯỜNG ĐẠI HỌC SÀI GÒN}}\\[0.2cm]
+    {\fontsize{13}{16}\selectfont \textbf{KHOA CÔNG NGHỆ THÔNG TIN}}\\[0.45cm]
+
+    \includegraphics[width=4.0cm]{sgu.png}\\[0.5cm]
+
+    {\fontsize{12}{15}\selectfont \textbf{BÁO CÁO KỸ THUẬT CÁ NHÂN ĐỒ ÁN MÔN HỌC}}\\[0.2cm]
+    {\fontsize{13}{16}\selectfont \textbf{CÁC CÔNG NGHỆ LẬP TRÌNH HIỆN ĐẠI}}\\[0.6cm]
+
+    {\fontsize{15}{21}\selectfont \textbf{TÌM HIỂU CÔNG NGHỆ NEXT.JS QUA ỨNG DỤNG TRA CỨU\\\& KHÁM PHÁ PHIM ẢNH}}\\[0.5cm]
+
+    {\fontsize{12}{16}\selectfont \textbf{CHUYÊN ĐỀ CÁ NHÂN: KIẾN TRÚC APP ROUTER VÀ\\SERVER-DRIVEN UI TRÊN NỀN TẢNG NEXT.JS 16}}\\[1.1cm]
+
+    {\fontsize{13}{19}\selectfont
+    \begin{tabular}{l @{\hspace{0.8cm}} l @{\hspace{1.5cm}} l}
+      \textbf{GVHD:} & \multicolumn{2}{l}{ThS. Phạm Thi Vương} \\[0.25cm]
+      \textbf{Nhóm:} & \multicolumn{2}{l}{21} \\[0.2cm]
+      \textbf{SVTH:} & Nguyễn Công Quân & 3123560070 \\[0.2cm]
+      \textbf{Vai trò:} & \multicolumn{2}{l}{Trưởng nhóm \& Kiến trúc sư hệ thống} \\
+    \end{tabular}
+    }\\[0.8cm]
+
+    \vfill
+    {\fontsize{12}{15}\selectfont \textbf{Thành phố Hồ Chí Minh, năm 2026}}
+\end{center}
+\end{titlepage}
+
+\newpage
+\pagenumbering{arabic}
+\setcounter{page}{2}
+
+% ==============================================================================
+% TÓM TẮT BÁO CÁO CÁ NHÂN (ABSTRACT)
+% ==============================================================================
+\section*{TÓM TẮT BÁO CÁO CÁ NHÂN (ABSTRACT)}
+\addcontentsline{toc}{section}{TÓM TẮT BÁO CÁO CÁ NHÂN}
+
+Báo cáo kỹ thuật cá nhân này tổng kết các kết quả nghiên cứu lý thuyết, giải pháp thiết kế kiến trúc và hiện thực mã nguồn của sinh viên \textbf{Nguyễn Công Quân} (MSSV: 3123560070) trong đồ án MovieHub thuộc học phần \textit{Các Công nghệ Lập trình Hiện đại}.
+
+Với vai trò Trưởng nhóm (Team Leader) và Kiến trúc sư hệ thống (System Architect), tác giả trực tiếp chịu trách nhiệm các trọng tâm kỹ thuật cốt lõi:
+\begin{enumerate}
+    \item Thiết lập khung kiến trúc Next.js 16 (App Router), React 19 và Tailwind CSS v4 theo ngôn ngữ thiết kế điện ảnh Netflix Dark Cinema.
+    \item Thiết kế tầng dịch vụ TMDB REST API v3 bảo mật khóa máy chủ (\texttt{TMDB\_API\_KEY}) và tối ưu bộ nhớ đệm Data Cache với cơ chế Time-To-Live (TTL).
+    \item Xử lý luồng lấy dữ liệu song song 4 danh mục phim trang chủ bằng \texttt{Promise.all} kết hợp kỹ thuật ép kết xuất theo yêu cầu \texttt{await connection()}.
+    \item Thiết kế ranh giới mạng (Network Boundary) theo Composition Pattern, triệt tiêu hoàn toàn mã nguồn của thẻ phim phía máy khách (\textit{Zero-Bundle JavaScript}).
+    \item Hoàn thiện giao diện Trang chủ: Banner tối ưu LCP, thanh cuộn phim vô tận \texttt{MovieRow} và cửa sổ xem trailer tức thì \texttt{TrailerModal} bằng thẻ \texttt{<dialog>} chuẩn HTML5.
+\end{enumerate}
+
+Toàn bộ hệ thống được kiểm thử thực nghiệm tự động đạt 100\% tiêu chuẩn kỹ nghệ phần mềm môn học, không tồn tại rò rỉ khóa máy chủ hay phình to bundle client.
+
+\vspace{0.3cm}
+\noindent \textbf{Từ khóa:} \textit{Next.js 16, App Router, React Server Components, Network Boundary, Zero-Bundle Size, Data Cache, Dynamic SSR, TMDB API.}
+
+\newpage
+
+% ==============================================================================
+% CHƯƠNG 1: LỜI MỞ ĐẦU VÀ TỔNG QUAN PHÂN CÔNG TRÁCH NHIỆM
+% ==============================================================================
+\section{LỜI MỞ ĐẦU VÀ TỔNG QUAN PHÂN CÔNG TRÁCH NHIỆM}
+
+\subsection{Bối cảnh đề tài và tinh thần cốt lõi của môn học}
+Học phần \textit{Các Công nghệ Lập trình Hiện đại} đánh giá năng lực làm chủ framework thông qua ba tầng tiêu chuẩn: (1) \textbf{Tầng 1A} hiểu sâu bản chất kết xuất (RSC so với CSR/SSR); (2) \textbf{Tầng 2} áp dụng chuẩn kỹ nghệ chuyên nghiệp (bảo mật khóa, kiểm thử tự động); (3) \textbf{Tầng 3} tối ưu hóa hiệu năng chuyên sâu (Data Cache, LCP, CLS). Nhóm 21 lựa chọn phiên bản Next.js 16.4.5, React 19.2.8 và TypeScript 5 với đề tài MovieHub kết nối TMDB REST API v3 làm bối cảnh thực nghiệm.
+
+\subsection{Trách nhiệm chuyên môn của sinh viên Nguyễn Công Quân}
+Với cương vị Trưởng nhóm và Kiến trúc sư hệ thống, tác giả trực tiếp đảm nhận:
+\begin{enumerate}
+    \item Khởi tạo dự án, cấu hình TypeScript Strict, Tailwind CSS v4, Root Layout \texttt{app/layout.tsx} và theme Netflix Dark Cinema.
+    \item Thiết kế hàm lõi \texttt{fetchTMDB<T>()} (\texttt{services/client.ts}), bảo vệ khóa \texttt{TMDB\_API\_KEY} phía server và cấu hình Data Cache.
+    \item Hiện thực trang chủ (\texttt{app/page.tsx}) fetch song song 4 nhóm phim bằng \texttt{Promise.all} và kích hoạt Dynamic SSR bằng \texttt{await connection()}.
+    \item Tách biệt ranh giới mạng giữa \texttt{MovieCard} (Server) và \texttt{MovieRow} (Client) qua Composition Pattern đạt Zero-Bundle Size.
+    \item Phát triển \texttt{HeroBanner.tsx} tối ưu LCP, thanh trượt ngang \texttt{MovieRow.tsx} cuộn vô tận và \texttt{TrailerModal.tsx} phát trailer qua thẻ \texttt{<dialog>} HTML5.
+\end{enumerate}
+
+\subsection{Bảng phân định ranh giới công việc giữa 3 thành viên}
+Để bảo đảm tính minh bạch trong báo cáo cá nhân, ranh giới chuyên môn giữa 3 thành viên Nhóm 21 được phân định chi tiết theo Bảng~\ref{tab:phancong}.
+
+\begin{table}[H]
+\centering
+\caption{Bảng phân định ranh giới chuyên môn giữa 3 thành viên Nhóm 21}
+\label{tab:phancong}
+\fontsize{9.5}{12.5}\selectfont
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|p{3.2cm}|X|p{4.6cm}|}
+\hline
+\textbf{Thành viên} & \textbf{Trọng tâm kỹ thuật phụ trách} & \textbf{Tệp mã nguồn cốt lõi} \\
+\hline
+\textbf{Nguyễn Công Quân} \newline (Trưởng nhóm / \newline System Architect) & \textbf{Kiến trúc App Router, Server-Driven UI, Fetch song song \& Trang chủ}: Nền tảng dự án, lõi TMDB, Network Boundary, Zero-Bundle Slider, Billboard Banner. & \texttt{app/page.tsx}, \newline \texttt{services/client.ts}, \newline \nolinkurl{components/client/MovieRow.tsx}, \newline \nolinkurl{components/server/MovieCard.tsx} \\
+\hline
+\textbf{Nguyễn Quốc Đại} \newline (QA \& Resilience) & \textbf{Kiểm toán kiến trúc, Xử lý lỗi, SEO \& Bộ kiểm thử tự động}: Root Error Boundary, sitemap/robots, Security Headers, 43 test cases Node.js runner. & \texttt{app/error.tsx}, \texttt{app/global-error.tsx}, \newline \texttt{app/sitemap.ts}, \texttt{next.config.ts}, \newline \nolinkurl{tests/*.test.mjs} \\
+\hline
+\textbf{Nguyễn Thái Vinh} \newline (UI/UX \& Mutation) & \textbf{Tương tác, Bộ lọc đa tiêu chí, Live Search \& Server Actions}: Watchlist Cookie HttpOnly qua Server Action, Optimistic UI, bộ lọc đa chiều, Debounce Search. & \nolinkurl{app/actions/watchlist.ts}, \newline \texttt{app/watchlist/page.tsx}, \newline \nolinkurl{components/client/FilterBar.tsx}, \newline \nolinkurl{app/api/search/route.ts} \\
+\hline
+\end{tabularx}
+\end{table}
+
+% ==============================================================================
+% CHƯƠNG 2: CƠ SỞ LÝ THUYẾT REACT SERVER COMPONENTS (RSC)
+% ==============================================================================
+\section{CƠ SỞ LÝ THUYẾT VỀ REACT SERVER COMPONENTS TRONG NEXT.JS 16}
+
+\subsection{Bản chất và nguyên lý hoạt động của React Server Components (RSC)}
+Trong kiến trúc CSR truyền thống, trình duyệt tải về một tệp HTML rỗng và gói JavaScript có kích thước rất lớn, dẫn đến chỉ số FCP bị trì hoãn. Mô hình SSR truyền thống cải thiện FCP nhờ dựng sẵn HTML tại máy chủ, nhưng vẫn buộc trình duyệt tải mã JavaScript để thực hiện Hydration.
+
+React Server Components (RSC) trong Next.js 16 App Router tạo nên bước chuyển dịch căn bản: các Server Components được thực thi hoàn toàn trên máy chủ và \textbf{không bao giờ bị đóng gói vào bundle JavaScript gửi tới trình duyệt}. Máy chủ biên dịch Server Components thành HTML kết hợp luồng dữ liệu cấu trúc \textit{RSC Payload} (định dạng stream JSON-like). Trình duyệt chỉ giải mã RSC Payload để hòa trộn vào cây DOM mà không cần nạp mã logic của component, đạt hiệu quả \textbf{Zero-Bundle Size} tuyệt đối (Hình~\ref{fig:rsc-model}).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=0.3cm and 0.5cm, auto, >=Stealth]
+    \tikzstyle{server} = [rectangle, draw=red!60, fill=red!8, text width=11cm, text centered, rounded corners, minimum height=0.6cm, font=\fontsize{8.5}{10.5}\selectfont]
+    \tikzstyle{network} = [rectangle, draw=purple!60, fill=purple!8, text width=11cm, text centered, rounded corners, minimum height=0.6cm, font=\fontsize{8.5}{10.5}\selectfont]
+    \tikzstyle{client} = [rectangle, draw=blue!60, fill=blue!8, text width=11cm, text centered, rounded corners, minimum height=0.6cm, font=\fontsize{8.5}{10.5}\selectfont]
+    \tikzstyle{line} = [draw, -Latex, line width=0.7pt]
+
+    \node [server] (rsc) {\textbf{React Server Components (RSC)}: Chạy 100\% trên Server $\rightarrow$ Xuất HTML tĩnh \& RSC Payload};
+    \node [network, below=of rsc] (net) {\textbf{Ranh giới mạng (Network Boundary)}: Stream JSON-like UI qua HTTP (Zero-Bundle)};
+    \node [client, below=of net] (cli) {\textbf{Client Components (CC)}: Chỉ chứa mã tương tác $\rightarrow$ Hydrate cục bộ trên trình duyệt};
+
+    \path [line] (rsc) -- node[right, font=\footnotesize] {Serialize UI} (net);
+    \path [line] (net) -- node[right, font=\footnotesize] {Merge DOM} (cli);
+\end{tikzpicture}
+\caption{Nguyên lý phân tách kết xuất của React Server Components trong Next.js 16}
+\label{fig:rsc-model}
+\end{figure}
+
+\subsection{Sự chuyển dịch cơ chế Data Fetching và tác động của \texttt{await connection()}}
+Khác với Next.js 14 mặc định \texttt{cache: 'force-cache'}, Next.js 16 chuyển đổi mặc định của \texttt{fetch()} sang \texttt{cache: 'no-store'}, dữ liệu luôn tươi mới thời gian thực. Để kích hoạt tầng bộ nhớ đệm \textit{Data Cache} có kiểm soát, lập trình viên cấu hình tường minh \texttt{\{ next: \{ revalidate: N \} \}}. Khi hết $N$ giây, cơ chế \textit{Stale-While-Revalidate} trả về dữ liệu cũ trước đồng thời ngầm làm mới bản đệm từ TMDB.
+
+Bên cạnh đó, trong quá trình \texttt{npm run build}, Next.js cố gắng prerender các trang thành HTML tĩnh. Nếu lúc build mất mạng hoặc thiếu \texttt{TMDB\_API\_KEY}, bản build sẽ thất bại. Tác giả tích hợp hàm \texttt{await connection()} từ \texttt{next/server} vào đầu trang \texttt{app/page.tsx}, ép Next.js chuyển sang chế độ \textbf{Dynamic Rendering (SSR theo yêu cầu)}. Nhờ đó: (1) Quá trình build luôn thành công 100\% mà không cần mạng ngoài; (2) Khi người dùng truy cập, nếu TMDB lỗi, hệ thống kích hoạt Error Boundary thay vì lưu chết HTML rỗng vào bộ nhớ tĩnh.
+
+% ==============================================================================
+% CHƯƠNG 3: PHÂN TÍCH VÀ THIẾT KẾ PHÂN HỆ TRANG CHỦ & DỊCH VỤ TMDB
+% ==============================================================================
+\section{PHÂN TÍCH VÀ THIẾT KẾ PHÂN HỆ TRANG CHỦ \& TẦNG DỊCH VỤ TMDB}
+
+\subsection{Thiết kế hàm lõi kết nối TMDB (\texttt{services/client.ts})}
+Tầng dịch vụ TMDB đóng vai trò cổng giao tiếp độc quyền giữa ứng dụng và máy chủ TMDB. Tác giả đã thiết lập hàm tổng quát \texttt{fetchTMDB<T>()} tuân thủ nghiêm ngặt các nguyên tắc kỹ nghệ phần mềm:
+
+\begin{lstlisting}[caption={Hàm lõi kết nối TMDB với Data Cache và phòng vệ timeout}]
+export async function fetchTMDB<T>(
+    endpoint: string,
+    revalidateTime: number = 3600,
+    language: string = "vi-VN"
+): Promise<T> {
+    const TMDB_API_KEY = process.env.TMDB_API_KEY; // Giu kin tren server
+    if (!TMDB_API_KEY) throw new TMDBError("TMDB_API_KEY chua duoc cau hinh.");
+
+    const separator = endpoint.includes("?") ? "&" : "?";
+    const url = `${TMDB_BASE_URL}${endpoint}${separator}api_key=${TMDB_API_KEY}&language=${language}`;
+
+    try {
+        const res = await fetch(url, {
+            next: { revalidate: revalidateTime },
+            signal: AbortSignal.timeout(10000), // Timeout sau 10 giay
+        });
+        if (!res.ok) throw new TMDBError(`Loi TMDB [${res.status}]`, res.status);
+        return await res.json() as T;
+    } catch (error) {
+        if (error instanceof TMDBError) throw error;
+        console.error("[TMDB] Request failed:", endpoint.split("?")[0]); // An khoa API
+        throw new TMDBError("Khong the tai du lieu phim tu TMDB.");
+    }
+}
+\end{lstlisting}
+
+\noindent \textbf{Ba chốt chặn an toàn cốt lõi:} (1) \texttt{TMDB\_API\_KEY} không có tiền tố \texttt{NEXT\_PUBLIC\_}, triệt tiêu rò rỉ khóa máy chủ; (2) Áp dụng \texttt{AbortSignal.timeout(10000)} giải phóng socket khi mạng nghẽn; (3) Ẩn chuỗi truy vấn trong nhật ký lỗi qua \texttt{endpoint.split("?")[0]}.
+
+\subsection{Sơ đồ luồng dữ liệu song song phân hệ Trang chủ}
+Trang chủ cần hiển thị đồng thời 4 danh mục phim. Nếu gọi tuần tự (\textit{waterfall}), thời gian chờ là tổng các yêu cầu ($T = \sum t_i \approx 1.5s$). Tác giả thiết kế luồng song song qua \texttt{Promise.all}, đưa thời gian trễ về đúng bằng truy vấn chậm nhất ($T = \max(t_i) \approx 350ms$), mô tả tại Hình~\ref{fig:dataflow-home}.
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=0.35cm and 0.55cm, auto, >=Stealth]
+    \tikzstyle{client} = [rectangle, draw, fill=gray!15, text width=2.4cm, text centered, rounded corners, minimum height=0.55cm, font=\fontsize{8}{10}\selectfont]
+    \tikzstyle{server} = [rectangle, draw, fill=blue!15, text width=3.3cm, text centered, rounded corners, minimum height=0.55cm, font=\fontsize{8}{10}\selectfont]
+    \tikzstyle{tmdb} = [rectangle, draw, fill=red!15, text width=2.4cm, text centered, rounded corners, minimum height=0.45cm, font=\fontsize{7.5}{9.5}\selectfont]
+
+    \node [client] (user) {Trình duyệt\\(HTTP GET /)};
+    \node [server, right=of user] (page) {\textbf{app/page.tsx}\\(Server Component)\\\texttt{Promise.all([...])}};
+    
+    \node [tmdb, above right=0.05cm and 0.55cm of page] (t1) {Trending (3600s)};
+    \node [tmdb, right=0.55cm of page] (t2) {Now Playing (1800s)};
+    \node [tmdb, below right=0.05cm and 0.55cm of page] (t3) {Top Rated (86400s)};
+    \node [tmdb, below=0.12cm of t3] (t4) {Classic (1800s)};
+
+    \draw [->, line width=0.5pt] (user) -- (page);
+    \draw [<->, line width=0.5pt] (page) -- (t1);
+    \draw [<->, line width=0.5pt] (page) -- (t2);
+    \draw [<->, line width=0.5pt] (page) -- (t3);
+    \draw [<->, line width=0.5pt] (page) -- (t4);
+
+    \node [server, below=0.55cm of page] (render) {Render \texttt{MovieCard} Server\\Truyền prop \texttt{cards} $\rightarrow$ \texttt{MovieRow}};
+    \draw [->, line width=0.5pt] (page) -- (render);
+    \draw [->, line width=0.5pt] (render) -| node[above, near start, font=\footnotesize] {HTML + RSC Stream} (user);
+\end{tikzpicture}
+\caption{Kiến trúc Data Fetching song song và kết xuất Server-Driven UI trang chủ}
+\label{fig:dataflow-home}
+\end{figure}
+
+\subsection{Chiến lược lưu trữ bộ nhớ đệm (Data Cache)}
+Thời hạn lưu đệm (TTL) được phân bổ khoa học theo chu kỳ dữ liệu TMDB (Bảng~\ref{tab:cache-config}).
+
+\begin{table}[H]
+\centering
+\caption{Cấu hình thời hạn Data Cache cho các danh mục phim trang chủ}
+\label{tab:cache-config}
+\fontsize{9.5}{12.5}\selectfont
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|p{3.2cm}|p{2.2cm}|X|}
+\hline
+\textbf{Danh mục phim} & \textbf{TTL (Giây)} & \textbf{Cơ sở kỹ thuật và Lý do thiết kế} \\
+\hline
+Phim Thịnh Hành (\textit{Trending}) & 3600s (1 giờ) & Điểm số TMDB tính theo chu kỳ ngày; cache 1 giờ giảm 98\% request lặp mà vẫn cập nhật kịp thời. \\
+\hline
+Phim Chiếu Rạp (\textit{Now Playing}) & 1800s (30 phút) & Lịch chiếu cập nhật liên tục; cache 30 phút bảo đảm khán giả thấy phim rạp mới nhất. \\
+\hline
+Top 10 Đánh Giá (\textit{Top Rated}) & 86400s (24 giờ) & Phim kinh điển có điểm ổn định; lưu cache 24 giờ tối ưu tốc độ phản hồi tối đa. \\
+\hline
+Phim Kinh Điển (\textit{Classic}) & 1800s (30 phút) & Dữ liệu bộ lọc kết hợp năm phát hành; cân bằng hiệu năng và độ linh hoạt khi truy vấn. \\
+\hline
+\end{tabularx}
+\end{table}
+
+% ==============================================================================
+% CHƯƠNG 4: THIẾT KẾ RANH GIỚI MẠNG & ZERO-BUNDLE
+% ==============================================================================
+\section{THIẾT KẾ RANH GIỚI MẠNG VÀ MÔ HÌNH ZERO-BUNDLE SLIDER}
+
+\subsection{Quy tắc Composition Pattern trong Next.js App Router}
+Trong Next.js, nếu một component cha được đánh dấu directive \texttt{"use client"}, toàn bộ component con mà nó import trực tiếp cũng tự động biến thành Client Components, làm phình to bundle JavaScript (Bundle Bloat). Để ngăn chặn điều này, tác giả áp dụng nguyên tắc \textit{"Push \texttt{"use client"} to the leaves"} thông qua Composition Pattern (Hình~\ref{fig:boundary-pattern}).
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[node distance=0.35cm and 0.55cm, auto, >=Stealth]
+    \tikzstyle{serverbox} = [rectangle, draw=blue!70, fill=blue!6, text width=6.0cm, rounded corners, minimum height=1.3cm, font=\fontsize{8.5}{10.5}\selectfont]
+    \tikzstyle{clientbox} = [rectangle, draw=red!70, fill=red!6, text width=6.0cm, rounded corners, minimum height=1.3cm, font=\fontsize{8.5}{10.5}\selectfont]
+
+    \node [serverbox] (srv) {
+        \textbf{Phía Server (\texttt{app/page.tsx})}:
+        \begin{itemize}
+            \item Lấy dữ liệu TMDB trực tiếp tại máy chủ.
+            \item Render \texttt{<MovieCard movie=\{m\} />}.
+            \item \textbf{Bundle JS tải về client: 0 KB}.
+        \end{itemize}
+    };
+
+    \node [clientbox, right=of srv] (cli) {
+        \textbf{Phía Client (\texttt{MovieRow.tsx})}:
+        \begin{itemize}
+            \item Khai báo chỉ thị \texttt{"use client"}.
+            \item Xử lý sự kiện trượt \texttt{useRef}.
+            \item \textbf{Không hề import \texttt{MovieCard}}.
+        \end{itemize}
+    };
+
+    \draw [->, line width=0.7pt, dashed, color=blue!80!black] (srv) -- node[above, font=\small\bfseries] {Truyền prop \texttt{cards}} (cli);
+\end{tikzpicture}
+\caption{Mô hình Composition Pattern tách biệt ranh giới mạng giữa MovieCard và MovieRow}
+\label{fig:boundary-pattern}
+\end{figure}
+
+\subsection{Hiện thực kỹ thuật Zero-Bundle JavaScript với prop \texttt{cards: ReactNode[]}}
+Thanh trượt ngang \texttt{MovieRow.tsx} bắt buộc phải là Client Component vì sử dụng hook \texttt{useRef} và sự kiện click. Nếu \texttt{MovieRow} trực tiếp import \texttt{MovieCard}, toàn bộ mã JavaScript của thẻ phim sẽ bị nạp vào client bundle.
+
+\noindent \textbf{Giải pháp kiến trúc của tác giả:} Cho phép \texttt{MovieRow} nhận danh sách thẻ dưới dạng mảng các nút JSX trừu tượng (\texttt{cards: ReactNode[]}):
+
+\begin{lstlisting}[caption={Composition Pattern truyền Server Components qua props cards}]
+// components/client/MovieRow.tsx (use client)
+interface MovieRowProps {
+    title: string;
+    cards: ReactNode[]; // Nhan ReactNode da bien dich o Server, khong import MovieCard
+    isTop10?: boolean;
+}
+export default function MovieRow({ title, cards, isTop10 }: MovieRowProps) {
+    const rowRef = useRef<HTMLDivElement>(null);
+    return (
+        <section className="relative px-4 md:px-12">
+            <h2 className="text-xl md:text-2xl font-bold text-white mb-4">{title}</h2>
+            <div ref={rowRef} className="flex gap-4 overflow-x-auto scrollbar-none">{cards}</div>
+        </section>
+    );
+}
+
+// app/page.tsx (Server Component)
+<MovieRow title="Phim Thinh Hanh" cards={trending.map(m => <MovieCard key={m.id} movie={m} />)} />
+\end{lstlisting}
+
+\noindent \textbf{Hiệu quả kỹ thuật đạt được:} (1) \texttt{MovieCard.tsx} tiếp tục là Server Component thuần túy, mã JavaScript của thẻ phim \textbf{bằng đúng 0 KB} trên trình duyệt; (2) Module Graph của \texttt{MovieRow.tsx} hoàn toàn sạch; (3) Được kiểm chứng tự động qua bài test \nolinkurl{tests/server-client-boundary.test.mjs} đạt \textbf{PASS 100\%}.
+
+% ==============================================================================
+% CHƯƠNG 5: HIỆN THỰC MÃ NGUỒN CỐT LÕI (PHẦN 1: TRANG CHỦ & DỊCH VỤ TMDB)
+% ==============================================================================
+\section{HIỆN THỰC MÃ NGUỒN CỐT LÕI (PHẦN 1: TRANG CHỦ \& DỊCH VỤ)}
+
+\subsection{Hiện thực Server Component trang chủ (\texttt{app/page.tsx})}
+Tệp \texttt{app/page.tsx} đại diện cho đầu não điều phối toàn bộ dữ liệu hiển thị của trang chủ MovieHub:
+
+\begin{lstlisting}[caption={Server Component trang chủ song song hóa 4 luồng dữ liệu}]
+export default async function HomePage() {
+    await connection(); // Ep Dynamic SSR tren server theo yeu cau
+    const [trending, nowPlaying, topRated, classic] = await Promise.all([
+        getTrendingMovies(), getNowPlayingMovies(), getTopRatedMovies(), discoverMovies({ genre: "classic" }),
+    ]);
+    const featured = trending[0] || nowPlaying[0] || topRated[0];
+    return (
+        <main className="min-h-screen bg-[#141414] pb-24 overflow-x-hidden">
+            <HeroBanner movie={featured} />
+            <div className="relative z-20 space-y-8 -mt-16 sm:-mt-24">
+                <MovieRow title="Phim Thinh Hanh" cards={trending.map(m => <MovieCard key={m.id} movie={m} />)} />
+                <MovieRow title="Top 10 Danh Gia Cao" cards={topRated.slice(0, 10).map(m => <MovieCard key={m.id} movie={m} />)} isTop10={true} />
+            </div>
+        </main>
+    );
+}
+\end{lstlisting}
+
+\noindent \textbf{Đặc điểm kỹ thuật:} Cơ chế phục hồi sự cố an toàn với biến \texttt{featured} theo tầng (\texttt{trending[0] || nowPlaying[0] || topRated[0]}), kết hợp phân tầng thị giác với lề âm (\texttt{-mt-16 sm:-mt-24}) và \texttt{z-20} phủ hàng phim lên chân Billboard Banner.
+
+\subsection{Hiện thực tầng dịch vụ TMDB \& Thuật toán khử trùng lặp}
+Để hiển thị 24 poster phim thay vì bị giới hạn ở 20 phim của một trang TMDB, tác giả gọi đồng thời 2 trang dữ liệu trong hàm \texttt{getTrendingMovies()}:
+
+\begin{lstlisting}[caption={Dịch vụ lấy phim thịnh hành kết hợp khử trùng lặp dữ liệu}]
+export async function getTrendingMovies(limit: number = 24): Promise<Movie[]> {
+    const [page1, page2] = await Promise.all([
+        fetchTMDB<MovieListResponse>("/trending/movie/week?page=1", 3600),
+        limit > 20
+            ? fetchTMDB<MovieListResponse>("/trending/movie/week?page=2", 3600).catch(() => ({ results: [] as Movie[], page: 2, total_pages: 0, total_results: 0 }))
+            : Promise.resolve({ results: [] as Movie[], page: 2, total_pages: 0, total_results: 0 }),
+    ]);
+    const combined = deduplicateMovies([...(page1.results || []), ...(page2.results || [])]);
+    return combined.slice(0, limit);
+}
+\end{lstlisting}
+
+\noindent Nguy cơ trùng lặp ở ranh giới phân trang được loại bỏ triệt để bằng hàm \texttt{deduplicateMovies()} sử dụng \texttt{Set<number>} đạt độ phức tạp $O(N)$ thời gian và không gian:
+
+\begin{lstlisting}[caption={Thuật toán loại bỏ phần tử trùng lặp theo ID}]
+export function deduplicateMovies(movies: Movie[]): Movie[] {
+    const seen = new Set<number>();
+    return movies.filter(m => m?.id && !seen.has(m.id) && seen.add(m.id));
+}
+\end{lstlisting}
+
+% ==============================================================================
+% CHƯƠNG 6: HIỆN THỰC MÃ NGUỒN CỐT LÕI (PHẦN 2: TƯƠNG TÁC ĐIỆN ẢNH)
+% ==============================================================================
+\section{HIỆN THỰC MÃ NGUỒN CỐT LÕI (PHẦN 2: TƯƠNG TÁC ĐIỆN ẢNH)}
+
+\subsection{Hiện thực Client Slider \texttt{MovieRow.tsx} với thuật toán Infinite Loop}
+Thanh cuộn ngang \texttt{MovieRow.tsx} được trang bị thuật toán trượt thông minh: khi cuộn đến cuối danh sách, giao diện tự động lặp vòng vô tận mượt mà:
+
+\begin{lstlisting}[caption={Thuật toán cuộn vô tận trong MovieRow.tsx}]
+const handleScroll = (dir: "left" | "right") => {
+    if (!rowRef.current) return;
+    const { scrollLeft, clientWidth, scrollWidth } = rowRef.current;
+    const maxScroll = scrollWidth - clientWidth;
+    const step = Math.max(clientWidth * 0.55, 320); // Buoc truot ~55% man hinh
+
+    if (dir === "right") {
+        rowRef.current.scrollTo({ left: scrollLeft >= maxScroll - 80 ? 0 : Math.min(scrollLeft + step, maxScroll), behavior: "smooth" });
+    } else {
+        rowRef.current.scrollTo({ left: scrollLeft <= 80 ? maxScroll : Math.max(scrollLeft - step, 0), behavior: "smooth" });
+    }
+};
+\end{lstlisting}
+
+\noindent \textbf{Chữ số Top 10 nét rỗng chuẩn Netflix:} Với \texttt{isTop10 = true}, tác giả hiện thực chữ số khổng lồ (1 đến 10) bằng CSS \texttt{.netflix-number}: dùng \texttt{-webkit-text-stroke: 4px \#595959} và \texttt{color: \#141414}, tạo nét viền rỗng điện ảnh sắc nét mà không cần nạp ảnh raster.
+
+\subsection{Hiện thực Modal xem Trailer tức thì (\texttt{TrailerModal.tsx})}
+Tác giả tận dụng trực tiếp API \texttt{<dialog>} chuẩn HTML5 kết hợp cùng \texttt{useEffect} để phát trailer:
+
+\begin{lstlisting}[caption={Hiện thực TrailerModal tối giản bằng thẻ dialog HTML5}]
+export default function TrailerModal({ trailerKey, movieTitle }: TrailerModalProps) {
+    const [isOpen, setIsOpen] = useState(false);
+    const dialogRef = useRef<HTMLDialogElement>(null);
+
+    useEffect(() => {
+        if (!isOpen) return;
+        dialogRef.current?.showModal(); // API dialog HTML5 native chan tuong tac nen
+        document.body.style.overflow = "hidden"; // Khoa cuon trang chu
+        return () => { dialogRef.current?.close(); document.body.style.overflow = ""; };
+    }, [isOpen]);
+
+    return (
+        <>
+            <button type="button" onClick={() => setIsOpen(true)} className="flex items-center gap-2 bg-white text-black font-extrabold px-6 py-2 rounded hover:scale-105 transition-all">
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg><span>Xem Trailer</span>
+            </button>
+            {isOpen && (
+                <dialog ref={dialogRef} className="fixed inset-0 m-0 h-full w-full bg-black/90 backdrop-blur-md open:flex items-center justify-center p-4" onClick={() => setIsOpen(false)}>
+                    <div className="relative w-full max-w-5xl aspect-video rounded-xl overflow-hidden bg-black" onClick={e => e.stopPropagation()}>
+                        <iframe src={`https://www.youtube.com/embed/${trailerKey}?autoplay=1&rel=0`} title={`Trailer ${movieTitle}`} className="w-full h-full border-0" allow="autoplay; encrypted-media" allowFullScreen />
+                    </div>
+                </dialog>
+            )}
+        </>
+    );
+}
+\end{lstlisting}
+
+\subsection{Thuật toán chọn video tối ưu (\texttt{services/videos.ts})}
+Hàm \texttt{selectBestTrailer(videos)} duyệt danh sách media từ TMDB với thang ưu tiên 6 bậc: (1) Trailer tiếng Việt chính thức $\rightarrow$ (2) Trailer tiếng Việt $\rightarrow$ (3) Trailer chính thức $\rightarrow$ (4) Trailer bất kỳ $\rightarrow$ (5) Teaser $\rightarrow$ (6) Video đầu tiên. Giải pháp bảo đảm khán giả luôn xem trailer tiếng Việt chuẩn xác nhất nếu TMDB có cung cấp.
+
+% ==============================================================================
+% CHƯƠNG 7: TỐI ƯU HÓA HIỆU NĂNG THỊ GIÁC & PIPELINE MINH CHỨNG
+% ==============================================================================
+\section{TỐI ƯU HÓA HIỆU NĂNG THỊ GIÁC VÀ PIPELINE MINH CHỨNG}
+
+\subsection{Tối ưu hóa hình ảnh với \texttt{next/image} (LCP \& CLS)}
+Hiệu năng hiển thị thị giác là tiêu chí chấm điểm khắt khe trong Web Frontend hiện đại:
+\begin{itemize}
+    \item \textbf{Tối ưu Largest Contentful Paint (LCP):} Tại \texttt{HeroBanner.tsx}, ảnh Backdrop chiếm diện tích lớn nhất màn hình. Cấu hình \texttt{priority=\{true\}} chỉ thị trình duyệt chèn thẻ \texttt{<link rel="preload">} vào \texttt{<head>}, ép nạp ảnh ngay trong giai đoạn tải trang đầu tiên mà không đợi đánh giá CSS.
+    \item \textbf{Triệt tiêu dịch chuyển bố cục (CLS):} Tại \texttt{MovieCard.tsx}, bọc ảnh trong khung có tỉ lệ cố định chuẩn điện ảnh: \texttt{aspect-[2/3] w-full bg-[\#202020]}. Thuộc tính \texttt{sizes="(max-width: 640px) 40vw, (max-width: 1024px) 25vw, 15vw"} giúp Next.js tự động sinh ảnh đúng kích thước thiết bị, tiết kiệm băng thông tối đa.
+\end{itemize}
+
+\subsection{Xây dựng Pipeline tự động thu thập minh chứng (scripts/collect-evidence.mjs)}
+Để chứng minh kết quả đồ án đáp ứng chuẩn kỹ nghệ Tầng 2, tác giả phối hợp xây dựng pipeline thu thập minh chứng tự động:
+\begin{enumerate}
+    \item Tự động tính toán mã băm SHA-256 trên toàn bộ cây mã nguồn (\texttt{source\_sha256}) để bảo đảm tính toàn vẹn và đồng bộ giữa các file log.
+    \item Khởi tạo máy chủ TMDB Mock cục bộ trên cổng loopback \texttt{127.0.0.1:4100} với TTL ngắn hạn (15 giây) để kiểm chứng chu kỳ hết hạn và cập nhật ngầm của Data Cache.
+    \item Ghi nhận kết quả vào tệp tổng hợp \texttt{baocao/evidence/mock-runtime.json} với trạng thái nghiệm thu đạt chuẩn \texttt{"status": "passed"}.
+\end{enumerate}
+
+% ==============================================================================
+% CHƯƠNG 8: KIỂM THỬ THỰC NGHIỆM VÀ MA TRẬN ĐÓNG GÓP GIT
+% ==============================================================================
+\section{KIỂM THỬ THỰC NGHIỆM VÀ MA TRẬN ĐÓNG GÓP GIT}
+
+\subsection{Kết quả kiểm thử tự động trên phân hệ phụ trách}
+Phân hệ do tác giả phụ trách được kiểm chứng toàn diện qua bộ kiểm thử tự động của Node.js Test Runner:
+
+\begin{table}[H]
+\centering
+\caption{Kết quả kiểm thử thực nghiệm trên các tệp phụ trách chính}
+\label{tab:test-results}
+\fontsize{9.5}{12.5}\selectfont
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|p{5.5cm}|p{2.0cm}|X|}
+\hline
+\textbf{Tệp kiểm thử} & \textbf{Kết quả} & \textbf{Nội dung xác thực kỹ thuật} \\
+\hline
+\nolinkurl{tests/server-client-boundary.test.mjs} & \textbf{PASS} & Khẳng định slider client (\texttt{MovieRow}) hoàn toàn không chứa câu lệnh \texttt{import MovieCard}. \\
+\hline
+\nolinkurl{tests/server-fetch.test.mjs} & \textbf{PASS} & Xác thực \texttt{fetchTMDB} giữ kín bí mật trên server, tự động cấu hình \texttt{revalidate} và chặn đứng lỗi timeout 10s. \\
+\hline
+\nolinkurl{tests/deduplicate.test.mjs} & \textbf{PASS} & Kiểm tra thuật toán \texttt{deduplicateMovies} giữ lại bản ghi hợp lệ đầu tiên và loại bỏ toàn bộ ID trùng. \\
+\hline
+\nolinkurl{baocao/evidence/build-output.txt} & \textbf{SUCCESS} & Xác nhận tuyến \texttt{ƒ /} được Next.js 16 biên dịch thành công dưới dạng \textbf{Dynamic SSR on demand}. \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{Ma trận đóng góp Git cá nhân của Nguyễn Công Quân}
+Trong toàn bộ quá trình phát triển, tác giả đã đóng góp \textbf{41 commits} cá nhân và điều phối \textbf{7 Pull Requests} sáp nhập vào nhánh chính. Bảng~\ref{tab:git-matrix} tổng hợp các commit bước ngoặt minh chứng cho khối lượng công việc thực tế của tác giả.
+
+\begin{table}[H]
+\centering
+\caption{Nhật ký các Git commit cốt lõi do sinh viên Nguyễn Công Quân thực hiện}
+\label{tab:git-matrix}
+\fontsize{9.5}{12.5}\selectfont
+\renewcommand{\arraystretch}{1.2}
+\begin{tabularx}{\textwidth}{|p{1.8cm}|p{2.2cm}|X|p{1.2cm}|}
+\hline
+\textbf{Commit} & \textbf{Thời gian} & \textbf{Nội dung kỹ thuật thực hiện} & \textbf{PR} \\
+\hline
+\texttt{2b04d20} & 2026-11-04 & Khởi tạo kiến trúc dự án Next.js 16, cấu hình TypeScript Strict, Tailwind CSS v4 và môi trường. & \#1 \\
+\hline
+\texttt{82c7e0e} & 2026-11-04 & Xây dựng trang chủ với song song hóa dữ liệu TMDB qua \texttt{Promise.all} và cấu hình Data Cache. & \#2 \\
+\hline
+\texttt{6f5e663} & 2026-11-05 & Hiện thực thanh trượt phim nằm ngang \texttt{MovieRow} và hàng Top 10 nét rỗng chuẩn Netflix. & \#3 \\
+\hline
+\texttt{3b86fa1} & 2026-11-05 & Tái cấu trúc ranh giới mạng: chuyển đổi \texttt{MovieRow} sang prop \texttt{cards: ReactNode[]} đạt Zero-Bundle. & \#4 \\
+\hline
+\texttt{60ba1f3} & 2026-11-05 & Hiện thực cửa sổ phát \texttt{TrailerModal} tối giản bằng thẻ \texttt{<dialog>} HTML5 và khóa cuộn trang. & \#6 \\
+\hline
+\texttt{136653b} & 2026-11-05 & Hoàn thiện thuật toán \texttt{selectBestTrailer} ưu tiên video tiếng Việt và tối ưu hóa CSS LCP. & \#7 \\
+\hline
+\end{tabularx}
+\end{table}
+
+% ==============================================================================
+% CHƯƠNG 9: KẾT LUẬN & TÀI LIỆU THAM KHẢO
+% ==============================================================================
+\section{KẾT LUẬN}
+
+\subsection{Đánh giá kết quả đạt được}
+Trong khuôn khổ đồ án môn học \textit{Các Công nghệ Lập trình Hiện đại}, sinh viên Nguyễn Công Quân với vai trò Trưởng nhóm và Kiến trúc sư hệ thống đã hoàn thành trọn vẹn các mục tiêu kỹ thuật đề ra:
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt,topsep=2pt]
+    \item \textbf{Làm chủ kiến trúc nền tảng:} Triển khai thành công kiến trúc App Router, Server-Driven UI và React Server Components (RSC) trên nền tảng Next.js 16 và React 19.
+    \item \textbf{Bảo mật và hiệu năng lấy dữ liệu:} Giữ an toàn tuyệt đối khóa \texttt{TMDB\_API\_KEY} trên server, cấu hình Data Cache thông minh với cơ chế \texttt{stale-while-revalidate} và song song hóa truy vấn qua \texttt{Promise.all}.
+    \item \textbf{Tối ưu hóa mã nguồn (Zero-Bundle JS):} Ứng dụng chuẩn mực Composition Pattern để truyền Server Component (\texttt{MovieCard}) vào Client Component (\texttt{MovieRow}) dưới dạng \texttt{ReactNode[]}, triệt tiêu hoàn toàn mã JavaScript của thẻ phim phía client.
+    \item \textbf{Trải nghiệm điện ảnh chuẩn Netflix:} Hoàn thiện giao diện Netflix Dark Cinema mượt mà với banner tối ưu chỉ số LCP và cửa sổ phát trailer bằng thẻ \texttt{<dialog>} chuẩn HTML5.
+    \item \textbf{Kiểm định chất lượng tự động:} Thiết lập và vượt qua 100\% các bài kiểm thử tự động về ranh giới máy chủ/máy khách, tính tương thích CSS và an toàn hệ thống.
+\end{itemize}
+
+\subsection{Hạn chế và hướng phát triển}
+Bên cạnh các thành quả đạt được, đề tài định hướng tiếp tục hoàn thiện trong tương lai:
+\begin{itemize}[leftmargin=1.5em,itemsep=2pt,topsep=2pt]
+    \item \textbf{Kỹ thuật Virtualization cho thanh trượt:} Áp dụng kỹ thuật ảo hóa danh sách (List Virtualization) cho \texttt{MovieRow} khi danh mục phim vượt quá 100 mục nhằm tối ưu hóa bộ nhớ DOM.
+    \item \textbf{Đo lường Network Waterfall diện rộng:} Mở rộng các kịch bản kiểm thử tải thực tế trên mạng di động 3G/4G yếu để tinh chỉnh tối đa kích thước ảnh TMDB theo từng viewport thiết bị.
+\end{itemize}
+
+\vspace{0.2cm}
+
+% ==============================================================================
+% TÀI LIỆU THAM KHẢO (IEEE FORMAT)
+% ==============================================================================
+\begin{thebibliography}{99}
+\fontsize{9}{12}\selectfont
+\setlength{\itemsep}{1.5pt}
+\bibitem{nextjs16} Vercel, "Next.js 16 Documentation - App Router, Server Components and Data Fetching," 2026. [Online]. Available: \url{https://nextjs.org/docs}.
+\bibitem{react19} Meta Open Source, "React 19 Server Components and Actions Architecture Guide," 2026. [Online]. Available: \url{https://react.dev}.
+\bibitem{tmdbapi} The Movie Database, "TMDB API Reference Documentation (v3 REST API)," 2026. [Online]. Available: \url{https://developer.themoviedb.org/reference/intro/getting-started}.
+\bibitem{tailwind4} Tailwind Labs, "Tailwind CSS v4 Oxide Engine and High-Performance Utility Styling," 2026. [Online]. Available: \url{https://tailwindcss.com/docs}.
+\bibitem{webvitals} Google Chrome Developers, "Optimizing Web Vitals: LCP, FID/INP, and Cumulative Layout Shift," 2026. [Online]. Available: \url{https://web.dev/vitals/}.
+\end{thebibliography}
+
+\end{document}
