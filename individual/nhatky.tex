@@ -1,0 +1,530 @@
+\documentclass[12pt,a4paper]{extarticle}
+\usepackage{fontspec}
+\setmainfont{Times New Roman}
+\setmonofont{Consolas}[Scale=0.90]
+\usepackage[vietnamese]{babel}
+\usepackage{mathastext}
+
+% Quy chuẩn căn lề hành chính & học thuật SGU: Trái 3.0cm, Phải 2.0cm, Trên 2.0cm, Dưới 2.0cm
+\usepackage[top=20mm,bottom=20mm,left=30mm,right=20mm]{geometry}
+\usepackage{setspace}
+\setstretch{1.20}
+\setlength{\parindent}{1.0cm}
+\setlength{\parskip}{4.0pt plus 1pt minus 1pt}
+
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{amsmath,amssymb}
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{float}
+\usepackage[table]{xcolor}
+\usepackage{graphicx}
+\usepackage{enumitem}
+\usepackage{url}
+
+% Định nghĩa màu sắc hành chính trang trọng
+\definecolor{tableheader}{RGB}{242, 244, 247}
+\definecolor{codeblue}{RGB}{0, 70, 150}
+
+\usepackage[colorlinks=true,linkcolor=black,citecolor=black,urlcolor=codeblue]{hyperref}
+
+% Định dạng tiêu đề các phần (I, II, III...)
+\titleformat{\section}
+  {\fontsize{13}{16}\selectfont\bfseries}
+  {\thesection.}{0.5em}{}
+\titlespacing*{\section}{0pt}{10pt}{5pt}
+
+\titleformat{\subsection}
+  {\fontsize{12}{15}\selectfont\bfseries}
+  {\thesubsection.}{0.5em}{}
+\titlespacing*{\subsection}{0pt}{8pt}{4pt}
+
+% Đổi số thứ tự section sang số La Mã (I, II, III...) chuẩn Biên bản
+\renewcommand{\thesection}{\Roman{section}}
+\renewcommand{\thesubsection}{\Roman{section}.\arabic{subsection}}
+
+\captionsetup[table]{
+  font={small,bf},
+  skip=5pt,
+  labelsep=period
+}
+
+% Cấu hình Header và Footer
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\fontsize{9}{11}\selectfont \textit{Biên bản Nhật ký làm việc Đồ án cuối kỳ -- Nhóm 21}}
+\fancyhead[R]{\fontsize{10}{12}\selectfont \textbf{\thepage}}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0pt}
+
+\begin{document}
+
+% ==============================================================================
+% TRANG 1: PHẦN ĐẦU BIÊN BẢN HÀNH CHÍNH (CHUẨN 100% THEO BIỂU MẪU ĐH SÀI GÒN)
+% ==============================================================================
+\thispagestyle{empty}
+\enlargethispage{3.5\baselineskip}
+
+\noindent
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}cc}
+\begin{tabular}{c}
+\fontsize{11}{13.5}\selectfont \textbf{TRƯỜNG ĐẠI HỌC SÀI GÒN} \\
+\fontsize{11}{13.5}\selectfont \textbf{KHOA CÔNG NGHỆ THÔNG TIN} \\
+\rule{3.5cm}{0.6pt}
+\end{tabular} &
+\begin{tabular}{c}
+\fontsize{11}{13.5}\selectfont \textbf{CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM} \\
+\fontsize{11}{13.5}\selectfont \textbf{Độc lập -- Tự do -- Hạnh phúc} \\
+\rule{4.5cm}{0.6pt} \\[0.1cm]
+\fontsize{10}{12.5}\selectfont \textit{Thành phố Hồ Chí Minh, ngày \dots\dots\ tháng \dots\dots\ năm 2026}
+\end{tabular}
+\end{tabular*}
+
+\vspace{0.3cm}
+
+\begin{center}
+{\fontsize{13.5}{16.5}\selectfont \textbf{BIÊN BẢN ĐÁNH GIÁ ĐỒ ÁN CUỐI KỲ}}\\[0.15cm]
+{\fontsize{10.5}{13.5}\selectfont \textbf{Học phần: Các Công nghệ Lập trình Hiện đại \quad -- \quad Mã học phần: \dots\dots\dots\dots\dots\dots \quad -- \quad Nhóm/lớp: Nhóm 21}}
+\end{center}
+
+\vspace{0.1cm}
+
+% BẢNG ĐIỂM CÁN BỘ CHẤM THI (KẺ KHUNG LIỀN NÉT, CHUẨN BIỂU MẪU KHOA CNTT)
+\noindent
+\begin{table}[H]
+\centering
+\fontsize{9}{11.5}\selectfont
+\renewcommand{\arraystretch}{1.12}
+\begin{tabular}{|*{6}{>{\centering\arraybackslash}p{2.1cm}|}>{\centering\arraybackslash}p{2.4cm}|}
+\hline
+\multicolumn{2}{|c|}{\textbf{Cán bộ chấm thi 1}} & \multicolumn{2}{c|}{\textbf{Cán bộ chấm thi 2}} & \multicolumn{2}{c|}{\textbf{Tổng hợp}} & \textbf{Ghi chú} \\
+\hline
+Điểm chữ & Điểm số & Điểm chữ & Điểm số & Điểm chữ & Điểm số & \\
+\hline
+\rule{0pt}{1.8em} & & & & & & \\
+\hline
+\multicolumn{2}{|c|}{\parbox[t][2.5cm][t]{4.2cm}{\centering Ký và ghi rõ họ tên \vfill \textbf{ThS. Phạm Thi Vương} \vspace{0.1cm}}} & 
+\multicolumn{2}{c|}{\parbox[t][2.5cm][t]{4.2cm}{\centering Ký và ghi rõ họ tên \vfill \mbox{} \vspace{0.1cm}}} & 
+\multicolumn{2}{c|}{\parbox[t][2.5cm][t]{4.2cm}{\vfill \mbox{}}} & 
+\parbox[t][2.5cm][t]{2.4cm}{\vfill \mbox{}} \\
+\hline
+\end{tabular}
+\end{table}
+
+\vspace{-0.15cm}
+\noindent \textbf{Nhóm:} Nhóm 21 \\
+\noindent \textbf{Tên đồ án:} Tìm hiểu công nghệ Next.js qua ứng dụng tra cứu \& khám phá phim ảnh (MovieHub) \\[0.05cm]
+\noindent \textbf{Thành viên nhóm:}
+
+\vspace{-0.1cm}
+% BẢNG THÀNH VIÊN NHÓM (CHỈ LIỆT KÊ ĐÚNG 3 THÀNH VIÊN CHÍNH THỨC, KHÔNG THỪA SỐ 4, 5)
+\noindent
+\begin{table}[H]
+\centering
+\fontsize{9}{11.5}\selectfont
+\renewcommand{\arraystretch}{1.10}
+\begin{tabularx}{\textwidth}{|c|c|X|c|c|p{2.5cm}|}
+\hline
+\textbf{STT} & \textbf{MSSV} & \textbf{Họ tên} & \textbf{Nhóm/Lớp} & \textbf{Điểm} & \textbf{Ký tên} \\
+\hline
+1 & 3123560070 & Nguyễn Công Quân (Trưởng nhóm) & Nhóm 21 & & \\
+\hline
+2 & 3123560013 & Nguyễn Quốc Đại & Nhóm 21 & & \\
+\hline
+3 & 3123410433 & Nguyễn Thái Vinh & Nhóm 21 & & \\
+\hline
+\end{tabularx}
+\end{table}
+
+\vspace{-0.1cm}
+\noindent \textbf{Nội dung:}
+
+\section{TỔNG QUAN ĐỒ ÁN VÀ QUY CHUẨN KỸ NGHỆ}
+
+\textbf{1. Bối cảnh đề tài và công nghệ lõi:} Học phần \textit{Các Công nghệ Lập trình Hiện đại} đánh giá trực tiếp năng lực làm chủ framework hiện đại: hiểu sâu mô hình render Server-Driven UI, phân định ranh giới mạng giữa Server và Client, kiểm soát Data Cache, đột biến dữ liệu an toàn và năng lực tự phục hồi trước sự cố runtime. Nhóm 21 lựa chọn phiên bản \textbf{Next.js 16 (App Router)}, \textbf{React 19.2.8}, \textbf{TypeScript 5 Strict} và \textbf{Tailwind CSS v4} kết nối REST API v3 của The Movie Database (TMDB) để xây dựng ứng dụng MovieHub chuẩn phong cách điện ảnh Netflix Dark Cinema.
+
+\textbf{2. Quy chuẩn kỹ nghệ và quy trình làm việc nhóm:} Để đảm bảo chất lượng kỹ nghệ môn học theo quy định tại \path{REQUIRE.md}, nhóm thiết lập quy trình: (1) \textbf{Git Flow:} phân nhánh độc lập (\texttt{feature/*}, \texttt{qdai/*}), tuyệt đối không commit thẳng vào \texttt{main}; (2) \textbf{Code Review:} 100\% Pull Requests được kiểm duyệt chéo nội bộ; (3) \textbf{CI Automation:} chạy lint, type-check, 43 bài test Node Native Runner PASS 100\% và build production Dynamic SSR trước mỗi lần tích hợp.
+
+\newpage
+% ==============================================================================
+% TRANG 2: MA TRẬN PHÂN CÔNG TRÁCH NHIỆM VÀ PHÂN BỔ 3 TẦNG KỸ NGHỆ
+% ==============================================================================
+\section{MA TRẬN PHÂN CÔNG TRÁCH NHIỆM VÀ PHÂN BỔ 3 TẦNG KỸ NGHỆ}
+
+\subsection{Bảng phân định ranh giới trách nhiệm chi tiết giữa 3 thành viên}
+
+Ranh giới chuyên môn giữa 3 thành viên Nhóm 21 được phân định rạch ròi, độc lập và bổ trợ lẫn nhau nhằm đảm bảo tính toàn vẹn của hệ thống theo Bảng 1:
+
+\begin{table}[H]
+\centering
+\fontsize{7.8}{9.8}\selectfont
+\renewcommand{\arraystretch}{1.10}
+\caption{Bảng phân công trách nhiệm chi tiết và tỷ lệ hoàn thành công việc}
+\label{tab:team_assignment}
+\begin{tabularx}{\textwidth}{|p{2.3cm}|p{2.0cm}|X|p{3.0cm}|c|}
+\hline
+\rowcolor{tableheader}
+\textbf{Họ và tên} & \textbf{MSSV / Vai trò} & \textbf{Trọng tâm kỹ thuật phụ trách chính} & \textbf{Tệp mã nguồn cốt lõi} & \textbf{Tiến độ} \\
+\hline
+\textbf{Nguyễn Công Quân} & 3123560070 \newline \textit{Trưởng nhóm / Architect} & Khởi tạo dự án Next.js 16, App Router, TypeScript Strict, Tailwind v4; thiết kế tầng dịch vụ TMDB Client; fetch song song 4 hàng phim trang chủ bằng \texttt{Promise.all} và ép Dynamic SSR qua \texttt{await connection()}; thiết kế ranh giới mạng Zero-Bundle Slider; hiện thực \texttt{HeroBanner} LCP và \texttt{TrailerModal} HTML5. & \path{app/layout.tsx}, \newline \path{app/page.tsx}, \newline \path{services/client.ts}, \newline \path{MovieRow.tsx}, \newline \path{MovieCard.tsx}, \newline \path{TrailerModal.tsx} & 100\% \\
+\hline
+\textbf{Nguyễn Quốc Đại} & 3123560013 \newline \textit{Kỹ sư QA \& Resilience} & Giám định kiến trúc độc lập đối soát 34 tiêu chí môn học (\path{DANH_GIA_REQUIRE.md}); thiết lập bộ ba xử lý lỗi hệ thống (\texttt{error.tsx}, \texttt{global-error.tsx}, \texttt{not-found.tsx}); cấu hình SEO Metadata động (\texttt{sitemap.ts}, \texttt{robots.ts}); bảo mật HTTP Security Headers; loại bỏ lỗi monkey-patch DNS và route \texttt{/tv} gãy; chuẩn hóa 43 test cases Node native runner. & \path{app/error.tsx}, \newline \path{app/global-error.tsx}, \newline \path{app/not-found.tsx}, \newline \path{app/sitemap.ts}, \newline \path{next.config.ts}, \newline \path{tests/*.test.mjs} & 100\% \\
+\hline
+\textbf{Nguyễn Thái Vinh} & 3123410433 \newline \textit{Kỹ sư UI/UX \& Mutation} & Nghiên cứu và hiện thực phân hệ Watchlist qua Server Actions với Cookie \texttt{HttpOnly} RFC 6265; tích hợp Optimistic UI qua React 19 \texttt{useOptimistic}; xây dựng bộ lọc đa tiêu chí 5 chiều tại trang \texttt{/browse} đồng bộ URL qua \texttt{useTransition}; phát triển Live Search thanh tìm kiếm Header tích hợp GET Route Handler \texttt{/api/search} có Debounce và AbortController. & \path{app/actions/watchlist.ts}, \newline \path{app/watchlist/page.tsx}, \newline \path{WatchlistButton.tsx}, \newline \path{app/browse/page.tsx}, \newline \path{FilterBar.tsx}, \newline \path{NavSearchBar.tsx}, \newline \path{api/search/route.ts} & 100\% \\
+\hline
+\end{tabularx}
+\end{table}
+
+\newpage
+% ==============================================================================
+% TRANG 3: MA TRẬN 3 TẦNG KỸ NGHỆ
+% ==============================================================================
+\subsection{Ma trận phân bổ công việc theo 3 Tầng yêu cầu kỹ nghệ (REQUIRE.md)}
+
+Bảng 2 ánh xạ chi tiết các hạng mục hiện thực vào 3 Tầng kỹ nghệ quy định của đồ án:
+
+\begin{table}[H]
+\centering
+\fontsize{8}{10}\selectfont
+\renewcommand{\arraystretch}{1.10}
+\caption{Ma trận phân bổ công việc theo các tầng kỹ nghệ môn học}
+\label{tab:tiers_mapping}
+\begin{tabularx}{\textwidth}{|p{2.0cm}|X|p{3.2cm}|p{2.5cm}|}
+\hline
+\rowcolor{tableheader}
+\textbf{Tầng kỹ nghệ} & \textbf{Nội dung kỹ thuật yêu cầu} & \textbf{Hiện vật hiện thực trong đồ án} & \textbf{Thành viên chủ trì} \\
+\hline
+\textbf{Tầng 1A} \newline (Lõi bắt buộc) & Cấu trúc App Router; phân định rạch ròi Server/Client Components; Data fetching phía server; luồng render trang chủ. & \path{app/page.tsx}, \path{app/layout.tsx}, ranh giới \texttt{MovieRow} \& \texttt{MovieCard}. & Nguyễn Công Quân \\
+\hline
+\textbf{Tầng 1B} \newline (Lõi tự chọn) & Bộ ba xử lý lỗi \texttt{error}/\texttt{not-found}; SEO Metadata (\texttt{sitemap.ts}); Cấu hình HTTP Security Headers; Phản hồi lỗi runtime. & \path{app/error.tsx}, \path{global-error.tsx}, \path{sitemap.ts}, \path{next.config.ts}. & Nguyễn Quốc Đại \\
+\cline{2-4}
+& Server Actions mutation; Cookie an toàn; Route Handler GET có HTTP Cache; Dynamic Route \texttt{/browse} đa tiêu chí. & \path{app/actions/watchlist.ts}, \path{app/api/search/route.ts}, \path{FilterBar.tsx}. & Nguyễn Thái Vinh \\
+\hline
+\textbf{Tầng 2 \& 3} \newline (Chuyên sâu \& Tối ưu) & Zero-Bundle JS Composition Pattern; Billboard LCP priority; Modal trailer HTML5; Data Cache TTL. & Kỹ thuật truyền \texttt{ReactNode[]}, \path{HeroBanner.tsx}, \path{TrailerModal.tsx}. & Nguyễn Công Quân \\
+\cline{2-4}
+& Kiểm toán kiến trúc độc lập (Triangulation Audit); Loại bỏ lỗi DNS socket; 43 bài test Node Native Runner. & \path{baocao/DANH_GIA_REQUIRE.md}, \path{tests/*.test.mjs} đạt 100\% PASS. & Nguyễn Quốc Đại \\
+\cline{2-4}
+& Trải nghiệm người dùng Optimistic UI; Debounce 300ms + AbortController; Ràng buộc cookie 4KB RFC 6265. & \path{WatchlistButton.tsx} (\texttt{useOptimistic}), \path{NavSearchBar.tsx}. & Nguyễn Thái Vinh \\
+\hline
+\end{tabularx}
+\end{table}
+
+\newpage
+% ==============================================================================
+% TRANG 4: NHẬT KÝ TIẾN ĐỘ THỰC HIỆN DỰ ÁN 9 TUẦN
+% ==============================================================================
+\section{NHẬT KÝ TIẾN ĐỘ THỰC HIỆN DỰ ÁN 9 TUẦN}
+
+Tiến độ 9 tuần được chia làm 2 giai đoạn: \textbf{Giai đoạn 1 (Tuần 1 -- 4)} thiết lập kiến trúc nền tảng, cơ chế render và xử lý lỗi cốt lõi; \textbf{Giai đoạn 2 (Tuần 5 -- 9)} hoàn thiện tương tác, kiểm toán đối soát độc lập, giải quyết dứt điểm các lỗi nguy cơ và đóng gói nghiệm thu. Bảng 3 tổng hợp toàn bộ tiến độ thực hiện:
+
+\begin{table}[H]
+\centering
+\fontsize{7.8}{10.2}\selectfont
+\renewcommand{\arraystretch}{1.10}
+\caption{Nhật ký tiến độ thực hiện 9 tuần của Nhóm 21}
+\label{tab:weekly_progress}
+\begin{tabularx}{\textwidth}{|p{1.2cm}|p{2.6cm}|X|p{2.3cm}|}
+\hline
+\rowcolor{tableheader}
+\textbf{Tuần} & \textbf{Mục tiêu trọng tâm} & \textbf{Công việc kỹ thuật cụ thể \& Hiện vật bàn giao} & \textbf{Phụ trách} \\
+\hline
+\textbf{Tuần 1} & Khởi tạo \& Kiến trúc & Khởi tạo repo Git, cấu hình TypeScript Strict, Tailwind CSS v4. Thiết kế module TMDB Client (\path{services/client.ts}). Khảo sát 34 tiêu chí môn học trong \path{REQUIRE.md}. & Quân (Chủ trì), Đại, Vinh \\
+\hline
+\textbf{Tuần 2} & Giao diện cốt lõi \& SSR & Xây dựng Root Layout với font Geist. Hiện thực trang chủ (\path{app/page.tsx}) fetch song song 4 hàng phim bằng \texttt{Promise.all} + \texttt{await connection()}. Cấu hình tiêu đề bảo mật HTTP. & Quân (Chủ trì), Đại, Vinh \\
+\hline
+\textbf{Tuần 3} & Ranh giới mạng \& UI & Lập trình thanh trượt \texttt{MovieRow.tsx} với thuật toán Infinite Loop (ngưỡng 80px). Tái cấu trúc Zero-Bundle prop \texttt{cards: ReactNode[]}. Xây dựng trang \path{app/not-found.tsx}. & Quân (Chủ trì), Đại, Vinh \\
+\hline
+\textbf{Tuần 4} & Actions \& Error Handling & Hiện thực \path{TrailerModal.tsx} dùng thẻ \texttt{<dialog>}. Viết Server Actions \path{app/actions/watchlist.ts} lưu Cookie \texttt{HttpOnly} RFC 6265. Xây dựng Root Error Boundary (\path{app/error.tsx}) có \texttt{retry()}. & Vinh (Chủ trì), Quân, Đại \\
+\hline
+\textbf{Tuần 5} & Bộ lọc \& Sitemap & Lập trình sitemap tự động \path{app/sitemap.ts} và \path{app/robots.ts}. Xây dựng trang Khám phá \path{app/browse/page.tsx} và thanh lọc \path{FilterBar.tsx} 5 chiều đồng bộ qua \texttt{useTransition}. & Vinh (Chủ trì), Đại, Quân \\
+\hline
+\textbf{Tuần 6} & Live Search \& Fix DNS & Thuật toán \texttt{selectBestTrailer} tiếng Việt. Phát hiện và loại bỏ triệt để monkey-patch \texttt{dns.lookup} gây ô nhiễm socket Node.js; xóa route \texttt{/tv} gãy 404. Live Search \path{NavSearchBar.tsx} Debounce 300ms. & Đại (Chủ trì), Vinh, Quân \\
+\hline
+\textbf{Tuần 7} & Kiểm toán QA độc lập & Biên soạn toàn diện hồ sơ phản biện \path{baocao/DANH_GIA_REQUIRE.md}. Chuyển đổi và mở rộng bộ test sang Node Native Test Runner (43 tests PASS). Viết test cases cho Watchlist và Live Search API. & Đại (Chủ trì), Quân, Vinh \\
+\hline
+\textbf{Tuần 8} & Mock TMDB \& Bảo vệ Root & Xây dựng pipeline thu thập minh chứng \path{collect-evidence.mjs} và mock server loopback cổng 4100 với \path{/_counts}. Triển khai \path{app/global-error.tsx} bảo vệ RootLayout. & Quân (Chủ trì), Đại, Vinh \\
+\hline
+\textbf{Tuần 9} & Nghiệm thu \& Đóng gói & Chạy nghiệm thu tự động toàn diện \texttt{npm run evidence}; xác thực 43/43 tests, lint 0 lỗi, build production Dynamic SSR thành công. Đồng bộ hóa số liệu báo cáo và hoàn thiện hồ sơ. & Cả 3 thành viên đồng chủ trì \\
+\hline
+\end{tabularx}
+\end{table}
+
+\newpage
+% ==============================================================================
+% TRANG 5: NHẬT KÝ CHI TIẾT CỦA NGUYỄN CÔNG QUÂN
+% ==============================================================================
+\section{NHẬT KÝ KỸ THUẬT CHI TIẾT TỪNG THÀNH VIÊN VÀ MINH CHỨNG}
+
+\subsection{Nhật ký làm việc của sinh viên Nguyễn Công Quân}
+
+\noindent \textbf{Họ và tên:} Nguyễn Công Quân \hspace{1cm} \textbf{MSSV:} 3123560070 \newline
+\textbf{Vai trò:} Trưởng nhóm (Team Leader) \& Kiến trúc sư hệ thống (System Architect) \newline
+\textbf{Chuyên đề cá nhân:} Kiến trúc App Router, Server-Driven UI \& Data Fetching song song Trang chủ.
+
+\begin{table}[H]
+\centering
+\fontsize{7.5}{9.5}\selectfont
+\renewcommand{\arraystretch}{1.08}
+\caption{Nhật ký công việc kỹ thuật cốt lõi của Nguyễn Công Quân}
+\label{tab:quan_log}
+\begin{tabularx}{\textwidth}{|p{1.4cm}|p{1.4cm}|X|p{3.2cm}|c|}
+\hline
+\rowcolor{tableheader}
+\textbf{Thời gian} & \textbf{Commit} & \textbf{Nội dung công việc kỹ thuật cụ thể} & \textbf{Hiện vật mã nguồn} & \textbf{Trạng thái} \\
+\hline
+04/11/2026 & \texttt{8c47bdf} & Khởi tạo cấu trúc dự án Next.js 16.4.5, kích hoạt TypeScript Strict Mode, thiết lập Tailwind CSS v4. Thiết kế TMDB Client trong \path{services/client.ts}, bảo mật khóa \texttt{TMDB\_API\_KEY} phía server. & \path{app/layout.tsx}, \newline \path{services/client.ts} & Hoàn thành \\
+\hline
+04/11/2026 & \texttt{0843640} & Hiện thực trang chủ (\path{app/page.tsx}) fetch song song 4 hàng phim bằng \texttt{Promise.all}. Kích hoạt Dynamic SSR bằng hàm \texttt{await connection()} ép Next.js render động theo yêu cầu. & \path{app/page.tsx}, \newline \path{services/tmdb.ts} & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{cb185c7} & Thiết kế thanh trượt \texttt{MovieRow.tsx} với thuật toán kéo cuộn vô tận (Infinite Loop) ngưỡng 80px. Tái cấu trúc Zero-Bundle: biến \texttt{MovieRow} thành Client Shell nhận \texttt{cards: ReactNode[]}. & \path{MovieRow.tsx}, \newline \path{MovieCard.tsx} & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{92a4338} & Lập trình \texttt{HeroBanner.tsx} tối ưu LCP với thuộc tính \texttt{priority}. Hiện thực \path{TrailerModal.tsx} nhúng YouTube qua thẻ \texttt{<dialog>} HTML5, tự động hủy iframe khi đóng modal. & \path{HeroBanner.tsx}, \newline \path{TrailerModal.tsx} & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{5f9fc32} & Khử trùng lặp ID phim giữa các danh mục bằng \texttt{Set<number>}, bảo đảm tính duy nhất của dữ liệu hiển thị. Hỗ trợ tích hợp bộ lọc và Route Handler Search. & \path{app/page.tsx}, \newline \path{services/tmdb.ts} & Hoàn thành \\
+\hline
+06/11/2026 & \texttt{fcfce8d} & Xây dựng pipeline kiểm thử tự động \path{scripts/collect-evidence.mjs} và mock server cổng 4100 với route \path{/_counts} để đo đếm chính xác số lượt gọi API. & \path{collect-evidence.mjs}, \newline \path{test-server.mjs} & Hoàn thành \\
+\hline
+\end{tabularx}
+\end{table}
+
+\noindent \textbf{Đóng góp kỹ thuật nổi bật của Nguyễn Công Quân:}
+
+\textbf{1. Tầng dịch vụ TMDB Client \& Bảo mật:} Giữ an toàn tuyệt đối \texttt{TMDB\_API\_KEY} trên server, cấu hình Next.js Data Cache với TTL riêng biệt (\texttt{trending}: 1 giờ, \texttt{movie details}: 24 giờ).
+
+\textbf{2. Dynamic SSR \& Fetch song song:} Áp dụng \texttt{Promise.all} giảm tổng thời gian chờ xuống bằng request chậm nhất ($\approx 350$ms); sử dụng \texttt{await connection()} từ \texttt{next/server} ép render SSR.
+
+\textbf{3. Ranh giới mạng Zero-Bundle:} Áp dụng React Composition Pattern đưa \texttt{MovieCard} (Server Component) vào \texttt{MovieRow} qua prop \texttt{children}/\texttt{cards: ReactNode[]}, triệt tiêu hoàn toàn mã JS của thẻ phim phía client.
+
+\newpage
+% ==============================================================================
+% TRANG 6: NHẬT KÝ CHI TIẾT CỦA NGUYỄN QUỐC ĐẠI
+% ==============================================================================
+\subsection{Nhật ký làm việc của sinh viên Nguyễn Quốc Đại}
+
+\noindent \textbf{Họ và tên:} Nguyễn Quốc Đại \hspace{1cm} \textbf{MSSV:} 3123560013 \newline
+\textbf{Vai trò:} Kỹ sư QA \& Đảm bảo chất lượng hệ thống (QA \& System Resilience Engineer) \newline
+\textbf{Chuyên đề cá nhân:} Kiểm toán kiến trúc, Hệ sinh thái xử lý lỗi, An toàn hệ thống \& Bộ kiểm thử tự động.
+
+\begin{table}[H]
+\centering
+\fontsize{7.5}{9.5}\selectfont
+\renewcommand{\arraystretch}{1.08}
+\caption{Nhật ký công việc kỹ thuật cốt lõi của Nguyễn Quốc Đại}
+\label{tab:dai_log}
+\begin{tabularx}{\textwidth}{|p{1.4cm}|p{1.4cm}|X|p{3.2cm}|c|}
+\hline
+\rowcolor{tableheader}
+\textbf{Thời gian} & \textbf{Commit} & \textbf{Nội dung công việc kỹ thuật cụ thể} & \textbf{Hiện vật mã nguồn} & \textbf{Trạng thái} \\
+\hline
+04/11/2026 & \texttt{8fe18e6} & Thiết lập các tiêu đề bảo mật cấp độ ứng dụng trong \path{next.config.ts}: X-Frame-Options: DENY, X-Content-Type-Options: nosniff, Referrer-Policy, Strict-Transport-Security. & \path{next.config.ts} & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{8fe18e6} & Xây dựng trang \path{app/not-found.tsx} bắt lỗi 404 cho các route không tồn tại và ID phim không hợp lệ; tích hợp nút điều hướng quay về trang chủ an toàn. & \path{app/not-found.tsx} & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{8c059f7} & Xây dựng Root Error Boundary \path{app/error.tsx} bắt ngoại lệ runtime toàn trang, tích hợp hàm \texttt{reset()} thử lại mà không làm mất trạng thái ứng dụng. & \path{app/error.tsx} & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{953db35} & Thiết lập SEO Metadata động: lập trình sitemap tự động \path{app/sitemap.ts} nạp danh sách phim trending và cấu hình quy tắc crawl trong \path{app/robots.ts}. & \path{app/sitemap.ts}, \newline \path{app/robots.ts} & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{953db35} & Thực hiện kiểm toán kiến trúc toàn diện 34 tiêu chí môn học, lập hồ sơ phản biện chi tiết trong \path{baocao/DANH_GIA_REQUIRE.md} chỉ ra các điểm nghẽn kỹ thuật. & \path{DANH_GIA_REQUIRE.md} & Hoàn thành \\
+\hline
+06/11/2026 & \texttt{631bfa5} & Phát hiện và loại bỏ triệt để đoạn mã can thiệp \texttt{dns.lookup} gây ô nhiễm socket Node.js; xóa bỏ route \texttt{/tv} gãy luồng 404; triển khai \path{app/global-error.tsx}. & \path{app/global-error.tsx}, \newline \path{services/client.ts} & Hoàn thành \\
+\hline
+06/11/2026 & \texttt{7621c5d} & Chuẩn hóa toàn bộ 43 test cases sang Node.js Native Test Runner (\texttt{node:test} và \texttt{node:assert}), loại bỏ phụ thuộc Jest, kiểm soát 100\% test PASS. & \path{tests/*.test.mjs} & Hoàn thành \\
+\hline
+\end{tabularx}
+\end{table}
+
+\noindent \textbf{Đóng góp kỹ thuật nổi bật của Nguyễn Quốc Đại:}
+
+\textbf{1. Kiểm toán độc lập (Triangulation Audit):} Soát lỗi 34 tiêu chí môn học, chỉ ra bằng chứng thực nghiệm qua bảng đối chiếu mã nguồn thực tế tại \path{DANH_GIA_REQUIRE.md}.
+
+\textbf{2. Bộ ba xử lý lỗi đa tầng \& Tự phục hồi:} Xây dựng \path{error.tsx} (bắt lỗi SSR có nút thử lại), \path{global-error.tsx} (bắt lỗi RootLayout có cấu trúc HTML chuẩn) và \path{not-found.tsx} (xử lý tài nguyên thiếu).
+
+\textbf{3. Giải quyết sự cố kiến trúc \& Chuẩn hóa Test:} Loại bỏ monkey-patch DNS Node.js và route \texttt{/tv} rác; đưa toàn bộ 43 ca kiểm thử về Node Native Test Runner đạt tỷ lệ PASS 100\%.
+
+\newpage
+% ==============================================================================
+% TRANG 7: NHẬT KÝ CHI TIẾT CỦA NGUYỄN THÁI VINH
+% ==============================================================================
+\subsection{Nhật ký làm việc của sinh viên Nguyễn Thái Vinh}
+
+\noindent \textbf{Họ và tên:} Nguyễn Thái Vinh \hspace{1cm} \textbf{MSSV:} 3123410433 \newline
+\textbf{Vai trò:} Kỹ sư UI/UX \& Đột biến dữ liệu (UI/UX \& Mutation Specialist) \newline
+\textbf{Chuyên đề cá nhân:} Server Actions, Cookie State RFC 6265, Optimistic UI, Bộ lọc đa tiêu chí \& Live Search.
+
+\begin{table}[H]
+\centering
+\fontsize{7.5}{9.5}\selectfont
+\renewcommand{\arraystretch}{1.08}
+\caption{Nhật ký công việc kỹ thuật cốt lõi của Nguyễn Thái Vinh}
+\label{tab:vinh_log}
+\begin{tabularx}{\textwidth}{|p{1.4cm}|p{1.4cm}|p{2.2cm}|X|c|}
+\hline
+\rowcolor{tableheader}
+\textbf{Thời gian} & \textbf{Nhánh PR} & \textbf{Hiện vật mã nguồn} & \textbf{Nội dung công việc kỹ thuật cụ thể} & \textbf{Trạng thái} \\
+\hline
+04/11/2026 & \texttt{feature/} \newline \texttt{navbar} & \path{Navbar.tsx}, \newline \path{NavLink.tsx} & Thiết kế thanh điều hướng Header: hiệu ứng trong suốt chuyển nền đen (\texttt{\#141414}) khi cuộn trang; liên kết điều hướng mượt giữa Trang chủ, Khám phá và Danh sách. & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{feature/} \newline \texttt{watchlist} & \path{actions/watchlist.ts}, \newline \path{app/watchlist/} & Lập trình Server Actions với các hàm \texttt{addToWatchlist}, \texttt{removeFromWatchlist}; lưu mảng ID phim vào Cookie \texttt{HttpOnly}, giới hạn dung lượng 4KB. & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{feature/} \newline \texttt{watchlist} & \path{WatchlistButton.tsx}, \newline \path{app/watchlist/} & Ứng dụng hook React 19 \texttt{useOptimistic} cho nút lưu phim; xây dựng giao diện hiển thị danh sách phim đã lưu với khả năng xóa phim tức thì. & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{feature/} \newline \texttt{filters} & \path{FilterBar.tsx}, \newline \path{app/browse/} & Xây dựng bộ lọc đa tiêu chí 5 chiều: Thể loại, Năm phát hành, Điểm đánh giá tối thiểu, Quốc gia và Sắp xếp; đồng bộ URL query params hai chiều qua \texttt{useTransition}. & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{feature/} \newline \texttt{filters} & \path{services/discover.ts}, \newline \path{Pagination.tsx} & Hiện thực tầng dịch vụ Discover kết nối endpoint TMDB; xây dựng phân trang với thuật toán rút gọn \texttt{getPageRange()} và hiển thị empty state khi không có kết quả. & Hoàn thành \\
+\hline
+05/11/2026 & \texttt{feature/} \newline \texttt{search} & \path{NavSearchBar.tsx}, \newline \path{api/search/route.ts} & Phát triển ô tìm kiếm Header: cơ chế Debounce 300ms kết hợp \texttt{AbortController}; xây dựng Route Handler GET \path{/api/search} trả về JSON và cấu hình HTTP Cache. & Hoàn thành \\
+\hline
+\end{tabularx}
+\end{table}
+
+\noindent \textbf{Đóng góp kỹ thuật nổi bật của Nguyễn Thái Vinh:}
+
+\textbf{1. Server Actions \& Cookie State RFC 6265:} Giải pháp lưu trữ Watchlist an toàn XSS tuyệt đối qua cờ \texttt{HttpOnly}, cho phép Server Component đọc trực tiếp dữ liệu khi SSR mà không cần Database.
+
+\textbf{2. Optimistic UI React 19:} Nút \texttt{WatchlistButton} phản hồi đổi trạng thái ngay lập tức ($0$ms) giúp trải nghiệm người dùng liền mạch; tự động rollback nếu server action thất bại.
+
+\textbf{3. Bộ lọc 5 chiều \& Live Search chống nghẽn:} Đồng bộ tham số URL qua \texttt{useTransition} giữ giao diện tương tác không bị đơ; Live Search loại bỏ hoàn toàn tình trạng race condition nhờ \texttt{AbortController}.
+
+\newpage
+% ==============================================================================
+% TRANG 8: MA TRẬN PULL REQUESTS VÀ BIÊN BẢN HỌP NHÓM
+% ==============================================================================
+\section{MINH CHỨNG PULL REQUESTS VÀ BIÊN BẢN HỌP NHÓM}
+
+\subsection{Ma trận 10 Pull Requests tích hợp vào nhánh chính dự án}
+
+Toàn bộ mã nguồn dự án được tích hợp thông qua 10 Pull Requests nghiêm ngặt theo Bảng 7:
+
+\begin{table}[H]
+\centering
+\fontsize{7.5}{9.2}\selectfont
+\renewcommand{\arraystretch}{1.08}
+\caption{Ma trận 10 Pull Requests được tích hợp vào nhánh chính dự án}
+\label{tab:pr_matrix}
+\begin{tabularx}{\textwidth}{|c|p{4.2cm}|p{3.2cm}|p{2.3cm}|p{2.3cm}|c|}
+\hline
+\rowcolor{tableheader}
+\textbf{PR} & \textbf{Tiêu đề Pull Request} & \textbf{Nhánh nguồn $\rightarrow$ Đích} & \textbf{Tác giả} & \textbf{Reviewer} & \textbf{Kết quả} \\
+\hline
+\#1 & Khởi tạo dự án Next.js 16, TypeScript Strict \& Tailwind v4 & \texttt{init-setup} $\rightarrow$ \texttt{main} & Nguyễn Công Quân & Nguyễn Quốc Đại & MERGED \\
+\hline
+\#2 & Xây dựng trang chủ SSR, TMDB Client \& fetch song song & \texttt{feature/homepage-ssr} $\rightarrow$ \texttt{main} & Nguyễn Công Quân & Nguyễn Thái Vinh & MERGED \\
+\hline
+\#3 & Hiện thực thanh trượt MovieRow \& Top 10 nét rỗng Netflix & \texttt{feature/movie-slider} $\rightarrow$ \texttt{main} & Nguyễn Công Quân & Nguyễn Quốc Đại & MERGED \\
+\hline
+\#4 & Tích hợp Server Actions Watchlist \& Tái cấu trúc Zero-Bundle & \texttt{feature/search-watchlist} $\rightarrow$ \texttt{main} & Vinh, Quân & Nguyễn Quốc Đại & MERGED \\
+\hline
+\#5 & Xây dựng bộ lọc Browse 5 chiều \& Khảo sát kiểm toán QA & \texttt{feature/navbar-filters} $\rightarrow$ \texttt{main} & Vinh, Đại & Nguyễn Công Quân & MERGED \\
+\hline
+\#6 & Hoàn thiện TrailerModal HTML5, Live Search \& Khử trùng lặp & \texttt{feature/trailer-search} $\rightarrow$ \texttt{main} & Quân, Vinh & Nguyễn Quốc Đại & MERGED \\
+\hline
+\#7 & Kiểm toán độc lập DANH\_GIA\_REQUIRE \& Test ranh giới mạng & \texttt{qdai/audit-review} $\rightarrow$ \texttt{main} & Nguyễn Quốc Đại & Nguyễn Công Quân & MERGED \\
+\hline
+\#8 & Xử lý dứt điểm lỗi monkey-patch DNS, xóa route /tv \& Root Error & \texttt{qdai/fix-feedback-w7} $\rightarrow$ \texttt{main} & Nguyễn Quốc Đại & Nguyễn Công Quân & MERGED \\
+\hline
+\#9 & Chuẩn hóa 43 test cases Node Native Runner \& Mock counts & \texttt{qdai/test-runner} $\rightarrow$ \texttt{main} & Nguyễn Quốc Đại & Nguyễn Thái Vinh & MERGED \\
+\hline
+\#10 & Cập nhật phụ thuộc, Overrides TypeScript \& Đồng bộ báo cáo & \texttt{qdai/final-sync} $\rightarrow$ \texttt{main} & Nguyễn Quốc Đại & Nguyễn Công Quân & MERGED \\
+\hline
+\end{tabularx}
+\end{table}
+
+\subsection{Biên bản các cuộc họp nhóm định kỳ (Meeting Minutes)}
+
+\textbf{Biên bản 1: Họp Khởi động dự án (Tuần 1, 04/11/2026):} Phân tích yêu cầu \path{REQUIRE.md}; thống nhất kiến trúc Next.js 16 App Router; phân định 3 phân hệ độc lập cho 3 thành viên; cam kết quy trình Git Flow và tiêu chuẩn mã nguồn.
+
+\textbf{Biên bản 2: Họp Rà soát Kiến trúc Render (Tuần 3, 05/11/2026):} Giải quyết vấn đề phình bundle phía client của thanh trượt phim bằng cách thống nhất áp dụng Composition Pattern truyền \texttt{cards: ReactNode[]}, đạt Zero-Bundle JS.
+
+\textbf{Biên bản 3: Họp Quyết định Giải pháp Watchlist (Tuần 4, 05/11/2026):} So sánh giữa LocalStorage, Database và Cookie. Thống nhất chọn Cookie \texttt{HttpOnly} kết hợp Server Actions để Server Component đọc được dữ liệu SSR và an toàn XSS.
+
+\newpage
+% ==============================================================================
+% TRANG 9: BIÊN BẢN HỌP TIẾP THEO & BẢNG ĐÁNH GIÁ CHÉO NỘI BỘ
+% ==============================================================================
+\noindent \textbf{V.2. Biên bản các cuộc họp nhóm định kỳ (tiếp theo):}
+
+\vspace{0.1cm}
+\textbf{Biên bản 4: Họp Xử lý Sự cố Kiến trúc Khẩn cấp (Tuần 6, 05/11/2026):} Nguyễn Quốc Đại phát hiện đoạn mã can thiệp \texttt{dns.lookup} làm ô nhiễm socket Node.js và route \texttt{/tv} gãy luồng 404. Nhóm biểu quyết 100\% xóa bỏ monkey-patch DNS và xóa triệt để route \texttt{/tv}.
+
+\textbf{Biên bản 5: Họp Chuẩn hóa Bộ kiểm thử (Tuần 8, 06/11/2026):} Thống nhất chuyển toàn bộ test sang Node.js Native Test Runner (43 bài test); nghiệm thu pipeline tự động \path{collect-evidence.mjs} và máy chủ Mock TMDB loopback cổng 4100.
+
+\textbf{Biên bản 6: Họp Nghiệm thu Toàn diện (Tuần 9, 06/11/2026):} Chạy script \texttt{npm run evidence}, kiểm tra 43/43 tests PASS, kiểm tra lint và build production thành công; rà soát báo cáo học thuật và ký biên bản nghiệm thu.
+
+\section{BẢNG ĐÁNH GIÁ CHÉO NỘI BỘ VÀ XẾP LOẠI (PEER ASSESSMENT)}
+
+Nhóm đã tiến hành đánh giá chéo nội bộ dựa trên 4 tiêu chí: (1) Tinh thần trách nhiệm; (2) Chất lượng kỹ thuật; (3) Đúng hạn; (4) Tinh thần hợp tác đồng đội. Kết quả được ghi nhận trong Bảng 8:
+
+\begin{table}[H]
+\centering
+\fontsize{8.5}{10.8}\selectfont
+\renewcommand{\arraystretch}{1.12}
+\caption{Bảng đánh giá chéo nội bộ giữa các thành viên trong Nhóm 21}
+\label{tab:peer_review}
+\begin{tabularx}{\textwidth}{|p{3.0cm}|p{2.2cm}|p{2.2cm}|X|c|}
+\hline
+\rowcolor{tableheader}
+\textbf{Thành viên được đánh giá} & \textbf{Người đánh giá} & \textbf{Điểm số} & \textbf{Nhận xét chuyên môn nội bộ} & \textbf{Xếp loại} \\
+\hline
+\multirow{2}{*}{\textbf{Nguyễn Công Quân}} & Nguyễn Quốc Đại & 10 / 10 & Khởi tạo kiến trúc xuất sắc, làm chủ App Router và ranh giới mạng, điều phối nhóm nhịp nhàng. & A+ \\
+\cline{2-5}
+& Nguyễn Thái Vinh & 10 / 10 & Hỗ trợ tích hợp Server Actions vào giao diện rất nhanh, giải quyết triệt để vấn đề bundle size. & A+ \\
+\hline
+\multirow{2}{*}{\textbf{Nguyễn Quốc Đại}} & Nguyễn Công Quân & 10 / 10 & Kiểm toán kiến trúc cực kỳ sâu sắc, phát hiện và sửa dứt điểm lỗi DNS, xây dựng bộ test 43 ca hoàn hảo. & A+ \\
+\cline{2-5}
+& Nguyễn Thái Vinh & 10 / 10 & Giúp hoàn thiện hệ thống bắt lỗi và sitemap động, đóng góp tài liệu phản biện rất giá trị. & A+ \\
+\hline
+\multirow{2}{*}{\textbf{Nguyễn Thái Vinh}} & Nguyễn Công Quân & 10 / 10 & Hiện thực Watchlist và Optimistic UI mượt mà, bộ lọc 5 chiều đồng bộ URL rất chuẩn kỹ thuật. & A+ \\
+\cline{2-5}
+& Nguyễn Quốc Đại & 10 / 10 & Tuân thủ nghiêm ngặt chuẩn RFC 6265 về cookie, viết test case cho search và watchlist đầy đủ. & A+ \\
+\hline
+\end{tabularx}
+\end{table}
+
+\newpage
+% ==============================================================================
+% TRANG 10: KẾT LUẬN VÀ CHỮ KÝ XÁC NHẬN CỦA TẬP THỂ NHÓM
+% ==============================================================================
+\section{KẾT LUẬN VÀ CHỮ KÝ XÁC NHẬN CỦA TẬP THỂ NHÓM}
+
+\subsection{Đánh giá kết quả đạt được so với mục tiêu ban đầu}
+
+Sau 9 tuần làm việc với tinh thần nghiêm túc, kỷ luật và áp dụng chuẩn kỹ nghệ phần mềm chuyên nghiệp, Nhóm 21 đã hoàn thành \textbf{100\% các mục tiêu kỹ thuật đề ra}:
+
+\textbf{1. Làm chủ framework Next.js 16 \& React 19:} Phân định rạch ròi Server/Client Components, tối ưu hóa ranh giới mạng đạt Zero-Bundle JS, kiểm soát Data Cache TTL và kích hoạt Dynamic SSR theo yêu cầu.
+
+\textbf{2. An ninh và khả năng tự phục hồi:} Giữ kín khóa bí mật máy chủ, thiết lập HTTP Security Headers, loại bỏ hoàn toàn các lỗi nguy cơ (DNS monkey-patch), xây dựng hệ thống tự phục hồi đa tầng (\texttt{error.tsx}, \texttt{global-error.tsx}, \texttt{not-found.tsx}).
+
+\textbf{3. Đột biến dữ liệu an toàn \& UX cao cấp:} Hiện thực Server Actions với Cookie \texttt{HttpOnly} tuân thủ RFC 6265, trải nghiệm Optimistic UI tức thì, Live Search Debounce 300ms + AbortController và bộ lọc đa tiêu chí 5 chiều.
+
+\textbf{4. Minh chứng thực nghiệm vững chắc:} Vượt qua 43/43 bài kiểm thử tự động của Node.js Native Test Runner, 0 lỗi TypeScript, 0 lỗi ESLint, build production Dynamic SSR thành công và toàn bộ log kiểm chứng được lưu trữ minh bạch.
+
+\subsection{Cam kết tính trung thực của biên bản nhật ký làm việc}
+
+Tập thể Nhóm 21 xin cam kết toàn bộ thông tin ghi nhận trong bản Nhật ký làm việc này là hoàn toàn trung thực, phản ánh chính xác khối lượng công việc, lịch sử đóng góp Git commit, các phiên thảo luận và sản phẩm bàn giao thực tế của từng thành viên trong nhóm.
+
+\vspace{0.8cm}
+
+% BẢNG KÝ TÊN CỦA 3 SINH VIÊN (ĐỂ TRỐNG KÝ TAY VÀ GHI RÕ HỌ TÊN, MSSV)
+\noindent
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\textbf{SINH VIÊN KÝ TÊN}\\[0.15cm]
+\textit{(Ký và ghi rõ họ tên)}\\[3.2cm]
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\textbf{SINH VIÊN KÝ TÊN}\\[0.15cm]
+\textit{(Ký và ghi rõ họ tên)}\\[3.2cm]
+\end{minipage}
+\hfill
+\begin{minipage}[t]{0.32\textwidth}
+\centering
+\textbf{SINH VIÊN KÝ TÊN}\\[0.15cm]
+\textit{(Ký và ghi rõ họ tên)}\\[3.2cm]
+\end{minipage}
+
+\end{document}
