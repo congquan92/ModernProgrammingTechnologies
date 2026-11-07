@@ -1,0 +1,20 @@
+# Fdb version 4
+["pdflatex"] 1794011665.7752 "/home/quocdai210/Projects/ModernProgrammingTechnologies/individual/nhatky.tex" "nhatky.pdf" "nhatky" 1794011665.94869 2
+  "/home/quocdai210/Projects/ModernProgrammingTechnologies/individual/nhatky.tex" 1794011664.8318 37657 aafb059e2ef3c088a5851fe96a779c56 ""
+  "/usr/share/texmf-dist/fonts/tfm/public/cm/cmr12.tfm" 1775415801 1288 655e228510b4c2a1abe905c368440826 ""
+  "/usr/share/texmf-dist/tex/latex/base/exscale.sty" 1775415801 2581 e3b93c96ce990e6e2ffc819a28b77ea9 ""
+  "/usr/share/texmf-dist/tex/latex/base/size12.clo" 1775415801 8449 8dc66c6c313c8eb2d774af83bca435dd ""
+  "/usr/share/texmf-dist/tex/latex/extsizes/extarticle.cls" 1775415801 20602 3112294ba237d94ce4a1502cfef3594f ""
+  "/usr/share/texmf-dist/tex/latex/fontspec/fontspec.sty" 1775415801 3804 debc05110ffb506cef68ea4e72c7bcee ""
+  "/usr/share/texmf-dist/tex/latex/l3backend/l3backend-pdftex.def" 1775415801 30662 bfd6e864f4ffc5018b0e2b6260c3181c ""
+  "/usr/share/texmf-dist/tex/latex/l3kernel/expl3.sty" 1775415801 6558 45786cbbf5684a09ee65aa45a7b367e0 ""
+  "/usr/share/texmf-dist/tex/latex/l3packages/xparse/xparse.sty" 1775415801 10176 c2fc1c663b3f3899ddac6e6ed3fb1d7e ""
+  "/usr/share/texmf-dist/web2c/texmf.cnf" 1775415801 43569 fd570f2fa160877d211e859f687312ba ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1793871062 2426817 aa0f6fbae165ac0ef1862467dbb1a5cf ""
+  "nhatky.aux" 1794011657.77428 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  "nhatky.tex" 1794011664.8318 37657 aafb059e2ef3c088a5851fe96a779c56 ""
+  (generated)
+  "nhatky.aux"
+  "nhatky.log"
+  "nhatky.pdf"
+  (rewritten before read)
