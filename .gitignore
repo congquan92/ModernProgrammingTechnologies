@@ -57,6 +57,10 @@ next-env.d.ts
 /baocao/*.lof
 /baocao/*.lot
 
+# Python virtual environment
+.venv/
+baocao/.venv/
+
 # agent skills (local config, not for version control)
 .agents/
 skills-lock.json
