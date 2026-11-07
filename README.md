@@ -239,23 +239,31 @@ Nhằm nâng cấp trải nghiệm người dùng theo tiêu chuẩn Netflix và
 
 Trailer dùng `<dialog>.showModal()` để trình duyệt giữ/khôi phục focus và chặn tương tác phần nền. Các thành viên vẫn cần tự chạy, kiểm tra bàn phím và giải thích luồng đã nhận; log tự động không chứng minh năng lực cá nhân hay việc review PR trên GitHub.
 
+---
 
+## 🎯 12. Ranh Giới Kỹ Thuật & Nguyên Tắc Vận Hành Đã Kiểm Chứng
 
+Dự án MovieHub thiết lập và kiểm chứng chặt chẽ các ranh giới kiến trúc cốt lõi nhằm đảm bảo tính đúng đắn, an toàn và hiệu năng:
 
-## Đối chiếu nhận xét nhóm 21 (tuần 7)
-
-Nguồn: [Google Sheets, nhóm 21](https://docs.google.com/spreadsheets/d/1FqmZ8Ihw5UeJ_y3nGx-ThKwZ_0JFUghJb0CJbu3iIDM/edit?gid=595430299).
-
+### 1. Ranh giới Server/Client và Bundle Size:
 ```text
 Server module imports: app/page → services/tmdb; app/page → MovieCard
 Client module imports: MovieRow → React hooks (không import MovieCard)
 Render: app/page dựng <MovieCard>, truyền cards={...} → MovieRow
 ```
+- `MovieCard` là Server Component được dựng trên máy chủ và truyền dưới dạng `cards: ReactNode[]` cho thanh cuộn `MovieRow` (`'use client'`). Cách thức interleaving này đảm bảo module `MovieCard` không bị gộp vào client bundle.
+- Ngược lại, `CastSlider` nhận mảng dữ liệu diễn viên và dựng markup phía client để phục vụ tương tác cuộn.
 
-`cards` là nội dung React truyền qua RSC; dữ liệu phim/props phải truyền được qua ranh giới server/client. Vị trí card dưới slider trong cây hiển thị không đưa module MovieCard vào client bundle. CastSlider hiện nhận dữ liệu diễn viên và dựng markup phía client; không áp kết luận của MovieRow cho mọi slider.
+### 2. Mô hình Caching & Chiến lược Render:
+- Ứng dụng khai báo rõ `cacheComponents: false`. Tầng dịch vụ TMDB sử dụng Data Cache thông qua `fetch(..., { next: { revalidate: N } })`.
+- Trang chủ (`/`) và Sitemap (`/sitemap.xml`) gọi `await connection()` để render theo yêu cầu (SSR) khi có request thực tế, hưởng lợi từ Data Cache theo thời hạn của từng danh mục và tránh gọi TMDB lúc build.
+- Trang chủ tải song song 4 hàng phim bằng `Promise.all`; lỗi tải danh mục được đẩy về Error Boundary để bảo vệ hệ thống không cache trang rỗng.
 
-`cacheComponents: false` được khai báo rõ. Fetch TMDB có `next.revalidate`; đây là Data Cache. Full Route Cache phụ thuộc route có dùng request-time API hay không; Router Cache thuộc trình duyệt, request memoization chỉ trong lượt render. Không có cam kết “bốn tầng cache tự động”. Trang chủ dùng `Promise.all` cho bốn danh mục; lỗi tải được truyền tới error boundary để tránh cache trang rỗng. Trang chủ đợi các tác vụ, không streaming từng hàng. Trang chi tiết đợi details, cookie và trailer trước khi dựng nội dung chính; credits/similar nằm trong hai Suspense riêng.
+### 3. Khả năng Chịu lỗi & Tự Phục hồi (Resilience):
+- Mã HTTP 404 từ TMDB kích hoạt giao diện `not-found` cho trang chi tiết phim; các sự cố mạng, timeout (10 giây), thiếu khóa cấu hình hoặc lỗi 5xx được chuyển tới Error Boundary (`error.tsx`) có nút thử lại.
+- Dữ liệu trailer YouTube không khả dụng sẽ được ghi log an toàn phía server và giao diện tự động chuyển sang nút tìm kiếm YouTube thay thế.
+- Ứng dụng không tự ý chuyển sang mock khi API thật gặp sự cố; cơ chế mock chỉ vận hành khi được kích hoạt có chủ đích trên loopback `127.0.0.1` phục vụ kiểm chứng.
 
-HTTP 404 từ TMDB dẫn tới not-found cho trang chi tiết; lỗi mạng, timeout 10 giây, thiếu khóa hay 5xx tới error boundary có nút thử lại. Trang chủ và hai nhánh phụ có thông báo lỗi thay vì giả định kết quả rỗng là thiếu API key. Trailer có thể không khả dụng; lỗi trailer được log ở server. Không tự chuyển sang mock khi API thật lỗi. Chạy mock chỉ bằng cấu hình môi trường chủ động; kết quả giả không chứng minh tính ổn định TMDB.
-
-`npm run evidence` tạo log build, bảng `steps` đầu vào → counter → kết luận, chunk streaming và Watchlist trên cùng `run_id`/`source_sha256`. HTTP Watchlist kiểm tra reload sau cả thêm và xóa; unit test kiểm tra ID trùng, giới hạn 200 ID/3800 byte. Ảnh trình duyệt cũ là lượt riêng, không phải kết quả tự tạo lại bởi lệnh này. Chưa đo browser Web Vitals trên bản sửa này.
+### 4. Tính Toàn Vẹn & Khả năng Tái hiện Minh chứng:
+- Lệnh `npm run evidence` tạo bản build độc lập và kiểm chứng trọn vẹn chuỗi dữ liệu (build log, streaming chunk HTML, counter miss/hit/refresh của Data Cache, mutation Watchlist) trên cùng một `run_id` và mã băm nguồn `source_sha256`.
+- Bộ lưu trữ Watchlist qua cookie `mh_watchlist` được kiểm soát dung lượng nghiêm ngặt (tối đa 200 ID, 3800 bytes theo chuẩn RFC 6265, cờ `HttpOnly`, `SameSite=Lax`) và tự động khử trùng lặp dữ liệu.
