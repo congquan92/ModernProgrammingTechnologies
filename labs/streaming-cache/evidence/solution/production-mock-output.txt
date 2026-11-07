@@ -1,0 +1,20 @@
+generated_at: 2026-11-07T08:23:43.422Z
+git_head: 629d281e10a0288867f361d8757c113a1f9cc2be
+working_tree_dirty: true
+source_sha256: cf6e26cbd625bef0592c4ce4d9123de1f661b78d7b3d1895c105aa3ebfac6ee1
+run_id: 2026-11-07T08:23:43.448Z
+node: v26.12.1
+next: 16.4.5
+platform: linux
+mode: production; controlled loopback TMDB mock; Cache Components disabled
+scope: HTTP streaming, Data Cache, Server Actions and Chrome interaction checks; no CWV/CDN claims
+command: node node_modules/next/dist/bin/next start --hostname 127.0.0.1 --port 38609
+
+▲ Next.js 16.4.5
+- Local:         http://127.0.0.1:38609
+- Network:       http://127.0.0.1:38609
+✓ Ready in 166ms
+✓ Running next.config.ts took 47ms
+
+exit_code: 143
+signal: none

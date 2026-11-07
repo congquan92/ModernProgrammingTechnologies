@@ -1,0 +1,18 @@
+{
+  "generated_at": "2026-11-07T08:21:01.389227+00:00",
+  "command": "npm ci",
+  "exit_code": 0,
+  "platform": "linux",
+  "node": "v26.12.1",
+  "npm": "12.2.1",
+  "next": "16.4.5",
+  "git_head": "629d281e10a0288867f361d8757c113a1f9cc2be",
+  "package_json_sha256": "8356eafe478945125f52a9fbc0671581e03ec4cc5b3555f89d20f5df0d45b5ee",
+  "package_lock_sha256": "0b38882216acf16dab2f9f105c614357cd9da2f24d336d0b149f57da5f70afe4",
+  "fresh_checkout": "/tmp/moviehub-lab-complete-5yonk093",
+  "reused_node_modules": false,
+  "notes": [
+    "npm reported eslint@9.39.5 deprecated",
+    "npm blocked unrs-resolver@1.12.2 postinstall under its allowScripts policy; no policy override applied"
+  ]
+}

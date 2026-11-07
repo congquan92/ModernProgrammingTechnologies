@@ -1,0 +1,25 @@
+{
+  "generated_at": "2026-11-07T08:23:43.422Z",
+  "git_head": "629d281e10a0288867f361d8757c113a1f9cc2be",
+  "working_tree_dirty": true,
+  "source_sha256": "cf6e26cbd625bef0592c4ce4d9123de1f661b78d7b3d1895c105aa3ebfac6ee1",
+  "run_id": "2026-11-07T08:23:43.448Z",
+  "node": "v26.12.1",
+  "next": "16.4.5",
+  "platform": "linux",
+  "mode": "production; controlled loopback TMDB mock; Cache Components disabled",
+  "scope": "real production Server Action HTTP requests; browser interaction/video not measured",
+  "route": "/movie/1794039851596",
+  "add_post": 200,
+  "cookie_flags": [
+    "Secure",
+    "HttpOnly",
+    "SameSite=Lax"
+  ],
+  "saved_on_watchlist": true,
+  "persisted_after_reload": true,
+  "separate_cookie_jar_empty": true,
+  "removed_on_watchlist": true,
+  "removal_persisted_after_reload": true,
+  "cookie_values": "omitted"
+}

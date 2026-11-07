@@ -1,0 +1,17 @@
+{
+  "generated_at": "2026-11-07T08:23:43.422Z",
+  "git_head": "629d281e10a0288867f361d8757c113a1f9cc2be",
+  "working_tree_dirty": true,
+  "source_sha256": "cf6e26cbd625bef0592c4ce4d9123de1f661b78d7b3d1895c105aa3ebfac6ee1",
+  "run_id": "2026-11-07T08:23:43.448Z",
+  "node": "v26.12.1",
+  "next": "16.4.5",
+  "platform": "linux",
+  "mode": "production; controlled loopback TMDB mock; Cache Components disabled",
+  "scope": "HTTP streaming, Data Cache, Server Actions and Chrome interaction checks; no CWV/CDN claims",
+  "server_rendered_home_rows": 4,
+  "api_key_in_home": false,
+  "repeated_query_renders": true,
+  "search_handler_returns_results": true,
+  "invalid_movie_noindex": true
+}

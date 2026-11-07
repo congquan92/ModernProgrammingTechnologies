@@ -1,0 +1,107 @@
+{
+  "generated_at": "2026-11-07T08:23:43.422Z",
+  "git_head": "629d281e10a0288867f361d8757c113a1f9cc2be",
+  "working_tree_dirty": true,
+  "source_sha256": "cf6e26cbd625bef0592c4ce4d9123de1f661b78d7b3d1895c105aa3ebfac6ee1",
+  "run_id": "2026-11-07T08:23:43.448Z",
+  "node": "v26.12.1",
+  "next": "16.4.5",
+  "platform": "linux",
+  "mode": "production; controlled loopback TMDB mock; Cache Components disabled",
+  "scope": "HTTP streaming, Data Cache, Server Actions and Chrome interaction checks; no CWV/CDN claims",
+  "browser": "Chrome/154.0.8037.57",
+  "checks": [
+    {
+      "name": "rapid filters preserve both changes and reset page",
+      "status": "passed"
+    },
+    {
+      "name": "slow search navigation preserves newer focused draft",
+      "status": "passed"
+    },
+    {
+      "name": "header search and Back/Forward sync main search input",
+      "status": "passed"
+    },
+    {
+      "name": "native history query updates mounted search input",
+      "status": "passed"
+    },
+    {
+      "name": "pending search debounce preserves concurrent filter",
+      "status": "passed"
+    },
+    {
+      "name": "failed watchlist action rolls optimistic state back",
+      "status": "passed"
+    },
+    {
+      "name": "trailer dialog traps keyboard focus and restores trigger",
+      "status": "passed"
+    },
+    {
+      "name": "pending main debounce preserves newer slow header navigation",
+      "status": "passed"
+    },
+    {
+      "name": "header search and results fit mobile, tablet and desktop viewports",
+      "status": "passed"
+    },
+    {
+      "name": "all carousel arrows show keyboard focus",
+      "status": "passed"
+    },
+    {
+      "name": "group/row handles rapid clicks, reversal and a new step after wrapping",
+      "status": "passed"
+    },
+    {
+      "name": "group/cast handles rapid clicks, reversal and a new step after wrapping",
+      "status": "passed"
+    },
+    {
+      "name": "group/similar handles rapid clicks, reversal and a new step after wrapping",
+      "status": "passed"
+    },
+    {
+      "name": "header search has visible keyboard focus and restores it on Escape",
+      "status": "passed"
+    },
+    {
+      "name": "header search safely encodes an incomplete Unicode character",
+      "status": "passed"
+    },
+    {
+      "name": "streamed cast and similar placeholders keep their layout dimensions",
+      "status": "passed",
+      "details": [
+        {
+          "width": 375,
+          "before": {
+            "cast": 208.328125,
+            "similar": 283.5,
+            "similarTop": 1108.828125
+          },
+          "after": {
+            "cast": 208.328125,
+            "similar": 283.5,
+            "similarTop": 1108.828125
+          }
+        },
+        {
+          "width": 800,
+          "before": {
+            "cast": 229.65625,
+            "similar": 388,
+            "similarTop": 907.65625
+          },
+          "after": {
+            "cast": 229.65625,
+            "similar": 388,
+            "similarTop": 907.65625
+          }
+        }
+      ]
+    }
+  ]
+}

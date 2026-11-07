@@ -24,6 +24,7 @@ docs
 build*
 !/baocao/evidence/build-output.txt
 !/baocao/evidence/build-mock-output.txt
+!/labs/streaming-cache/evidence/*/build-mock-output.txt
 
 # misc
 .DS_Store

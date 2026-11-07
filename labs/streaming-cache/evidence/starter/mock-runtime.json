@@ -1,0 +1,14 @@
+{
+  "generated_at": "2026-11-07T08:21:13.542Z",
+  "git_head": "629d281e10a0288867f361d8757c113a1f9cc2be",
+  "working_tree_dirty": true,
+  "source_sha256": "8e03c0dbcbf8abcccbfde1f09dfdb368bfd9ede101a012e662ec23b38d41dec3",
+  "run_id": "2026-11-07T08:21:13.592Z",
+  "node": "v26.12.1",
+  "next": "16.4.5",
+  "platform": "linux",
+  "mode": "production; controlled loopback TMDB mock; Cache Components disabled",
+  "scope": "HTTP streaming, Data Cache, Server Actions and Chrome interaction checks; no CWV/CDN claims",
+  "status": "failed",
+  "error": "cast_result must arrive progressively, at least 1000ms after main HTML in this mock"
+}

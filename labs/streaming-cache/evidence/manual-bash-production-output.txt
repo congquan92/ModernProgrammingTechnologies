@@ -1,0 +1,10 @@
+generated_at: 2026-11-07T08:26:50.412210+00:00
+command: npm run start -- --hostname 127.0.0.1 --port 3000
+
+npm notice run modern-programming-technologies@0.1.0 start
+npm notice run next start --hostname 127.0.0.1 --port 3000
+▲ Next.js 16.4.5
+- Local:         http://127.0.0.1:3000
+- Network:       http://127.0.0.1:3000
+✓ Ready in 165ms
+✓ Running next.config.ts took 44ms
