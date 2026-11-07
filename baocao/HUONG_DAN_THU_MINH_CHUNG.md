@@ -1,104 +1,92 @@
-## Lượt tự động dùng cho nghiệm thu nhóm 21
+# Hướng Dẫn Thu Minh Chứng (Evidence Collection Guide)
 
-Chạy `npm ci` rồi `npm run evidence` từ thư mục gốc (Node 24 trở lên). Lệnh chạy lint/test/build Webpack/typecheck, dựng `.next-evidence`, khởi động Next production và TMDB mock loopback với TTL 15 giây. CI chạy cùng lệnh, không cần API key thật. Đọc `mock-runtime.json`: chỉ nghiệm thu khi `status=passed`, các artifact cùng `run_id` và `source_sha256`.
+Tài liệu này hướng dẫn thu thập minh chứng kỹ thuật cho đồ án MovieHub (bao gồm kiểm thử, build production, HTTP streaming, Data Cache revalidation, Watchlist Server Actions và tương tác Chrome).
 
-- `cache-mock.json`: bảng `steps` ghi request và số lần origin nhận; mỗi endpoint có chuỗi 0 → 1 → 1 → 2 → 2. Nội dung phim phải đổi từ “Phiên bản 1” sang “Phiên bản 2” sau revalidation. HTTP client không prefetch; metadata/details cùng endpoint không được suy thành hai request origin nếu chưa thấy counter tăng.
-- `routes-http.json`: HTML server có đủ bốn hàng phim, query lặp chạy được, GET tìm kiếm trả phim và ID sai có `noindex`.
-- `streaming-mock.json`: HTML phần chính/fallback phải đến trước credits/similar trì hoãn; chỉ kết luận HTTP streaming, không kết luận FCP/khả năng tương tác.
-- `watchlist-http.json`: thêm → GET mới → xóa → GET mới, phiên cookie riêng vẫn trống. Test đơn vị kiểm tra trùng/giới hạn cookie.
+---
 
-Mock thay API TMDB; Next production, Data Cache và Server Actions chạy thật. Build `.next` là lượt riêng; trang chủ và sitemap render khi có request, các fetch dùng TTL dịch vụ thường (thấp nhất 1800 giây). Các bước thủ công bên dưới dùng TTL thường nếu không khai báo override; không trộn counter với lượt tự động hoặc hardcode ID 550 đã được dùng ở các lượt trước.
+## 1. Thu Thập Minh Chứng Tự Động (Khuyến Nghị)
 
-Lỗi API thật không tự chuyển mock. Kiểm tra bằng trình duyệt với khóa hợp lệ: mở phim tồn tại, lưu/reload/xóa/reload; ngắt kết nối upstream để kiểm tra thông báo thử lại. Các ảnh cũ không chứng minh bản sửa hiện tại đã qua kiểm tra browser; chưa có Core Web Vitals mới.
+Toàn bộ quy trình xác minh được tự động hóa qua script chuẩn (chạy trên cả Linux/CI và Windows/macOS), không cần khóa TMDB thật:
 
-# Tự ghi minh chứng Watchlist, streaming và Data Cache
+```bash
+# 1. Cài đặt dependencies đúng chuẩn package-lock.json
+npm ci
 
-## Bộ kiểm chứng HTTP tự động
-
-Chạy `npm run evidence` tại gốc dự án. Script dùng khóa giả, tạo production build trong `.next-evidence`, chọn cổng loopback trống và dừng máy chủ khi xong. Kết quả tổng hợp nằm trong `baocao/evidence/mock-runtime.json`; chỉ xem là đạt khi `status` bằng `passed` và các tệp liên quan có cùng `source_sha256`.
-
-`streaming-mock.json` ghi từng chunk HTML và kiểm tra phần chính/fallback về trước kết quả. `cache-mock.json` đếm tại mock origin, kiểm tra cả sau khi TTL 15 giây hết hạn và đợi background refresh hoàn tất. `watchlist-http.json` gọi POST Server Action thật và tải lại `/watchlist` với/không có cookie để kiểm tra thêm, lưu qua reload, cách ly cookie và xóa.
-
-TTL thử nghiệm được cấp qua `TMDB_MOCK_REVALIDATE_SECONDS=15`, chỉ áp dụng với mock HTTP `127.0.0.1`. Cờ `MOVIEHUB_EVIDENCE_BUILD=1` tách output khỏi build thường. Script tự thiết lập các biến này cho tiến trình con; không cần chỉnh `.env.local`.
-
-Đây là bằng chứng HTTP ở máy cục bộ. Nó không đo trình duyệt đã vẽ khi nào, không thay thế Network waterfall/video, không chứng minh cache ở CDN và không đo hiệu năng TMDB thật. Các bước dưới đây dành cho việc bổ sung minh chứng trực quan bằng trình duyệt.
-
-Chạy các lệnh bên dưới bằng PowerShell tại thư mục gốc dự án. Ghi rõ trong bài nộp rằng dữ liệu TMDB của phần streaming/cache là **giả lập có kiểm soát**; độ trễ 2,5 giây và 4 giây được thêm để thấy thứ tự hiển thị, không phải số đo hiệu năng thật.
-
-## Tạo lại các log kiểm tra bằng TMDB thật
-
-Mở PowerShell mới để không giữ các biến môi trường mock, cấu hình `.env.local` với khóa TMDB của bạn rồi chạy:
-
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1
+# 2. Chạy toàn bộ bộ kiểm chứng tự động (Lint, Test, Build, Typecheck, Streaming, Cache, Watchlist, Chrome)
+npm run evidence
 ```
 
-Script chạy lint, type-check, test, production build và kiểm tra HTML; các tệp `.txt` tương ứng được ghi vào `baocao/evidence`. Chụp terminal sau khi thấy `Saved:`; mỗi log phải kết thúc bằng `exit_code: 0`. Sau đó mở terminal khác chạy `npm run start`, trở lại terminal đầu và chạy:
+> **Ghi chú:**
+> - Nếu môi trường máy không có Google Chrome (hoặc chỉ muốn kiểm chứng lab streaming/cache): chạy `npm run lab`.
+> - Mặc định output được ghi vào `baocao/evidence/`. Muốn lưu thư mục khác, set biến môi trường `MOVIEHUB_EVIDENCE_DIR`.
 
-```powershell
-powershell -ExecutionPolicy Bypass -File scripts/refresh-evidence.ps1 -RuntimeOnly
-```
+### Tiêu chí nghiệm thu đạt:
+Mở tệp `baocao/evidence/mock-runtime.json` và kiểm tra:
+- `status`: `"passed"`
+- `build_errors`: `0`, `build_warnings`: `0`
+- Toàn bộ artifact sinh ra có cùng `run_id` và `source_sha256`.
 
-Lệnh thứ hai gọi các route localhost để tạo lại `runtime-http.txt`. Kiểm tra log trước khi chia sẻ để không lộ khóa hoặc thông tin riêng. Dừng production server bằng `Ctrl+C` sau khi chụp ảnh.
+---
 
-## 1. Khởi động môi trường thử nghiệm
+## 2. Ý Nghĩa Các Tệp Minh Chứng Sinh Ra
 
-Terminal A:
+| Tệp Minh Chứng | Nội Dung và Tiêu Chí Xác Minh |
+|---|---|
+| `mock-runtime.json` | Tổng quan kết quả lượt chạy, commit hash, SHA256 mã nguồn, phiên bản Node/Next. |
+| `streaming-mock.json` | Ghi nhận thứ tự chunk HTML. Phần thông tin chính (`main`) và `fallback` skeleton phải đến trước dữ liệu trì hoãn (`credits`, `similar`). |
+| `cache-mock.json` | Đếm request tại mock origin qua chuỗi: miss (0→1) → hit (1) → hết TTL 15s → revalidate (1→2) → warm hit (2). Tagline phim chuyển từ "Phiên bản 1" sang "Phiên bản 2". |
+| `watchlist-http.json` | Kiểm tra Server Action POST thật, cờ bảo mật cookie (`HttpOnly`, `Secure`, `SameSite=Lax`), lưu qua reload, xóa và cô lập cookie jar. |
+| `browser-interactions.json` | 16 kịch bản CDP kiểm tra tương tác Chrome: debounce tìm kiếm, đồng bộ Back/Forward, focus trap của modal trailer, cuộn carousel,... |
+| `routes-http.json` | Kiểm tra server-rendered HTML: 4 hàng phim trang chủ, search route handler, query lặp, route phim không hợp lệ có `noindex`. |
+| Các log `.txt` | `lint-output.txt`, `typecheck-output.txt`, `test-output.txt`, `build-mock-output.txt`, `production-mock-output.txt` (đều có `exit_code: 0`). |
 
-```powershell
-node scripts/mock-tmdb-evidence.mjs
-```
+---
 
-Giữ terminal A mở. Terminal B:
+## 3. Thao Tác Thủ Công: Quay Video / Chụp Ảnh Trình Duyệt
 
-```powershell
-$env:TMDB_BASE_URL='http://127.0.0.1:4100/3'
-$env:TMDB_API_KEY='evidence-only'
-npm run build
-npm run start
-```
+Dành cho trường hợp cần quay video hoặc chụp ảnh DevTools để nộp kèm báo cáo.
 
-Giữ terminal B mở. Mở `http://localhost:3000/movie/550` để xem trang phim giả. Khóa `evidence-only` không phải khóa TMDB thật.
+### Bước 1: Khởi động Mock Server & Production App
+Mở 2 cửa sổ dòng lệnh:
 
-## 2. Quay Watchlist trước và sau
+- **Terminal 1 (Mock TMDB):**
+  ```bash
+  node scripts/mock-tmdb-evidence.mjs
+  ```
+- **Terminal 2 (Next.js Production):**
+  ```bash
+  # Trên PowerShell:
+  $env:TMDB_BASE_URL='http://127.0.0.1:4100/3'
+  $env:TMDB_API_KEY='evidence-only'
+  npm run build
+  npm run start
 
-1. Mở Chrome/Edge ở cửa sổ riêng tư, vào `http://localhost:3000/movie/550`, bật công cụ quay màn hình (ví dụ Snipping Tool > Record). Hiển thị đồng thời trang phim và DevTools (`F12`).
-2. Trong DevTools, vào **Network**, bật **Preserve log**. Vào **Application > Storage > Cookies > http://localhost:3000**, kiểm tra chưa có cookie `mh_watchlist`. Nếu có, xóa riêng cookie này và tải lại trang.
-3. Quay trạng thái nút **Lưu Xem Sau**. Nhấp nút một lần. Quay lúc nút đổi thành **Đã Lưu**, rồi sang `/watchlist` để thấy phim đã được lưu. Tải lại `/watchlist` để chứng minh trạng thái vẫn còn.
-4. Trong **Network**, chọn request `POST` phát sinh khi nhấp nút (Server Action gửi về route hiện tại). Chụp cột **Method/Status** và phần **Response Headers** có `Set-Cookie`; che **giá trị cookie** trong ảnh. Ở **Application > Cookies**, chụp tên `mh_watchlist` cùng các cờ `HttpOnly`, `SameSite`, `Secure`, nhưng che cột **Value**.
-5. Quay thao tác nhấp lại để nút và danh sách trở về trạng thái chưa lưu. Lưu video dưới `baocao/evidence/watchlist-demo.mp4` và ảnh liên quan trong cùng thư mục.
+  # Trên Bash / macOS / Linux:
+  TMDB_BASE_URL='http://127.0.0.1:4100/3' TMDB_API_KEY='evidence-only' npm run build
+  TMDB_BASE_URL='http://127.0.0.1:4100/3' TMDB_API_KEY='evidence-only' npm run start
+  ```
 
-Có thể xuất **Network > Export HAR (sanitized)** thành `baocao/evidence/watchlist-network.har`. Bản sanitized bỏ các header nhạy cảm như `Cookie` và `Set-Cookie`, nên ảnh DevTools ở bước 4 dùng để minh họa cờ cookie. Không xuất HAR có dữ liệu nhạy cảm để nộp.
+### Bước 2: Quay Video Minh Chứng Watchlist
+1. Mở Chrome/Edge ở chế độ ẩn danh (Incognito), truy cập `http://localhost:3000/movie/550`. Bật DevTools (`F12`).
+2. Tab **Application > Storage > Cookies > http://localhost:3000**: Xác nhận chưa có cookie `mh_watchlist`.
+3. Bấm nút **Lưu Xem Sau** trên giao diện:
+   - Nút lập tức đổi trạng thái sang **Đã Lưu**.
+   - Tab **Network**: Ghi nhận request `POST` gửi Server Action thành công (Status 200).
+   - Tab **Application > Cookies**: Xuất hiện cookie `mh_watchlist` với các cờ `HttpOnly`, `Secure`, `SameSite=Lax` (che giá trị value khi chụp/quay).
+4. Điều hướng sang `/watchlist`: Phim đã xuất hiện trong danh sách. F5 tải lại trang để chứng minh trạng thái lưu bền vững.
+5. Bấm nút xóa: Phim biến mất khỏi danh sách; F5 tải lại xác nhận trạng thái xóa được duy trì.
 
-## 3. Ghi bằng chứng streaming
+### Bước 3: Quan Sát HTTP Streaming & Data Cache
+- **Streaming:** Truy cập một phim có ID bất kỳ (ví dụ `http://localhost:3000/movie/99999`). Quan sát phần thông tin chính và skeleton diễn viên/phim tương tự hiển thị ngay lập tức; sau ~2.5s và ~4s (độ trễ mock), dữ liệu diễn viên và phim tương tự lần lượt stream vào trang.
+- **Data Cache:** 
+  + Lần 1 tải trang: Terminal 1 in log `START /movie/99999 ... END`.
+  + Lần 2 tải lại trang ngay sau đó: Terminal 1 không in log thêm (dữ liệu được trả từ Data Cache của Next.js).
 
-Ở terminal C:
+---
 
-```powershell
-node scripts/verify-stream-evidence.mjs | Tee-Object baocao/evidence/streaming-mock.txt
-```
+## 4. Nguyên Tắc An Toàn & Trung Thực Dữ Liệu
 
-Script chọn ID mới mỗi lượt để tránh cache cũ. Kết quả cần có `main_movie_...` và `cast_fallback` trước `cast_result` và `similar_result`. Thời gian dự kiến khoảng 2,5 giây và 4 giây vì mock chủ động trì hoãn hai API đó; thời gian máy thực tế có thể khác. Terminal A đồng thời hiện thứ tự `START`/`END` của các endpoint.
-
-Để quay video dễ nhìn, mở một URL mới dạng `http://localhost:3000/movie/123456789` (chọn ID chưa mở). Ghi hình phần thông tin phim xuất hiện cùng skeleton, sau đó phần diễn viên và phim tương tự lần lượt xuất hiện. Trong trình duyệt, Network chỉ thấy request tới Next.js; các request TMDB chạy ở server nên quan sát ở terminal A.
-
-## 4. Ghi bằng chứng cache miss/hit
-
-Ở terminal C, dùng **cùng một URL** hai lượt trong vòng một giờ:
-
-```powershell
-$id = [DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-$url = "http://localhost:3000/movie/$id"
-Invoke-WebRequest $url | Out-Null
-(Invoke-RestMethod 'http://127.0.0.1:4100/_counts').PSObject.Properties | Where-Object Name -Like "/movie/$id*" | Select-Object Name,Value
-Invoke-WebRequest $url | Out-Null
-(Invoke-RestMethod 'http://127.0.0.1:4100/_counts').PSObject.Properties | Where-Object Name -Like "/movie/$id*" | Select-Object Name,Value
-```
-
-Sau lượt đầu, bộ đếm của `/movie/$id`, `/videos`, `/credits`, `/similar` tăng lên 1. Sau lượt hai, các giá trị giữ nguyên: Next.js trả dữ liệu từ Data Cache trong môi trường thử nghiệm này. Chụp terminal C cùng terminal A. Không bật `Disable cache` hoặc hard reload trong `next dev` khi thử Data Cache; dùng bản `npm run build` + `npm run start` như trên.
-
-## 5. Trở lại cấu hình thật
-
-Dừng terminal B và A bằng `Ctrl+C`, mở PowerShell **mới** để không kế thừa hai biến môi trường giả, rồi chạy `npm run build` và `npm run start` với `.env.local` của bạn. Không đưa khóa TMDB thật hoặc giá trị cookie vào video, ảnh và log nộp thầy.
-
-Chỉ khi đã tự quay/chụp và kiểm tra tệp lưu thành công mới đổi câu “chưa được kiểm chứng trực tiếp” trong báo cáo. Với bằng chứng mock, ghi rõ phạm vi là streaming và cache trong môi trường giả lập; không suy rộng thành Core Web Vitals hay hiệu năng TMDB thật.
+1. **Bảo mật:** Tuyệt đối không commit hoặc đưa `TMDB_API_KEY` thật, giá trị nội dung cookie người dùng vào báo cáo, ảnh chụp hay video.
+2. **Phạm vi kỹ thuật:**
+   - Dữ liệu mock streaming/cache dùng độ trễ giả lập có kiểm soát (2.5s và 4s) nhằm minh chứng thứ tự hiển thị của React Server Components và Suspense.
+   - Các phép đo này không đại diện cho điểm Core Web Vitals (FCP, LCP, CLS) hay hiệu năng thực tế của CDN và TMDB production.

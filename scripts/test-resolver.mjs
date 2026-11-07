@@ -1,17 +1,10 @@
-
 import fs from "node:fs";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import ts from "typescript";
 
 export async function resolve(specifier, context, nextResolve) {
-  if (specifier === "next/headers") {
+  if (["next/headers", "next/cache", "next/server"].includes(specifier)) {
     return nextResolve(new URL("./mock-headers.mjs", import.meta.url).href, context);
-  }
-  if (specifier === "next/cache") {
-    return nextResolve(new URL("./mock-cache.mjs", import.meta.url).href, context);
-  }
-  if (specifier === "next/server") {
-    return nextResolve(new URL("./mock-server.mjs", import.meta.url).href, context);
   }
   if (["next/image", "next/link"].includes(specifier)) {
     const resolved = await nextResolve(`${specifier}.js`, context);
