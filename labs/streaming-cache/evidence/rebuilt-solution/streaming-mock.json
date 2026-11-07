@@ -1,0 +1,329 @@
+{
+  "generated_at": "2026-11-07T09:11:50.195Z",
+  "git_head": "7e06a9a732b9ab5e14c7f9e357d0984291e234be",
+  "working_tree_dirty": true,
+  "source_sha256": "8a76a4540cc2ddf4e4d2450d86d9610841651afde68bce76ca4082dd17b18422",
+  "run_id": "2026-11-07T09:11:50.194Z",
+  "node": "v26.12.1",
+  "next": "16.4.5",
+  "platform": "linux",
+  "mode": "production; controlled loopback TMDB mock; Cache Components disabled",
+  "verification": "lab",
+  "scope": "HTTP streaming and Data Cache with baseline checks; no Watchlist/Chrome/CWV/CDN claims",
+  "route": "/movie/1794042737842",
+  "status": 200,
+  "events": {
+    "main": {
+      "ms": 58,
+      "chunk": 22
+    },
+    "cast_fallback": {
+      "ms": 59,
+      "chunk": 23
+    },
+    "similar_fallback": {
+      "ms": 59,
+      "chunk": 23
+    },
+    "cast_result": {
+      "ms": 2564,
+      "chunk": 29
+    },
+    "similar_result": {
+      "ms": 4073,
+      "chunk": 55
+    }
+  },
+  "chunks": [
+    {
+      "chunk": 1,
+      "ms": 22,
+      "bytes": 16384
+    },
+    {
+      "chunk": 2,
+      "ms": 22,
+      "bytes": 2958
+    },
+    {
+      "chunk": 3,
+      "ms": 46,
+      "bytes": 60
+    },
+    {
+      "chunk": 4,
+      "ms": 51,
+      "bytes": 896
+    },
+    {
+      "chunk": 5,
+      "ms": 52,
+      "bytes": 5342
+    },
+    {
+      "chunk": 6,
+      "ms": 53,
+      "bytes": 4525
+    },
+    {
+      "chunk": 7,
+      "ms": 53,
+      "bytes": 2603
+    },
+    {
+      "chunk": 8,
+      "ms": 53,
+      "bytes": 1394
+    },
+    {
+      "chunk": 9,
+      "ms": 53,
+      "bytes": 5167
+    },
+    {
+      "chunk": 10,
+      "ms": 54,
+      "bytes": 433
+    },
+    {
+      "chunk": 11,
+      "ms": 55,
+      "bytes": 5115
+    },
+    {
+      "chunk": 12,
+      "ms": 55,
+      "bytes": 732
+    },
+    {
+      "chunk": 13,
+      "ms": 55,
+      "bytes": 1739
+    },
+    {
+      "chunk": 14,
+      "ms": 55,
+      "bytes": 195
+    },
+    {
+      "chunk": 15,
+      "ms": 56,
+      "bytes": 1181
+    },
+    {
+      "chunk": 16,
+      "ms": 57,
+      "bytes": 428
+    },
+    {
+      "chunk": 17,
+      "ms": 57,
+      "bytes": 627
+    },
+    {
+      "chunk": 18,
+      "ms": 57,
+      "bytes": 263
+    },
+    {
+      "chunk": 19,
+      "ms": 57,
+      "bytes": 4910
+    },
+    {
+      "chunk": 20,
+      "ms": 58,
+      "bytes": 2842
+    },
+    {
+      "chunk": 21,
+      "ms": 58,
+      "bytes": 4942
+    },
+    {
+      "chunk": 22,
+      "ms": 58,
+      "bytes": 2800
+    },
+    {
+      "chunk": 23,
+      "ms": 59,
+      "bytes": 7132
+    },
+    {
+      "chunk": 24,
+      "ms": 59,
+      "bytes": 570
+    },
+    {
+      "chunk": 25,
+      "ms": 59,
+      "bytes": 201
+    },
+    {
+      "chunk": 26,
+      "ms": 59,
+      "bytes": 223
+    },
+    {
+      "chunk": 27,
+      "ms": 2563,
+      "bytes": 117
+    },
+    {
+      "chunk": 28,
+      "ms": 2563,
+      "bytes": 1883
+    },
+    {
+      "chunk": 29,
+      "ms": 2564,
+      "bytes": 6258
+    },
+    {
+      "chunk": 30,
+      "ms": 2564,
+      "bytes": 11450
+    },
+    {
+      "chunk": 31,
+      "ms": 4063,
+      "bytes": 117
+    },
+    {
+      "chunk": 32,
+      "ms": 4063,
+      "bytes": 4699
+    },
+    {
+      "chunk": 33,
+      "ms": 4064,
+      "bytes": 118
+    },
+    {
+      "chunk": 34,
+      "ms": 4064,
+      "bytes": 1606
+    },
+    {
+      "chunk": 35,
+      "ms": 4064,
+      "bytes": 2054
+    },
+    {
+      "chunk": 36,
+      "ms": 4065,
+      "bytes": 2054
+    },
+    {
+      "chunk": 37,
+      "ms": 4066,
+      "bytes": 2054
+    },
+    {
+      "chunk": 38,
+      "ms": 4066,
+      "bytes": 2054
+    },
+    {
+      "chunk": 39,
+      "ms": 4067,
+      "bytes": 2054
+    },
+    {
+      "chunk": 40,
+      "ms": 4067,
+      "bytes": 2054
+    },
+    {
+      "chunk": 41,
+      "ms": 4068,
+      "bytes": 2054
+    },
+    {
+      "chunk": 42,
+      "ms": 4068,
+      "bytes": 400
+    },
+    {
+      "chunk": 43,
+      "ms": 4069,
+      "bytes": 1654
+    },
+    {
+      "chunk": 44,
+      "ms": 4069,
+      "bytes": 2054
+    },
+    {
+      "chunk": 45,
+      "ms": 4069,
+      "bytes": 2054
+    },
+    {
+      "chunk": 46,
+      "ms": 4070,
+      "bytes": 2054
+    },
+    {
+      "chunk": 47,
+      "ms": 4070,
+      "bytes": 2054
+    },
+    {
+      "chunk": 48,
+      "ms": 4070,
+      "bytes": 2054
+    },
+    {
+      "chunk": 49,
+      "ms": 4071,
+      "bytes": 2054
+    },
+    {
+      "chunk": 50,
+      "ms": 4071,
+      "bytes": 2054
+    },
+    {
+      "chunk": 51,
+      "ms": 4072,
+      "bytes": 352
+    },
+    {
+      "chunk": 52,
+      "ms": 4072,
+      "bytes": 369
+    },
+    {
+      "chunk": 53,
+      "ms": 4072,
+      "bytes": 1333
+    },
+    {
+      "chunk": 54,
+      "ms": 4073,
+      "bytes": 2054
+    },
+    {
+      "chunk": 55,
+      "ms": 4073,
+      "bytes": 12628
+    },
+    {
+      "chunk": 56,
+      "ms": 4074,
+      "bytes": 16384
+    },
+    {
+      "chunk": 57,
+      "ms": 4074,
+      "bytes": 3863
+    },
+    {
+      "chunk": 58,
+      "ms": 4074,
+      "bytes": 14
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+generated_at: 2026-11-07T08:26:50.412210+00:00
+command: node scripts/mock-tmdb-evidence.mjs
+
+Mock TMDB: http://127.0.0.1:4100/3
+Chỉ dùng cho minh chứng; log không ghi api_key.
+START /movie/1794040011296 #1
+END   /movie/1794040011296 #1 1ms
+START /movie/1794040011296/videos #1
+END   /movie/1794040011296/videos #1 0ms
+START /movie/1794040011296/credits #1
+START /movie/1794040011296/similar #1
+END   /movie/1794040011296/credits #1 2504ms
+END   /movie/1794040011296/similar #1 4002ms
+START /movie/1794040015657 #1
+END   /movie/1794040015657 #1 1ms
+START /movie/1794040015657/videos #1
+END   /movie/1794040015657/videos #1 0ms
+START /movie/1794040015657/credits #1
+START /movie/1794040015657/similar #1
+END   /movie/1794040015657/credits #1 2502ms
+END   /movie/1794040015657/similar #1 4001ms
+START /movie/1794040015657 #2
+END   /movie/1794040015657 #2 0ms
+START /movie/1794040015657/videos #2
+END   /movie/1794040015657/videos #2 0ms
+START /movie/1794040015657/credits #2
+START /movie/1794040015657/similar #2
+END   /movie/1794040015657/credits #2 2502ms
+END   /movie/1794040015657/similar #2 4001ms

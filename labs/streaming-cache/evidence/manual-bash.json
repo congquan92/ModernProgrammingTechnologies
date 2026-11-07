@@ -1,0 +1,68 @@
+{
+  "generated_at": "2026-11-07T08:26:50.412210+00:00",
+  "run_id": "2026-11-07T08:26:50.412210+00:00",
+  "git_head": "629d281e10a0288867f361d8757c113a1f9cc2be",
+  "source_sha256": "cf6e26cbd625bef0592c4ce4d9123de1f661b78d7b3d1895c105aa3ebfac6ee1",
+  "node": "v26.12.1",
+  "next": "16.4.5",
+  "platform": "linux",
+  "status": "passed",
+  "scope": "exact documented Bash startup, streaming command and cache block; fresh npm ci checkout; mock HTTP only",
+  "bash_block_sha256": "ed66b1e6cb0bbcad7f90706fb9f9b5cac20375663b75be63be60765de04fa9ed",
+  "route": "/movie/1794040015657",
+  "streaming_events": {
+    "main": {
+      "ms": 285,
+      "chunk": 22
+    },
+    "cast_fallback": {
+      "ms": 285,
+      "chunk": 23
+    },
+    "similar_fallback": {
+      "ms": 285,
+      "chunk": 23
+    },
+    "cast_result": {
+      "ms": 2785,
+      "chunk": 29
+    },
+    "similar_result": {
+      "ms": 4306,
+      "chunk": 55
+    }
+  },
+  "counter_sequences": {
+    "/movie/1794040015657": [
+      0,
+      1,
+      1,
+      2,
+      2
+    ],
+    "/movie/1794040015657/videos": [
+      0,
+      1,
+      1,
+      2,
+      2
+    ],
+    "/movie/1794040015657/credits": [
+      0,
+      1,
+      1,
+      2,
+      2
+    ],
+    "/movie/1794040015657/similar": [
+      0,
+      1,
+      1,
+      2,
+      2
+    ]
+  },
+  "refreshed_content": "Phiên bản 2",
+  "extra_warm_hit_keeps_counts": true,
+  "powershell_runtime": "not run; PowerShell not installed"
+}

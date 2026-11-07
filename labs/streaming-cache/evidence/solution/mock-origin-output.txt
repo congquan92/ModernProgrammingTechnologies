@@ -1,0 +1,235 @@
+generated_at: 2026-11-07T08:23:43.422Z
+git_head: 629d281e10a0288867f361d8757c113a1f9cc2be
+working_tree_dirty: true
+source_sha256: cf6e26cbd625bef0592c4ce4d9123de1f661b78d7b3d1895c105aa3ebfac6ee1
+run_id: 2026-11-07T08:23:43.448Z
+node: v26.12.1
+next: 16.4.5
+platform: linux
+mode: production; controlled loopback TMDB mock; Cache Components disabled
+scope: HTTP streaming, Data Cache, Server Actions and Chrome interaction checks; no CWV/CDN claims
+command: node scripts/mock-tmdb-evidence.mjs
+
+Mock TMDB: http://127.0.0.1:37839/3
+Chỉ dùng cho minh chứng; log không ghi api_key.
+START /trending/movie/week #1
+END   /trending/movie/week #1 1ms
+START /trending/movie/week #2
+END   /trending/movie/week #2 1ms
+START /movie/top_rated #1
+END   /movie/top_rated #1 0ms
+START /movie/now_playing #1
+END   /movie/now_playing #1 0ms
+START /movie/now_playing #2
+END   /movie/now_playing #2 0ms
+START /discover/movie #1
+END   /discover/movie #1 0ms
+START /search/movie #1
+END   /search/movie #1 0ms
+START /search/movie #2
+END   /search/movie #2 0ms
+START /search/movie #3
+END   /search/movie #3 0ms
+START /movie/1794039851596 #1
+END   /movie/1794039851596 #1 0ms
+START /movie/1794039851596/videos #1
+END   /movie/1794039851596/videos #1 0ms
+START /movie/1794039851596/credits #1
+START /movie/1794039851596/similar #1
+END   /movie/1794039851596/credits #1 2504ms
+END   /movie/1794039851596/similar #1 4002ms
+START /movie/1794039851596 #2
+END   /movie/1794039851596 #2 0ms
+START /movie/1794039851596/videos #2
+END   /movie/1794039851596/videos #2 0ms
+START /movie/1794039851596/credits #2
+START /movie/1794039851596/similar #2
+END   /movie/1794039851596/credits #2 2502ms
+END   /movie/1794039851596/similar #2 4001ms
+START /movie/1794039851596 #3
+END   /movie/1794039851596 #3 0ms
+START /movie/1794039851596/videos #3
+END   /movie/1794039851596/videos #3 0ms
+START /movie/1794039851596 #4
+END   /movie/1794039851596 #4 0ms
+START /movie/1794039851596/credits #3
+START /movie/1794039851596/similar #3
+END   /movie/1794039851596/credits #3 2501ms
+END   /movie/1794039851596/similar #3 4001ms
+START /movie/1794039851596 #5
+END   /movie/1794039851596 #5 1ms
+START /movie/1794039851596/videos #4
+END   /movie/1794039851596/videos #4 0ms
+START /movie/1794039851596 #6
+END   /movie/1794039851596 #6 0ms
+START /movie/1794039851596/credits #4
+START /movie/1794039851596/similar #4
+END   /movie/1794039851596/credits #4 2500ms
+END   /movie/1794039851596/similar #4 4001ms
+START /discover/movie #2
+END   /discover/movie #2 1ms
+START /discover/movie #3
+END   /discover/movie #3 0ms
+START /movie/550 #1
+END   /movie/550 #1 1ms
+START /movie/551 #1
+END   /movie/551 #1 0ms
+START /movie/552 #1
+END   /movie/552 #1 0ms
+START /movie/553 #1
+END   /movie/553 #1 0ms
+START /discover/movie #4
+END   /discover/movie #4 1ms
+START /discover/movie #5
+END   /discover/movie #5 0ms
+START /search/movie #4
+END   /search/movie #4 0ms
+START /search/movie #5
+END   /search/movie #5 0ms
+START /search/movie #6
+END   /search/movie #6 0ms
+START /search/movie #7
+END   /search/movie #7 1ms
+START /search/movie #8
+END   /search/movie #8 1ms
+START /search/movie #9
+END   /search/movie #9 1ms
+START /search/movie #10
+END   /search/movie #10 1ms
+START /search/movie #11
+END   /search/movie #11 0ms
+START /search/movie #12
+END   /search/movie #12 0ms
+START /search/movie #13
+END   /search/movie #13 0ms
+START /search/movie #14
+END   /search/movie #14 0ms
+START /search/movie #15
+END   /search/movie #15 1ms
+START /search/movie #16
+END   /search/movie #16 0ms
+START /search/movie #17
+END   /search/movie #17 0ms
+START /search/movie #18
+END   /search/movie #18 0ms
+START /search/movie #19
+END   /search/movie #19 1ms
+START /search/movie #20
+END   /search/movie #20 0ms
+START /search/movie #21
+END   /search/movie #21 1ms
+START /search/movie #22
+END   /search/movie #22 0ms
+START /search/movie #23
+END   /search/movie #23 0ms
+START /search/movie #24
+END   /search/movie #24 0ms
+START /search/movie #25
+END   /search/movie #25 0ms
+START /search/movie #26
+END   /search/movie #26 0ms
+START /search/movie #27
+END   /search/movie #27 1ms
+START /search/movie #28
+END   /search/movie #28 0ms
+START /search/movie #29
+END   /search/movie #29 1ms
+START /search/movie #30
+END   /search/movie #30 0ms
+START /search/movie #31
+END   /search/movie #31 1ms
+START /movie/554 #1
+END   /movie/554 #1 1ms
+START /movie/555 #1
+END   /movie/555 #1 0ms
+START /movie/556 #1
+END   /movie/556 #1 0ms
+START /movie/557 #1
+END   /movie/557 #1 1ms
+START /movie/558 #1
+END   /movie/558 #1 0ms
+START /movie/559 #1
+END   /movie/559 #1 0ms
+START /movie/560 #1
+END   /movie/560 #1 0ms
+START /movie/561 #1
+END   /movie/561 #1 0ms
+START /trending/movie/week #3
+END   /trending/movie/week #3 0ms
+START /trending/movie/week #4
+END   /trending/movie/week #4 0ms
+START /movie/now_playing #3
+END   /movie/now_playing #3 0ms
+START /movie/now_playing #4
+END   /movie/now_playing #4 0ms
+START /movie/top_rated #2
+END   /movie/top_rated #2 0ms
+START /discover/movie #6
+END   /discover/movie #6 0ms
+START /movie/562 #1
+END   /movie/562 #1 0ms
+START /movie/563 #1
+END   /movie/563 #1 0ms
+START /movie/564 #1
+END   /movie/564 #1 0ms
+START /movie/565 #1
+END   /movie/565 #1 1ms
+START /movie/1794039851596 #7
+END   /movie/1794039851596 #7 0ms
+START /movie/1794039851596/videos #5
+END   /movie/1794039851596/videos #5 0ms
+START /movie/566 #1
+END   /movie/566 #1 0ms
+START /movie/567 #1
+END   /movie/567 #1 0ms
+START /movie/568 #1
+END   /movie/568 #1 0ms
+START /movie/569 #1
+END   /movie/569 #1 0ms
+START /movie/1794039851596/credits #5
+START /movie/1794039851596/credits #6
+START /movie/1794039851596/similar #5
+START /movie/550 #2
+END   /movie/550 #2 1ms
+START /movie/551 #2
+END   /movie/551 #2 0ms
+START /movie/552 #2
+END   /movie/552 #2 0ms
+START /movie/553 #2
+END   /movie/553 #2 0ms
+END   /movie/1794039851596/credits #5 2501ms
+START /search/movie #32
+END   /search/movie #32 0ms
+START /search/movie #33
+END   /search/movie #33 1ms
+START /search/movie #34
+END   /search/movie #34 0ms
+START /search/movie #35
+END   /search/movie #35 0ms
+END   /movie/1794039851596/credits #6 2501ms
+START /search/movie #36
+END   /search/movie #36 0ms
+START /search/movie #37
+END   /search/movie #37 0ms
+START /search/movie #38
+END   /search/movie #38 0ms
+START /movie/1794039903714 #1
+END   /movie/1794039903714 #1 0ms
+START /movie/1794039903714/videos #1
+END   /movie/1794039903714/videos #1 0ms
+START /movie/1794039903714/credits #1
+START /movie/1794039903714/similar #1
+END   /movie/1794039851596/similar #5 4002ms
+END   /movie/1794039903714/credits #1 2501ms
+END   /movie/1794039903714/similar #1 4000ms
+START /movie/1794039907821 #1
+END   /movie/1794039907821 #1 0ms
+START /movie/1794039907821/videos #1
+END   /movie/1794039907821/videos #1 1ms
+START /movie/1794039907821/credits #1
+START /movie/1794039907821/similar #1
+END   /movie/1794039907821/credits #1 2502ms
+END   /movie/1794039907821/similar #1 4001ms
+
+exit_code: null
+signal: SIGTERM

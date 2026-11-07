@@ -1,0 +1,21 @@
+--- a/app/movie/[id]/page.tsx
++++ b/app/movie/[id]/page.tsx
+@@ -3,7 +3,7 @@
+ import Link from "next/link";
+ import { notFound } from "next/navigation";
+ import type { Metadata } from "next";
+-import { getMovieDetails, getMovieVideos, selectBestTrailer, TMDBError } from "@/services/tmdb";
++import { getMovieDetails, getMovieVideos, selectBestTrailer, TMDBError, getMovieCredits, getSimilarMovies } from "@/services/tmdb";
+ import { formatRuntime } from "@/utils/formatRuntime";
+ import CastList from "@/components/server/CastList";
+ import CastSkeleton from "@/components/server/CastSkeleton";
+@@ -94,6 +94,9 @@
+   const [isSaved, videos] = await Promise.all([
+     isMovieSaved(movie.id),
+     getMovieVideos(movie.id.toString()),
++    // Lab starter: dữ liệu phụ bị chờ trước khi render các ranh giới Suspense.
++    getMovieCredits(id),
++    getSimilarMovies(id),
+   ]);
+ 
+   const bestTrailer = selectBestTrailer(videos);

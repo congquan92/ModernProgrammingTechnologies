@@ -1,0 +1,52 @@
+{
+  "generated_at": "2026-11-07T09:12:35.874729+00:00",
+  "checkout": "/tmp/moviehub-lab-rebuild-ix1gw0v9",
+  "git_head": "7e06a9a732b9ab5e14c7f9e357d0984291e234be",
+  "scope": "Automated Linux/Bash walkthrough of documented commands; not a timed student session; PowerShell unavailable",
+  "checks": {
+    "fresh_npm_ci": {
+      "exit_code": 0,
+      "seconds": 7.927
+    },
+    "starter": {
+      "exit_code": 1,
+      "seconds": 41.097,
+      "run_id": "2026-11-07T09:12:44.078Z",
+      "source_sha256": "bdd2dbc88c647592f95dcc33b41c5fafe622280a4633312d7eeee92a0b9a547b",
+      "chrome_bin": "intentionally nonexistent; Chrome must not be launched"
+    },
+    "comment-solution": {
+      "exit_code": 0,
+      "seconds": 55.298,
+      "run_id": "2026-11-07T09:13:25.173Z",
+      "source_sha256": "67090b0a4988be732334ae20e63eb3068ca813858f2329ab530c4a3ac54a862d",
+      "chrome_bin": "intentionally nonexistent; Chrome must not be launched"
+    },
+    "distinct_run_directories": true,
+    "comment_only_solution_accepted": true,
+    "diff_against_starter": {
+      "exit_code": 1,
+      "nonempty": true
+    },
+    "exact_solution_has_empty_head_diff": true,
+    "packaging_roundtrip": {
+      "exit_code": 0,
+      "seconds": 0.184
+    },
+    "canonical_lab": {
+      "status": "passed",
+      "run_id": "2026-11-07T09:11:50.194Z",
+      "source_sha256": "8a76a4540cc2ddf4e4d2450d86d9610841651afde68bce76ca4082dd17b18422",
+      "chrome_bin": "/moviehub-lab-chrome-must-not-run",
+      "no_browser_artifact": true,
+      "no_watchlist_artifact": true
+    },
+    "full_product": {
+      "status": "passed",
+      "run_id": "2026-11-07T09:13:45.024Z",
+      "source_sha256": "8a76a4540cc2ddf4e4d2450d86d9610841651afde68bce76ca4082dd17b18422",
+      "browser_checks": 16,
+      "watchlist_verified": true
+    }
+  }
+}

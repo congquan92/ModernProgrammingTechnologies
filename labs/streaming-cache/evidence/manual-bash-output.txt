@@ -1,0 +1,8 @@
+generated_at: 2026-11-07T08:26:50.412210+00:00
+command: exact Bash cache block from lab README
+
+{"/movie/1794040011296":1,"/movie/1794040011296/videos":1,"/movie/1794040011296/credits":1,"/movie/1794040011296/similar":1}{"/movie/1794040011296":1,"/movie/1794040011296/videos":1,"/movie/1794040011296/credits":1,"/movie/1794040011296/similar":1,"/movie/1794040015657":1,"/movie/1794040015657/videos":1,"/movie/1794040015657/credits":1,"/movie/1794040015657/similar":1}{"/movie/1794040011296":1,"/movie/1794040011296/videos":1,"/movie/1794040011296/credits":1,"/movie/1794040011296/similar":1,"/movie/1794040015657":1,"/movie/1794040015657/videos":1,"/movie/1794040015657/credits":1,"/movie/1794040015657/similar":1}{"/movie/1794040011296":1,"/movie/1794040011296/videos":1,"/movie/1794040011296/credits":1,"/movie/1794040011296/similar":1,"/movie/1794040015657":2,"/movie/1794040015657/videos":2,"/movie/1794040015657/credits":2,"/movie/1794040015657/similar":2}{"/movie/1794040011296":1,"/movie/1794040011296/videos":1,"/movie/1794040011296/credits":1,"/movie/1794040011296/similar":1,"/movie/1794040015657":2,"/movie/1794040015657/videos":2,"/movie/1794040015657/credits":2,"/movie/1794040015657/similar":2}http://127.0.0.1:3000/movie/1794040015657
+
+stderr:
+
+exit_code: 0

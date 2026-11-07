@@ -24,6 +24,7 @@ docs
 build*
 !/baocao/evidence/build-output.txt
 !/baocao/evidence/build-mock-output.txt
+!/labs/streaming-cache/evidence/*/build-mock-output.txt
 
 # misc
 .DS_Store
@@ -64,3 +65,8 @@ baocao/.venv/
 # agent skills (local config, not for version control)
 .agents/
 skills-lock.json
+
+# Learner snapshots and independent lab runs; packaged evidence stays tracked.
+/labs/streaming-cache/work/
+/labs/streaming-cache/evidence/runs/
+/labs/streaming-cache/evidence/latest/

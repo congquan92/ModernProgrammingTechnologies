@@ -1,0 +1,89 @@
+{
+  "generated_at": "2026-11-07T08:23:43.422Z",
+  "git_head": "629d281e10a0288867f361d8757c113a1f9cc2be",
+  "working_tree_dirty": true,
+  "source_sha256": "cf6e26cbd625bef0592c4ce4d9123de1f661b78d7b3d1895c105aa3ebfac6ee1",
+  "run_id": "2026-11-07T08:23:43.448Z",
+  "node": "v26.12.1",
+  "next": "16.4.5",
+  "platform": "linux",
+  "mode": "production; controlled loopback TMDB mock; Cache Components disabled",
+  "scope": "HTTP streaming, Data Cache, Server Actions and Chrome interaction checks; no CWV/CDN claims",
+  "base_url": "http://127.0.0.1:38609",
+  "ttl_seconds": 15,
+  "cache_components": false,
+  "content_before": "Phiên bản 1",
+  "content_after": "Phiên bản 2",
+  "before": {
+    "/movie/1794039851596": 0,
+    "/movie/1794039851596/videos": 0,
+    "/movie/1794039851596/credits": 0,
+    "/movie/1794039851596/similar": 0
+  },
+  "miss": {
+    "/movie/1794039851596": 1,
+    "/movie/1794039851596/videos": 1,
+    "/movie/1794039851596/credits": 1,
+    "/movie/1794039851596/similar": 1
+  },
+  "hit": {
+    "/movie/1794039851596": 1,
+    "/movie/1794039851596/videos": 1,
+    "/movie/1794039851596/credits": 1,
+    "/movie/1794039851596/similar": 1
+  },
+  "after_expiry": {
+    "/movie/1794039851596": 2,
+    "/movie/1794039851596/videos": 2,
+    "/movie/1794039851596/credits": 2,
+    "/movie/1794039851596/similar": 2
+  },
+  "warm_after_refresh": {
+    "/movie/1794039851596": 2,
+    "/movie/1794039851596/videos": 2,
+    "/movie/1794039851596/credits": 2,
+    "/movie/1794039851596/similar": 2
+  },
+  "steps": [
+    {
+      "input": "GET /movie/1794039851596 (cold, HTTP stream)",
+      "counts": {
+        "/movie/1794039851596": 1,
+        "/movie/1794039851596/videos": 1,
+        "/movie/1794039851596/credits": 1,
+        "/movie/1794039851596/similar": 1
+      },
+      "result": "miss; main and fallbacks before auxiliary content"
+    },
+    {
+      "input": "GET /movie/1794039851596 (within TTL)",
+      "counts": {
+        "/movie/1794039851596": 1,
+        "/movie/1794039851596/videos": 1,
+        "/movie/1794039851596/credits": 1,
+        "/movie/1794039851596/similar": 1
+      },
+      "result": "hit; no additional upstream requests"
+    },
+    {
+      "input": "wait 16s; GET /movie/1794039851596; wait for refresh",
+      "counts": {
+        "/movie/1794039851596": 2,
+        "/movie/1794039851596/videos": 2,
+        "/movie/1794039851596/credits": 2,
+        "/movie/1794039851596/similar": 2
+      },
+      "result": "one background refresh per endpoint"
+    },
+    {
+      "input": "GET /movie/1794039851596 (after refresh)",
+      "counts": {
+        "/movie/1794039851596": 2,
+        "/movie/1794039851596/videos": 2,
+        "/movie/1794039851596/credits": 2,
+        "/movie/1794039851596/similar": 2
+      },
+      "result": "hit; refreshed data cached"
+    }
+  ]
+}

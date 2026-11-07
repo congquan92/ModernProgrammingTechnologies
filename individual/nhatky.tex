@@ -1,7 +1,7 @@
 \documentclass[12pt,a4paper]{extarticle}
 \usepackage{fontspec}
-\setmainfont{Times New Roman}
-\setmonofont{Consolas}[Scale=0.90]
+\IfFontExistsTF{Times New Roman}{\setmainfont{Times New Roman}}{\setmainfont{Liberation Serif}}
+\IfFontExistsTF{Consolas}{\setmonofont{Consolas}[Scale=0.90]}{\setmonofont{Liberation Mono}[Scale=0.90]}
 \usepackage[vietnamese]{babel}
 \usepackage{mathastext}
 
@@ -56,65 +56,38 @@
 \pagestyle{fancy}
 \fancyhf{}
 \fancyhead[L]{\fontsize{9}{11}\selectfont \textit{Biên bản Nhật ký làm việc Đồ án cuối kỳ -- Nhóm 21}}
-\fancyhead[R]{\fontsize{10}{12}\selectfont \textbf{\thepage}}
+\fancyfoot[R]{\fontsize{10}{12}\selectfont \textbf{\thepage}}
 \renewcommand{\headrulewidth}{0.4pt}
 \renewcommand{\footrulewidth}{0pt}
+\fancypagestyle{plain}{
+  \fancyhf{}
+  \fancyfoot[R]{\fontsize{10}{12}\selectfont \textbf{\thepage}}
+  \renewcommand{\headrulewidth}{0pt}
+}
 
 \begin{document}
 
 % ==============================================================================
-% TRANG 1: PHẦN ĐẦU BIÊN BẢN HÀNH CHÍNH (CHUẨN 100% THEO BIỂU MẪU ĐH SÀI GÒN)
+% TRANG 1: THÔNG TIN NHẬT KÝ LÀM VIỆC
 % ==============================================================================
-\thispagestyle{empty}
-\enlargethispage{3.5\baselineskip}
+\thispagestyle{plain}
 
-\noindent
-\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}cc}
-\begin{tabular}{c}
+\begin{center}
 \fontsize{11}{13.5}\selectfont \textbf{TRƯỜNG ĐẠI HỌC SÀI GÒN} \\
 \fontsize{11}{13.5}\selectfont \textbf{KHOA CÔNG NGHỆ THÔNG TIN} \\
 \rule{3.5cm}{0.6pt}
-\end{tabular} &
-\begin{tabular}{c}
-\fontsize{11}{13.5}\selectfont \textbf{CỘNG HÒA XÃ HỘI CHỦ NGHĨA VIỆT NAM} \\
-\fontsize{11}{13.5}\selectfont \textbf{Độc lập -- Tự do -- Hạnh phúc} \\
-\rule{4.5cm}{0.6pt} \\[0.1cm]
-\fontsize{10}{12.5}\selectfont \textit{Thành phố Hồ Chí Minh, ngày \dots\dots\ tháng \dots\dots\ năm 2026}
-\end{tabular}
-\end{tabular*}
+\end{center}
 
 \vspace{0.3cm}
 
 \begin{center}
-{\fontsize{13.5}{16.5}\selectfont \textbf{BIÊN BẢN ĐÁNH GIÁ ĐỒ ÁN CUỐI KỲ}}\\[0.15cm]
-{\fontsize{10.5}{13.5}\selectfont \textbf{Học phần: Các Công nghệ Lập trình Hiện đại \quad -- \quad Mã học phần: \dots\dots\dots\dots\dots\dots \quad -- \quad Nhóm/lớp: Nhóm 21}}
+{\fontsize{13.5}{16.5}\selectfont \textbf{NHẬT KÝ LÀM VIỆC ĐỒ ÁN CUỐI KỲ}}\\[0.15cm]
+{\fontsize{10.5}{13.5}\selectfont \textbf{Học phần: Các Công nghệ Lập trình Hiện đại}}
 \end{center}
 
 \vspace{0.1cm}
 
-% BẢNG ĐIỂM CÁN BỘ CHẤM THI (KẺ KHUNG LIỀN NÉT, CHUẨN BIỂU MẪU KHOA CNTT)
-\noindent
-\begin{table}[H]
-\centering
-\fontsize{9}{11.5}\selectfont
-\renewcommand{\arraystretch}{1.12}
-\begin{tabular}{|*{6}{>{\centering\arraybackslash}p{2.1cm}|}>{\centering\arraybackslash}p{2.4cm}|}
-\hline
-\multicolumn{2}{|c|}{\textbf{Cán bộ chấm thi 1}} & \multicolumn{2}{c|}{\textbf{Cán bộ chấm thi 2}} & \multicolumn{2}{c|}{\textbf{Tổng hợp}} & \textbf{Ghi chú} \\
-\hline
-Điểm chữ & Điểm số & Điểm chữ & Điểm số & Điểm chữ & Điểm số & \\
-\hline
-\rule{0pt}{1.8em} & & & & & & \\
-\hline
-\multicolumn{2}{|c|}{\parbox[t][2.5cm][t]{4.2cm}{\centering Ký và ghi rõ họ tên \vfill \textbf{ThS. Phạm Thi Vương} \vspace{0.1cm}}} & 
-\multicolumn{2}{c|}{\parbox[t][2.5cm][t]{4.2cm}{\centering Ký và ghi rõ họ tên \vfill \mbox{} \vspace{0.1cm}}} & 
-\multicolumn{2}{c|}{\parbox[t][2.5cm][t]{4.2cm}{\vfill \mbox{}}} & 
-\parbox[t][2.5cm][t]{2.4cm}{\vfill \mbox{}} \\
-\hline
-\end{tabular}
-\end{table}
-
-\vspace{-0.15cm}
+\noindent \textbf{Giảng viên hướng dẫn:} ThS. Phạm Thi Vương \\
 \noindent \textbf{Nhóm:} Nhóm 21 \\
 \noindent \textbf{Tên đồ án:} Tìm hiểu công nghệ Next.js qua ứng dụng tra cứu \& khám phá phim ảnh (MovieHub) \\[0.05cm]
 \noindent \textbf{Thành viên nhóm:}
@@ -126,15 +99,15 @@
 \centering
 \fontsize{9}{11.5}\selectfont
 \renewcommand{\arraystretch}{1.10}
-\begin{tabularx}{\textwidth}{|c|c|X|c|c|p{2.5cm}|}
+\begin{tabularx}{\textwidth}{|>{\centering\arraybackslash}p{1.2cm}|>{\centering\arraybackslash}p{3.5cm}|>{\raggedright\arraybackslash}X|}
 \hline
-\textbf{STT} & \textbf{MSSV} & \textbf{Họ tên} & \textbf{Nhóm/Lớp} & \textbf{Điểm} & \textbf{Ký tên} \\
+\textbf{STT} & \textbf{MSSV} & \textbf{Họ tên} \\
 \hline
-1 & 3123560070 & Nguyễn Công Quân (Trưởng nhóm) & Nhóm 21 & & \\
+1 & 3123560070 & Nguyễn Công Quân (Trưởng nhóm) \\
 \hline
-2 & 3123560013 & Nguyễn Quốc Đại & Nhóm 21 & & \\
+2 & 3123560013 & Nguyễn Quốc Đại \\
 \hline
-3 & 3123410433 & Nguyễn Thái Vinh & Nhóm 21 & & \\
+3 & 3123410433 & Nguyễn Thái Vinh \\
 \hline
 \end{tabularx}
 \end{table}

@@ -1,0 +1,13 @@
+{
+  "generated_at": "2026-11-07T08:21:01.389227+00:00",
+  "platform": "linux",
+  "git_head": "629d281e10a0288867f361d8757c113a1f9cc2be",
+  "patch_sha256": "4da0c56ca0e1ab81c932c9a9dd3808f568694cc11e52303287fc9a04dc685177",
+  "original_page_sha256": "b0d94ca683a4273afa430708c412ccd7c56d2bc0aac326d9313d3637f753bd7f",
+  "starter_page_sha256": "ded6819ce414c56f325a0be83b8cfa731690b6ee130afb7816b4c51904b94ee8",
+  "restored_page_sha256": "b0d94ca683a4273afa430708c412ccd7c56d2bc0aac326d9313d3637f753bd7f",
+  "forward_check": "passed",
+  "reverse_check": "passed",
+  "byte_for_byte_roundtrip": true,
+  "regression_test": "tests/lab-starter.test.mjs"
+}
