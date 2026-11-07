@@ -1,0 +1,88 @@
+generated_at: 2026-11-07T09:13:25.174Z
+git_head: 7e06a9a732b9ab5e14c7f9e357d0984291e234be
+working_tree_dirty: true
+source_sha256: 67090b0a4988be732334ae20e63eb3068ca813858f2329ab530c4a3ac54a862d
+run_id: 2026-11-07T09:13:25.173Z
+node: v26.12.1
+next: 16.4.5
+platform: linux
+mode: production; controlled loopback TMDB mock; Cache Components disabled
+verification: lab
+scope: HTTP streaming and Data Cache with baseline checks; no Watchlist/Chrome/CWV/CDN claims
+command: node --disable-warning=DEP0205 --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs
+
+Lỗi searchQuickLive: TMDBError: Lỗi gọi API TMDB [503]
+    at fetchTMDB (file:///tmp/moviehub-lab-rebuild-ix1gw0v9/services/client.ts:54:28)
+    at async searchQuickLive (file:///tmp/moviehub-lab-rebuild-ix1gw0v9/services/search.ts:40:22)
+    at async GET (file:///tmp/moviehub-lab-rebuild-ix1gw0v9/app/api/search/route.ts:29:25)
+    at async TestContext.<anonymous> (file:///tmp/moviehub-lab-rebuild-ix1gw0v9/tests/api-search.test.mjs:154:18)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+  status: 503
+}
+[RouteHandler GET /api/search] Error: TMDBError: Lỗi gọi API TMDB [503]
+    at fetchTMDB (file:///tmp/moviehub-lab-rebuild-ix1gw0v9/services/client.ts:54:28)
+    at async searchQuickLive (file:///tmp/moviehub-lab-rebuild-ix1gw0v9/services/search.ts:40:22)
+    at async GET (file:///tmp/moviehub-lab-rebuild-ix1gw0v9/app/api/search/route.ts:29:25)
+    at async TestContext.<anonymous> (file:///tmp/moviehub-lab-rebuild-ix1gw0v9/tests/api-search.test.mjs:154:18)
+    at async Test.run (node:internal/test_runner/test:1409:7)
+    at async Test.processPendingSubtests (node:internal/test_runner/test:974:7) {
+  status: 503
+}
+✔ route GET /api/search: returns empty results for empty or short queries (16.634029ms)
+✔ route GET /api/search: includes standard Cache-Control header and returns results (2.182259ms)
+✔ route GET /api/search: sanitizes control characters and truncates queries to 100 chars (1.756046ms)
+✔ search service: searchQuickLive limits output to exactly 5 items (0.633378ms)
+✔ search API bounds Unicode queries without breaking URL encoding (2.620609ms)
+✔ search distinguishes upstream failure from valid empty results (5.052471ms)
+✔ architecture: FilterBar implements all 5 independent criteria (2.785814ms)
+✔ architecture: services/client.ts contains no 'as any' type bypasses (0.896264ms)
+✔ deduplicateMovies retains the first movie for each positive ID (2.643956ms)
+✔ short evidence TTL is allowed only for the loopback mock (112.755194ms)
+✔ child metadata applies root MovieHub suffix exactly once (47.380608ms)
+✔ home rejects upstream failure instead of caching an empty page (8.623679ms)
+✔ search accepts repeated query parameters and bounds the keyword (37.746415ms)
+✔ search page renders Unicode queries at the input length boundary (6.315783ms)
+✔ classic keyword search keeps old films and excludes newer or undated ones (5.755035ms)
+✔ search propagates a failed second page instead of reporting no matches (1.428914ms)
+✔ unsupported keyword filters redirect to a URL that matches the results (0.799458ms)
+✔ discover uses one native TMDB page and validates untrusted filters (1.725111ms)
+✔ browse normalizes repeated filters and invalid page numbers (29.225658ms)
+✔ browse redirects pages beyond the last page and preserves supported filters (7.950342ms)
+✔ watchlist add, reload and remove render the state from the Server Action (7.044977ms)
+✔ watchlist propagates service errors but skips deleted movies (1.797752ms)
+✔ a full watchlist of deleted movies can be cleared and used again (13.579096ms)
+✔ sitemap lists public routes and keeps them when TMDB fails (1.383194ms)
+✔ keyword filters have accessible labels and offer only supported choices (2.169114ms)
+✔ R1: Dead code and TV subsystem files are pruned (2.833028ms)
+✔ R1: searchQuickLive queries /search/movie for pure movie results (0.509952ms)
+✔ R2: robots.ts provides correct crawler directives and sitemap URL (77.122782ms)
+✔ R2: sitemap.ts provides valid sitemap configuration with fallback (1.186642ms)
+✔ R2: next.config.ts configures mandatory HTTP security headers (5.63047ms)
+✔ R2: error boundaries and 404 components exist and export default (2.046945ms)
+✔ client sliders receive rendered cards instead of importing MovieCard (3.160376ms)
+[TMDB] Request failed /movie/7
+[TMDB] Request failed /movie/7
+[TMDB Service] Cảnh báo: TMDB_API_KEY chưa được cấu hình hợp lệ trong .env.local!
+✔ fetchTMDB keeps the key in the server request and configures revalidation (100.110189ms)
+✔ TMDB failures preserve HTTP status, hide secrets and reject missing configuration (7.390823ms)
+✔ streaming verifier rejects a buffered response split into multiple chunks (83.210584ms)
+✔ watchlist: rejects invalid movieId inputs with exact error (7.644933ms)
+✔ watchlist: untrusted cookies accept only unique positive safe integers (2.022297ms)
+✔ watchlist: incoming cookies cannot bypass item and byte limits (0.94677ms)
+✔ watchlist: byte limit includes cookie percent encoding (1.593108ms)
+✔ watchlist: toggleWatchlist adds and removes movie authentic state (1.41121ms)
+✔ watchlist: capacity boundary allows 200 items, rejects 201st (1.515958ms)
+✔ watchlist: 200 serialized IDs byte size safely under RFC 6265 limit (0.575004ms)
+✔ watchlist: resilience to malformed or dirty cookie data (1.108067ms)
+ℹ tests 43
+ℹ suites 0
+ℹ pass 43
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 1420.691248
+
+exit_code: 0
+signal: none

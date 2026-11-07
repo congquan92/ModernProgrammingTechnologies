@@ -1,0 +1,52 @@
+generated_at: 2026-11-07T09:11:50.195Z
+git_head: 7e06a9a732b9ab5e14c7f9e357d0984291e234be
+working_tree_dirty: true
+source_sha256: 8a76a4540cc2ddf4e4d2450d86d9610841651afde68bce76ca4082dd17b18422
+run_id: 2026-11-07T09:11:50.194Z
+node: v26.12.1
+next: 16.4.5
+platform: linux
+mode: production; controlled loopback TMDB mock; Cache Components disabled
+verification: lab
+scope: HTTP streaming and Data Cache with baseline checks; no Watchlist/Chrome/CWV/CDN claims
+command: node scripts/mock-tmdb-evidence.mjs
+
+Mock TMDB: http://127.0.0.1:40451/3
+Chỉ dùng cho minh chứng; log không ghi api_key.
+START /trending/movie/week #1
+END   /trending/movie/week #1 1ms
+START /trending/movie/week #2
+END   /trending/movie/week #2 0ms
+START /movie/now_playing #1
+END   /movie/now_playing #1 0ms
+START /movie/now_playing #2
+END   /movie/now_playing #2 1ms
+START /movie/top_rated #1
+END   /movie/top_rated #1 0ms
+START /discover/movie #1
+END   /discover/movie #1 0ms
+START /search/movie #1
+END   /search/movie #1 0ms
+START /search/movie #2
+END   /search/movie #2 0ms
+START /search/movie #3
+END   /search/movie #3 0ms
+START /movie/1794042737842 #1
+END   /movie/1794042737842 #1 0ms
+START /movie/1794042737842/videos #1
+END   /movie/1794042737842/videos #1 0ms
+START /movie/1794042737842/credits #1
+START /movie/1794042737842/similar #1
+END   /movie/1794042737842/credits #1 2504ms
+END   /movie/1794042737842/similar #1 4002ms
+START /movie/1794042737842 #2
+END   /movie/1794042737842 #2 0ms
+START /movie/1794042737842/videos #2
+END   /movie/1794042737842/videos #2 0ms
+START /movie/1794042737842/credits #2
+START /movie/1794042737842/similar #2
+END   /movie/1794042737842/credits #2 2501ms
+END   /movie/1794042737842/similar #2 4001ms
+
+exit_code: null
+signal: SIGTERM

@@ -1,10 +1,34 @@
-# Đáp án: Streaming và Data Cache
+# Đáp án — Streaming và Data Cache
 
-Đọc sau khi hoàn thành [bài thực hành](README.md). Starter là biến thể cố ý chặn để học; bản sản phẩm gốc đã có hai Suspense đúng vị trí.
+Đọc sau khi làm ba bài trong [hướng dẫn](README.md). Các kết quả mẫu chỉ dùng đối chiếu; người học nộp kết quả của lần chạy riêng.
 
-## 1. Bản sửa tối thiểu
+## Bài 1 — Luồng và boundary
 
-Trong `app/movie/[id]/page.tsx`, bỏ hai lời gọi dữ liệu phụ khỏi `Promise.all` trước `return`, cùng hai import thừa:
+```mermaid
+flowchart TD
+    Browser[Trình duyệt] --> Page[MovieDetailPage — server]
+    Page --> Main[Chi tiết phim, trạng thái Watchlist, video]
+    Page --> CastBoundary[Suspense với CastSkeleton]
+    Page --> SimilarBoundary[Suspense với skeleton phim]
+    CastBoundary --> CastList[CastList — server]
+    SimilarBoundary --> SimilarMovies[SimilarMovies — server]
+    CastList --> ClientCast[CastSlider — client]
+    SimilarMovies --> ClientSimilar[SimilarMoviesSlider — client]
+    Main --> Helper[fetchTMDB — server]
+    CastList --> Helper
+    SimilarMovies --> Helper
+    Helper --> Origin[TMDB hoặc mock loopback]
+```
+
+Trang cần chi tiết phim, trạng thái Watchlist và video để dựng phần chính. Cast/similar có thể hoàn tất sau dưới hai Suspense. Các slider, nút Watchlist và modal xử lý tương tác phía client; việc fetch TMDB nằm phía server.
+
+API key được đọc trong `services/client.ts`, không đưa vào `NEXT_PUBLIC_`, props hay mã trình duyệt. Với lab, khóa `evidence-only` là giả. `HttpOnly` của cookie Watchlist không liên quan tới việc giữ khóa TMDB trên server.
+
+Starter chờ cả credits/similar trong `Promise.all` **trước khi trả JSX**. Hai Suspense bên dưới chưa được render nên không thể giúp nội dung chính đến sớm. `loading.tsx` cấp route có thể xuất hiện, nhưng không chứng minh thông tin phim chính đã đến.
+
+## Bài 2 — Bản sửa tối thiểu
+
+Trong `app/movie/[id]/page.tsx`:
 
 ```diff
 -import { getMovieDetails, getMovieVideos, selectBestTrailer, TMDBError, getMovieCredits, getSimilarMovies } from "@/services/tmdb";
@@ -19,90 +43,98 @@ Trong `app/movie/[id]/page.tsx`, bỏ hai lời gọi dữ liệu phụ khỏi `
    ]);
 ```
 
-Đây là diff giải thích; để áp dụng tự động **chỉ khi trang vẫn đúng starter và chưa có sửa riêng**, dùng patch ngược đầy đủ:
+Đây là diff giải thích; thực hiện sửa trong editor. Có thể giữ comment mà vẫn đúng hành vi. Không thêm fetch trình duyệt, xóa skeleton hay thay Server/Client boundary.
+
+`Promise.all` khởi động các tác vụ song song, nhưng `await` vẫn chờ tác vụ chậm nhất. Sau sửa, `CastList` và `SimilarMovies` tự fetch trong các Suspense riêng; phần chính/fallback được gửi trước kết quả phụ.
+
+Verifier yêu cầu năm marker HTML thật, phần chính/fallback ở chunk trước kết quả và khoảng cách từ `main` tới mỗi kết quả phụ ít nhất 1.000 ms trong điều kiện mock. Một response đã buffer vẫn có thể bị chia thành nhiều chunk transport cùng lúc, nên chỉ đếm chunk là chưa đủ. Những mốc này đo lúc HTTP client nhận HTML, không đo lúc trình duyệt vẽ hoặc hydration.
+
+Starter đúng bài khi lint/test/build/typecheck/route đạt rồi thất bại ở assertion streaming. Lỗi build hay kết nối không được tính. Solution đúng khi lượt mới có `verification=lab`, `status=passed`, exit code 0.
+
+Diff bài nộp phải so với snapshot `work/page.starter.txt`. So với HEAD có thể trống vì source sản phẩm vốn đã chứa lời giải. Với `git diff --no-index`, exit code 1 là có khác biệt, không phải nghiệm thu lab thất bại.
+
+## Bài 3 — Counter, dữ liệu và phạm vi cache
+
+Kỳ vọng cho từng endpoint `/movie/<id>` và các suffix `/videos`, `/credits`, `/similar`:
+
+| Mốc | Counter | Nội dung |
+| --- | ---: | --- |
+| `before`, ID mới | 0 | Chưa tải |
+| `miss`, cold request đã đọc hết | 1 | Phiên bản 1 |
+| `hit`, trong TTL | 1 | Phiên bản 1 |
+| `after_expiry`, đã kích hoạt refresh | 2 | Request kích hoạt có thể còn nhận bản cũ |
+| `warm_after_refresh`, refresh hoàn tất | 2 | Phiên bản 2 |
+
+**1. Sau TTL:** request đầu có thể nhận dữ liệu stale và kích hoạt revalidation nền. Hết TTL không tự sinh request khi không có người truy cập. Không được khẳng định request kích hoạt bắt buộc trả Phiên bản 2.
+
+**2. Counter và hoàn tất:** mock tăng counter tại `START`, khi request tới. Counter tăng chưa chứng minh response đã xong. Bộ kiểm chứng đợi refresh rồi xác nhận HTML chứa Phiên bản 2; có thể đối chiếu `END` trong log mock. Warm hit sau đó không làm counter tăng tiếp.
+
+**3. Ba loại ghi nhớ:** Data Cache lưu response giữa các request tới Next; request memoization chỉ có phạm vi một lượt render; cache trình duyệt nằm phía người dùng. Bộ đo dùng HTTP client Node với request mới, không dựa vào cache trình duyệt. Helper truyền `AbortSignal.timeout(10000)`, opt out cơ chế memoization fetch mặc định; không quy số request ở đây cho memoization. `generateMetadata` và page cùng gọi helper cũng không tự chứng minh origin nhận hai request; counter mới là bằng chứng.
+
+**4. Mô hình route:** trang đọc cookie Watchlist nên có dữ liệu theo request, trong khi các fetch TMDB dùng `next: { revalidate }` vẫn có Data Cache. Mô tả là **SSR kết hợp Data Cache**, không suy ISR toàn trang chỉ từ `next.revalidate`. Lab giữ `cacheComponents: false`.
+
+Counter là số request origin, không phải thời gian phản hồi. Mock nhỏ trên máy cục bộ không chứng minh hiệu năng TMDB thật, Core Web Vitals hoặc cache CDN.
+
+## Kiểm tra đóng gói dành cho nhóm biên soạn
+
+Trên source bàn giao chưa có chỉnh sửa riêng của học viên:
 
 ```sh
-git apply --reverse --check labs/streaming-cache/starter.patch
-git apply --reverse labs/streaming-cache/starter.patch
+node --test labs/streaming-cache/check-starter.test.mjs
 ```
 
-Nếu đã tự sửa đúng, `git apply --reverse --check` có thể thất bại vì patch không còn ở trạng thái starter; không ép áp dụng. So sánh với diff trên. Sau khi sửa, dừng server production, build và start lại với cấu hình lab.
+Kiểm tra áp dụng/đảo ngược patch trên bản sao rồi so khớp từng byte. Đây là kiểm tra đóng gói, không nằm trong `npm test` hay điều kiện chấm lời giải. Học viên chạy `npm run lab` để kiểm tra hành vi.
 
-## 2. Giải thích streaming và boundary
+`npm run evidence` vẫn là quy trình toàn sản phẩm, gồm Watchlist và Chrome. `npm run lab` dùng chế độ `--lab`, giữ các kiểm tra nền và HTTP streaming/cache, không cần Chrome. Giữ các thư mục kết quả mặc định dưới `evidence/runs/` để không ghi đè lượt trước.
 
-`MovieDetailPage`, `CastList`, `SimilarMovies` là Server Components. Trang cần chi tiết phim, trạng thái Watchlist và video trước khi dựng nội dung chính. `CastSlider`, `SimilarMoviesSlider`, nút Watchlist và modal trailer xử lý tương tác phía client.
+## Nguồn lỗi và minh chứng lịch sử
 
-Trong starter, `Promise.all` khởi động các tác vụ song song, nhưng `await` vẫn chờ **tác vụ chậm nhất** trước khi trang trả JSX. Hai Suspense bên dưới chưa được render nên không thể giúp `<main>` đến sớm. `loading.tsx` có thể xuất hiện trước, nhưng skeleton cấp route đó không chứng minh thông tin phim chính đã đến.
+Hai lỗi kiểm tra patch quá chặt và diff trống đã được tái hiện khi rà bản lab trước. Starter chặn streaming là bài tập cố ý, không được đưa vào AI Disclosure như một lỗi AI thực tế. Các tình huống xử lý khác trong hướng dẫn chưa mặc định là sự cố nhóm từng gặp.
 
-Sau sửa, `CastList` và `SimilarMovies` vẫn tự fetch trong hai Suspense riêng. Server gửi phần chính/fallback rồi gửi kết quả phụ khi chúng sẵn sàng. Không cần chuyển trang thành Client Component, thêm fetch trình duyệt hay thay skeleton.
+Các thư mục `evidence/starter/`, `evidence/solution/` và tệp install/manual/patch cũ giữ nguyên để truy lịch sử ngày 07/11/2026; chúng thuộc bản lab 75 phút và fingerprint trước lần viết lại. Không ghép chúng với bộ nghiệm thu mới bên dưới.
 
-Trình duyệt gọi Next.js; request TMDB nằm phía server, quan sát bằng log mock. Khóa không được đưa vào `NEXT_PUBLIC_`, props hoặc log/ảnh. `HttpOnly` của Watchlist không liên quan đến việc giữ khóa TMDB ở server.
+## Minh chứng bản viết lại
 
-Một response hoàn chỉnh có thể bị transport chia nhiều chunk cùng lúc. Vì vậy verifier kiểm tra cả thứ tự marker HTML thật và khoảng cách ít nhất 1.000 ms trong điều kiện độ trễ mock. Không dùng thời gian nhận HTML để suy ra FCP/LCP hoặc thời điểm hydration.
+Các lượt dưới đây chạy thật ngày 07/11/2026 trên Linux. Node `v26.12.1`, Next `16.4.5`; Git HEAD `7e06a9a732b9ab5e14c7f9e357d0984291e234be`, working tree có thay đổi chưa commit. Fingerprint canonical của mã runtime/test/config là `8a76a4540cc2ddf4e4d2450d86d9610841651afde68bce76ca4082dd17b18422`; không dùng riêng HEAD để đại diện các thay đổi chưa commit.
 
-## 3. Giải thích cache
+| Lượt | Run ID | Kết quả và phạm vi |
+| --- | --- | --- |
+| [Starter](evidence/rebuilt-starter/mock-runtime.json) | `2026-11-07T09:12:44.078Z` | Exit code 1; lint, 43 test, build/typecheck và route đạt; thất bại đúng tại streaming |
+| [Solution giữ comment](evidence/rebuilt-comment-solution/mock-runtime.json) | `2026-11-07T09:13:25.173Z` | Exit code 0; lab đạt với đường dẫn Chrome cố ý không tồn tại |
+| [Solution canonical](evidence/rebuilt-solution/mock-runtime.json) | `2026-11-07T09:11:50.194Z` | Exit code 0; lab đạt, không chạy Watchlist/Chrome |
+| [Hồi quy toàn sản phẩm](evidence/rebuilt-full/mock-runtime.json) | `2026-11-07T09:13:45.024Z` | Exit code 0; gồm Watchlist và 16 kiểm tra Chrome, lưu ngoài minh chứng báo cáo |
 
-`next: { revalidate: revalidateTime }` opt-in Data Cache phía server; không mặc định mọi fetch đều được cache. TTL mock 15 giây chỉ hoạt động với HTTP `127.0.0.1`, giữ nguyên TTL dịch vụ khi dùng TMDB thật.
+Starter, solution giữ comment và solution canonical có fingerprint khác nhau vì mã trang khác nhau; đọc từng metadata. Hai lượt canonical lab/full có cùng fingerprint nhưng khác `run_id` và phạm vi, không cộng kết quả thành một lượt.
 
-| Mốc | Counter mỗi endpoint | Nội dung |
-| --- | ---: | --- |
-| Before, ID mới | 0 | Chưa tải |
-| Cold miss hoàn tất | 1 | Phiên bản 1 |
-| Hit trong TTL | 1 | Phiên bản 1 |
-| Sau hết TTL, kích hoạt và đợi refresh | 2 | Request kích hoạt có thể còn nhận phiên bản 1 |
-| Hit sau refresh hoàn tất | 2 | Phiên bản 2 |
+Bộ `npm test` hiện có **43 ca**; kiểm tra đóng gói patch có **1 ca chạy riêng**, không nằm trong bộ lab. Con số 44 của bản cũ được giữ trong log lịch sử.
 
-Bốn endpoint là `/movie/<id>`, `/videos`, `/credits`, `/similar` của cùng ID. Mock tăng counter ngay khi nhận request; phải xem `END` hoặc đợi response xong trước khi kết luận dữ liệu mới sẵn sàng.
+[Kiểm tra luồng làm bài](evidence/rebuilt-checks/checks.json) ghi cài `npm ci` trong checkout mới, áp dụng starter/snapshot, chấp nhận lời giải giữ comment, diff có nội dung và patch roundtrip. Log cài dependency nằm trong [install-output.txt](evidence/rebuilt-checks/install-output.txt); diff thực tế nằm trong [solution-diff.txt](evidence/rebuilt-checks/solution-diff.txt).
 
-Revalidation theo thời gian có thể dùng stale-while-revalidate: request đầu sau TTL nhận dữ liệu cũ và kích hoạt refresh nền. TTL hết hạn không tự tạo một request khi không có người truy cập.
+### Số liệu của một lượt canonical lab
 
-Request memoization chỉ có phạm vi một lượt render; Data Cache tồn tại giữa các request. Helper truyền `AbortSignal.timeout(10000)`, nên không được quy việc gộp request ở đây cho memoization mặc định của React. Metadata và page gọi cùng endpoint không tự chứng minh origin nhận hai request; counter mới là bằng chứng. Cache trình duyệt cũng không giải thích việc một HTTP client mới gọi Next mà upstream không tăng.
-
-Route đọc Watchlist qua `cookies()` nên có dữ liệu theo request, trong khi các fetch TMDB vẫn có Data Cache. Vì vậy mô tả đúng là **SSR kết hợp Data Cache**, không suy ra ISR của toàn trang từ một `next.revalidate`.
-
-## 4. Minh chứng bàn giao và cách chạy lại
-
-Minh chứng chạy thực tế được đặt trong `evidence/`, tách starter khỏi solution. Đọc metadata từng lượt; không coi `status=failed` là thành công của sản phẩm. Starter chỉ đúng bài khi lỗi thực tế thuộc kiểm chứng streaming sau khi build và kiểm tra route đã đạt.
-
-- [Starter runtime](evidence/starter/mock-runtime.json): trạng thái cố ý chặn, lỗi verifier và fingerprint của bản starter.
-- [Solution runtime](evidence/solution/mock-runtime.json): trạng thái nghiệm thu tổng hợp của bản đã sửa.
-- [Streaming sau sửa](evidence/solution/streaming-mock.json): thời điểm/chunk của năm marker.
-- [Data Cache sau sửa](evidence/solution/cache-mock.json): counter, các bước request và nội dung trước/sau.
-- [Kiểm tra patch](evidence/patch-check.json): áp dụng/đảo ngược trên bản sao, đối chiếu SHA-256 trang.
-- [Cài dependency mới](evidence/install.json) và [log npm ci](evidence/install-output.txt): cài trong checkout riêng, không dùng lại `node_modules`.
-- [Lượt Bash thủ công](evidence/manual-bash.json) và [output](evidence/manual-bash-output.txt): chạy đúng khối lệnh cache trong hướng dẫn, kiểm tra nội dung mới và một warm hit bổ sung.
-
-Log lint, test, build, typecheck, mock và production được lưu cạnh metadata tương ứng. Log build có tên `build-mock-output.txt`; tệp này thuộc bộ lab, không dùng thay minh chứng build thật trong báo cáo cũ.
-
-Trên bản đã sửa, chạy `npm run lab` theo hướng dẫn [nghiệm thu](README.md#6-nghiệm-thu-phiếu-kết-quả--10-phút). Lệnh dùng `cross-env` đã có trong project, ghi vào `evidence/latest/` và giữ nguyên minh chứng bàn giao `starter/`, `solution/`. Muốn lưu tên riêng như `evidence/my-solution`, dùng `npm run evidence` với biến môi trường trong hướng dẫn. Bộ tự động còn kiểm tra Watchlist và Chrome vì dùng lại quy trình sẵn có; những kiểm tra này không mở rộng phạm vi bài tập.
-
-Muốn tái tạo log starter có metadata: áp dụng patch trong bản sao riêng, dừng server thủ công rồi chạy lệnh nghiệm thu với output `evidence/my-starter`. Exit code 1 chỉ được xem là đúng tình huống lab khi build/typecheck đã đạt, `routes-http.json` được tạo và lỗi trong `mock-runtime.json` thuộc kiểm chứng streaming. Sau đó tự sửa, build lại và nghiệm thu solution như hướng dẫn.
-
-### Kết quả đã chạy ngày 07/11/2026
-
-Môi trường Linux, Node `v26.12.1`, npm `12.2.1`, Next `16.4.5`; Git HEAD `629d281e10a0288867f361d8757c113a1f9cc2be`. Working tree có thay đổi chưa commit; fingerprint mã nguồn được ghi riêng trong metadata. Các lượt dưới đây thay thế lượt bàn giao ban đầu để khớp script và test lab mới.
-
-| Kiểm tra | Kết quả thực tế |
-| --- | --- |
-| Patch áp dụng rồi đảo ngược | Trang khôi phục đúng từng byte; SHA-256 gốc và khôi phục trùng nhau |
-| Cài mới bằng `npm ci` | Exit code 0; thêm 378 package trong checkout riêng, không dùng lại `node_modules` |
-| Starter, run_id `2026-11-07T08:21:13.592Z` | Lint, 44 test, build/typecheck và kiểm tra route đạt; verifier từ chối với `cast_result must arrive progressively, at least 1000ms after main HTML in this mock` |
-| Solution qua `npm run lab`, run_id `2026-11-07T08:23:43.448Z` | `status=passed`; lint, 44 test, production build, typecheck và 16 kiểm tra Chrome đạt |
-| Cache solution, cả bốn endpoint | Counter `0, 1, 1, 2, 2`; nội dung đổi từ Phiên bản 1 sang Phiên bản 2 |
-| Khối lệnh Bash thủ công | Cả bốn counter đúng chuỗi; nội dung Phiên bản 2; warm hit bổ sung không gọi origin |
-
-Các thời điểm dưới đây thuộc **một lượt solution tự động**, tính từ lúc bắt đầu request; không ghép với lượt Bash thủ công:
+Bảng dưới chỉ trích từ [streaming-mock.json](evidence/rebuilt-solution/streaming-mock.json), không ghép thời điểm của lượt khác:
 
 | Marker | Nhận sau (ms) | Chunk |
 | --- | ---: | ---: |
-| `main` | 61 | 22 |
-| `cast_fallback` | 61 | 23 |
-| `similar_fallback` | 61 | 23 |
-| `cast_result` | 2563 | 29 |
-| `similar_result` | 4076 | 55 |
+| `main` | 58 | 22 |
+| `cast_fallback` | 59 | 23 |
+| `similar_fallback` | 59 | 23 |
+| `cast_result` | 2564 | 29 |
+| `similar_result` | 4073 | 55 |
 
-Test `tests/lab-starter.test.mjs` kiểm tra patch trên thư mục tạm và chạy được ở cả trạng thái starter lẫn solution; checkout người học không bị sửa bởi test.
+[Data Cache cùng lượt](evidence/rebuilt-solution/cache-mock.json):
 
-Lượt `npm ci` ghi nhận cảnh báo ESLint đã hết thời gian hỗ trợ và npm 12 chặn postinstall của `unrs-resolver` theo policy `allowScripts`; giữ nguyên policy. Các kiểm tra lint/build/runtime phía trên vẫn đạt sau lượt cài này. Xem nguyên văn trong log cài đặt.
+| Endpoint | Before | Miss | Hit | Sau refresh | Hit mới |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| `/movie/1794042737842` | 0 | 1 | 1 | 2 | 2 |
+| `/movie/1794042737842/videos` | 0 | 1 | 1 | 2 | 2 |
+| `/movie/1794042737842/credits` | 0 | 1 | 1 | 2 | 2 |
+| `/movie/1794042737842/similar` | 0 | 1 | 1 | 2 | 2 |
 
-Phép đo dùng mock với độ trễ chủ động. Không có phép đo Lighthouse, TMDB thật hay video giao diện trong bộ lab này. Bash và bản cài dependency mới đã được kiểm chứng trên Linux; PowerShell chưa chạy vì máy không cài PowerShell.
+Nội dung được kiểm tra đổi từ **Phiên bản 1** sang **Phiên bản 2**.
+
+### Giới hạn kiểm tra
+
+Đã chạy luồng tự động trên Linux và kiểm tra snapshot/diff tương đương các lệnh hướng dẫn. Checkout mới cài dependency mất 7.927 giây; lệnh starter mất 41.097 giây, lệnh solution giữ comment mất 55.298 giây. Đây là thời gian lệnh tự động, **không phải** thời gian một nhóm sinh viên tự học. Mốc 40 phút là dự kiến phân bổ bài, chưa được xác nhận bằng buổi học với nhóm khác.
+
+Máy kiểm chứng chưa có PowerShell nên chưa chạy trực tiếp các lệnh trên PowerShell; không công bố đã kiểm chứng Windows. Chưa xác nhận một lượt CI GitHub. Không dùng số liệu mock để kết luận Core Web Vitals hay hiệu năng TMDB thật.

@@ -1,0 +1,8 @@
+npm notice run modern-programming-technologies@0.1.0 lab
+npm notice run node scripts/collect-evidence.mjs --lab
+Evidence directory: /tmp/moviehub-lab-rebuild-ix1gw0v9/labs/streaming-cache/evidence/runs/2026-11-07T09-12-44-078Z/
+Running: node node_modules/eslint/bin/eslint.js . --max-warnings=0
+Running: node --disable-warning=DEP0205 --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs
+Running: node node_modules/next/dist/bin/next build --webpack
+Running: node node_modules/typescript/bin/tsc --noEmit
+cast_result must arrive progressively, at least 1000ms after main HTML in this mock

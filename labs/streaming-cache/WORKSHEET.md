@@ -1,41 +1,44 @@
-# Phiếu nộp bài: Streaming và Data Cache
+# Phiếu thực hành — Streaming và Data Cache
 
-Sao chép phiếu này vào bài nộp của bạn. Các ô trống dành cho người học; điền số liệu tự chạy, không dùng số liệu mẫu trong đáp án.
+Điền bằng kết quả của chính nhóm thực hành. Ô trống và chỗ vẽ sơ đồ dành cho người học; không chép số liệu mẫu thành lần chạy của mình.
 
-## 1. Thông tin lần chạy
+## Thông tin
 
 | Mục | Kết quả |
 | --- | --- |
-| Họ tên, lớp, nhóm | |
+| Nhóm, thành viên, lớp | |
 | Ngày chạy, hệ điều hành | |
-| `node --version`, phiên bản Next | |
-| `git rev-parse HEAD`, working tree có thay đổi gì | |
-| Thư mục minh chứng của bạn | |
-| `run_id`, `source_sha256` của starter nếu chạy bộ tự động; ghi “log thủ công” nếu chỉ chạy verifier | |
-| `run_id`, `source_sha256` của solution | |
-| Dữ liệu dùng mock hay TMDB thật | |
+| Node.js / npm / Next.js | |
+| Git HEAD, thay đổi trong working tree | |
+| Thời gian bắt đầu/kết thúc thực hành, không tính cài dependency | |
+| Công cụ AI đã dùng, phần hỗ trợ và phần tự kiểm tra | |
 
-## 2. Dự đoán trước khi sửa
+## Bài 1 — Luồng dữ liệu và dự đoán
 
-Vẽ luồng request từ `/movie/[id]` đến helper fetch, nội dung chính, hai Server Component phụ và các Client Component. Đánh dấu nơi giữ API key.
+Vẽ luồng request tới trang phim, helper fetch, hai component phụ và các component tương tác. Đánh dấu Server/Client boundary và nơi giữ API key.
 
-1. Những dữ liệu nào cần có trước khi dựng nội dung phim chính?
-2. Dự đoán tác động của hai lời gọi credits/similar trong `Promise.all` của starter.
-3. Hai Suspense vẫn tồn tại: vì sao chúng chưa giúp nội dung chính đến sớm?
+**Sơ đồ của nhóm:**
 
-## 3. Starter và bản sửa
+1. Dữ liệu nào cần trước `return` để dựng thông tin phim chính?
+2. Hai lời gọi nào của starter không cần chặn phần chính? Vì sao hai Suspense chưa giúp được?
+3. Có nên chuyển trang sang Client Component hoặc đưa API key vào `NEXT_PUBLIC_` để sửa không? Giải thích.
 
-| Mục | Kết quả |
-| --- | --- |
-| Lệnh kiểm tra trước sửa | |
-| Exit code và nguyên văn lỗi streaming | |
-| Build/typecheck/route đã đạt trước lỗi này chưa | |
-| Diff sửa trang phim | |
-| Lý do bỏ hai lời gọi chờ dữ liệu phụ | |
-| Đã build/start lại sau khi sửa chưa | |
-| Lệnh sau sửa, exit code, ID mới được dùng | |
+## Bài 2 — Starter và lời giải
 
-Ghi thời điểm/chunk từ **cùng một lượt** `streaming-mock.json`:
+| Mục | Starter | Solution |
+| --- | --- | --- |
+| Thư mục kết quả được in | | |
+| `run_id` | | |
+| `source_sha256` | | |
+| `verification`, `status`, exit code | | |
+| Kết quả lint/test/build/typecheck/route | | |
+| Nguyên văn lỗi nếu có | | |
+
+**Diff so với `work/page.starter.txt`:** đính kèm output `git diff --no-index`. Exit code 1 của lệnh diff nghĩa là có khác biệt.
+
+Giải thích bản sửa và vì sao `Promise.all` vẫn có thể chặn nội dung chính:
+
+Ghi các marker từ **một** `streaming-mock.json` của solution:
 
 | Marker | Nhận sau (ms) | Chunk |
 | --- | --- | --- |
@@ -45,38 +48,39 @@ Ghi thời điểm/chunk từ **cùng một lượt** `streaming-mock.json`:
 | `cast_result` | | |
 | `similar_result` | | |
 
-Tính khoảng cách từ `main` đến mỗi kết quả phụ. Giải thích vì sao số chunk riêng lẻ chưa đủ chứng minh streaming.
+Tính khoảng cách từ `main` đến mỗi kết quả phụ. Vì sao nhiều chunk chưa đủ chứng minh streaming hữu ích? Những số đo này có chứng minh thời điểm trình duyệt vẽ không?
 
-## 4. Data Cache
+## Bài 3 — Data Cache
 
-ID dùng chung trong phép đo: __________. TTL: __________ giây.
+**Dự đoán trước khi đọc kết quả:** counter cho một endpoint ở năm mốc trước tải / miss / hit / sau refresh / hit mới:
 
-| Endpoint | Before | Miss | Hit | Sau refresh | Warm hit |
+Đường dẫn ID đo, TTL và trạng thái `cache_components`:
+
+| Endpoint | `before` | `miss` | `hit` | `after_expiry` | `warm_after_refresh` |
 | --- | --- | --- | --- | --- | --- |
 | `/movie/<id>` | | | | | |
 | `/movie/<id>/videos` | | | | | |
 | `/movie/<id>/credits` | | | | | |
 | `/movie/<id>/similar` | | | | | |
 
-| Nội dung | Quan sát |
+| Kiểm tra nội dung | Kết quả |
 | --- | --- |
-| Tagline trước refresh | |
-| Tagline sau refresh hoàn tất | |
-| Bằng chứng `END`/response đã hoàn tất | |
+| `content_before` | |
+| `content_after` | |
+| Nguồn chứng minh refresh hoàn tất: assertion nội dung hoặc log `END` | |
+| Dự đoán nào cần sửa, vì sao | |
 
-1. Request đầu sau TTL có bắt buộc trả nội dung mới không? Giải thích refresh nền.
-2. Counter tăng ở `START` hay `END`? Vì sao phải phân biệt?
-3. Phân biệt request memoization, Data Cache và cache trình duyệt. `AbortSignal` ảnh hưởng gì trong helper hiện tại?
-4. Vì sao route này được mô tả là SSR kết hợp Data Cache?
+1. Request đầu sau TTL có bắt buộc nhận nội dung mới không? Hết TTL có tự sinh request khi không có người truy cập không?
+2. Counter tăng tại `START` hay `END`? Vì sao cần kiểm tra cả nội dung sau refresh?
+3. Phân biệt Data Cache, request memoization và cache trình duyệt. `AbortSignal` ảnh hưởng gì trong helper hiện tại?
+4. Giải thích SSR kết hợp Data Cache của route này. Có thể suy tốc độ TMDB thật, Core Web Vitals hoặc cache CDN từ phép đo không?
 
-## 5. Danh sách bàn giao
+## Checklist bài nộp
 
-- [ ] Phiếu đã điền và diff bản sửa.
-- [ ] Log/ảnh lỗi starter thuộc streaming, có exit code.
-- [ ] Solution có `mock-runtime.json` với `status=passed`.
-- [ ] `streaming-mock.json`, `cache-mock.json` và log lint/test/build/typecheck cùng lượt.
-- [ ] Các artifact của mỗi lượt khớp `run_id` và `source_sha256`; starter/solution được tách riêng.
-- [ ] Khai rõ dùng mock, môi trường, phần tự làm và phần có AI hỗ trợ nếu có.
-- [ ] Không đưa khóa API thật, giá trị cookie hoặc `.env.local` vào bài nộp.
-
-Tiêu chí chấm: boundary/bảo vệ khóa **2 điểm**, sửa và chứng minh streaming **3 điểm**, cache và nội dung trước/sau **3 điểm**, giải thích/giới hạn phép đo **2 điểm**.
+- [ ] Ba bài đã điền; sơ đồ và diff so với snapshot starter được đính kèm.
+- [ ] Starter thất bại đúng tại streaming, có lỗi và exit code; các bước trước đó đạt.
+- [ ] Solution có `verification=lab`, `status=passed`, exit code 0.
+- [ ] Có `streaming-mock.json`, `cache-mock.json` và log lint/test/build/typecheck của solution.
+- [ ] Mỗi lượt khớp `run_id` và `source_sha256`; starter/solution tách riêng.
+- [ ] Đã ghi rõ Next production chạy thật, TMDB dùng mock loopback và giới hạn phép đo.
+- [ ] Đã khai AI hỗ trợ nếu có; không nộp khóa thật, cookie hoặc `.env.local`.

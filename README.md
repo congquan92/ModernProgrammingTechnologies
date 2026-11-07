@@ -7,9 +7,9 @@
 
 ---
 
-## Hands-on lab: Streaming và Data Cache (75 phút)
+## Hands-on lab: Streaming và Data Cache (40 phút)
 
-[Bắt đầu lab](labs/streaming-cache/README.md): dùng starter patch để sửa `await` chặn trang phim, đo HTML streaming và kiểm chứng cache miss/hit/revalidation bằng mock TMDB. Có hướng dẫn Bash/PowerShell, bài tập, [phiếu nộp bài](labs/streaming-cache/WORKSHEET.md), [đáp án](labs/streaming-cache/SOLUTION.md) và minh chứng chạy riêng; không cần khóa TMDB thật. Trên bản đã hoàn thành, chạy `npm run lab` để nghiệm thu và ghi kết quả vào `labs/streaming-cache/evidence/latest/`.
+[Bắt đầu lab](labs/streaming-cache/README.md): tài liệu riêng cho nhóm khác tự thực hành ba bài về Server/Client boundary, sửa streaming và kiểm chứng Data Cache. Có starter, [phiếu nộp bài](labs/streaming-cache/WORKSHEET.md), [đáp án](labs/streaming-cache/SOLUTION.md) và lỗi thường gặp. Chạy `npm run lab` trước/sau sửa; mỗi lượt lưu riêng dưới `labs/streaming-cache/evidence/runs/`, không cần khóa TMDB thật hoặc Chrome. Cài dependency trước buổi thực hành.
 
 ---
 
@@ -95,7 +95,7 @@
 | `npm run dev`      | Khởi chạy môi trường phát triển (Hot reload) tại `http://localhost:3000` |
 | `npm run lint`     | Chạy ESLint, thất bại nếu có bất kỳ warning nào                           |
 | `npm test`         | Chạy bộ kiểm thử chính trong `tests/` bằng Node.js                         |
-| `npm run lab`      | Nghiệm thu lab bằng mock; ghi kết quả riêng vào `labs/streaming-cache/evidence/latest/` |
+| `npm run lab`      | Nghiệm thu streaming/cache bằng mock, không cần Chrome; mỗi lượt lưu riêng dưới `labs/streaming-cache/evidence/runs/` |
 | `npm audit --audit-level=moderate` | Kiểm tra cảnh báo dependency; CI chặn từ mức moderate trở lên       |
 | `npx tsc --noEmit` | Kiểm tra toàn bộ kiểu dữ liệu TypeScript (Type-check)                    |
 | `npm run build`    | Biên dịch production bằng Webpack, không gọi TMDB                         |

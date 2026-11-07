@@ -1,0 +1,9 @@
+npm notice run modern-programming-technologies@0.1.0 lab
+npm notice run node scripts/collect-evidence.mjs --lab
+Evidence directory: /tmp/moviehub-lab-rebuild-ix1gw0v9/labs/streaming-cache/evidence/runs/2026-11-07T09-13-25-173Z/
+Running: node node_modules/eslint/bin/eslint.js . --max-warnings=0
+Running: node --disable-warning=DEP0205 --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON --test tests/*.test.mjs
+Running: node node_modules/next/dist/bin/next build --webpack
+Running: node node_modules/typescript/bin/tsc --noEmit
+Waiting for the 15-second mock TTL to expire, then checking background revalidation...
+Evidence saved in /tmp/moviehub-lab-rebuild-ix1gw0v9/labs/streaming-cache/evidence/runs/2026-11-07T09-13-25-173Z/. Mock measurements are not TMDB/CWV benchmarks.

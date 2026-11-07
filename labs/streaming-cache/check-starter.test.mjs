@@ -6,9 +6,10 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-test("lab starter patch round-trips the current exercise state without modifying the checkout", async (t) => {
-  const source = await readFile(new URL("../app/movie/[id]/page.tsx", import.meta.url));
-  const patch = fileURLToPath(new URL("../labs/streaming-cache/starter.patch", import.meta.url));
+// Packaging check for the distributed source, not a grader for edited solutions.
+test("distribution starter patch round-trips without modifying the checkout", async (t) => {
+  const source = await readFile(new URL("../../app/movie/[id]/page.tsx", import.meta.url));
+  const patch = fileURLToPath(new URL("./starter.patch", import.meta.url));
   const directory = await mkdtemp(join(tmpdir(), "moviehub-lab-patch-"));
   t.after(() => rm(directory, { recursive: true, force: true }));
   const page = join(directory, "app", "movie", "[id]", "page.tsx");

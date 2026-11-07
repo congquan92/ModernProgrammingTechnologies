@@ -1,279 +1,178 @@
-# Hands-on lab: Streaming và Data Cache trên MovieHub
+# Hands-on lab: Streaming và Data Cache trong Next.js
 
-**Thời lượng:** 75 phút sau khi cài dependency. **Đối tượng:** sinh viên biết React, TypeScript và `async`/`await` cơ bản. **Công nghệ:** Next.js 16.4.5, React 19.2.8; `cacheComponents: false`.
+**Dự án:** MovieHub. **Đối tượng:** nhóm khác đã biết React, TypeScript và `async`/`await`. **Thời lượng dự kiến:** 40 phút thực hành, sau khi chuẩn bị môi trường. Tài liệu này độc lập với báo cáo, nộp cùng bộ source.
 
-**Bộ tài liệu:** hướng dẫn này, [starter patch](starter.patch), [phiếu nộp bài](WORKSHEET.md), [đáp án và minh chứng](SOLUTION.md). Bắt đầu bằng bước 2 để làm bài; sau khi sửa xong, `npm run lab` nghiệm thu trên cả Bash/PowerShell. Lệnh ghi đè `evidence/latest/`; giữ riêng lượt cần nộp trước khi chạy lại.
+## 1. Vì sao chọn chủ đề này? — D0
 
-## 1. Mục tiêu và lý do chọn
+MovieHub lấy thông tin phim, diễn viên và phim tương tự từ TMDB trên server. Nếu trang cha chờ toàn bộ dữ liệu, người xem phải chờ phần chậm nhất dù hai phần phụ đã có Suspense. Nếu không hiểu Data Cache, người phát triển cũng dễ nhầm dữ liệu cũ sau TTL là lỗi hoặc gọi mọi cơ chế cache là ISR.
+
+Lab tập trung hai kỹ thuật đã dùng trong sản phẩm: **Streaming với Server Components** và **Data Cache có revalidation**. Người học sửa vị trí chờ dữ liệu rồi kiểm tra HTML và số request thực tế; không dành buổi học để dựng CRUD hay chép lại giao diện.
 
 Sau lab, người học có thể:
 
-- Chỉ ra server/client boundary của route `/movie/[id]` và nơi gọi TMDB.
-- Giải thích vì sao `await` ở component cha có thể chặn nội dung chính dù component con nằm trong Suspense.
-- Sửa chỗ chờ dữ liệu phụ và kiểm chứng HTML được gửi dần qua HTTP.
-- Phân biệt Data Cache, request memoization, cache trình duyệt và ISR toàn trang bằng log thực tế.
-- Chứng minh cache miss/hit/background revalidation bằng số request origin và nội dung thay đổi.
+1. Vẽ luồng dữ liệu trang phim, xác định Server/Client boundary và nơi giữ API key.
+2. Sửa việc chờ dữ liệu phụ làm chặn nội dung chính; chứng minh fallback và kết quả đến ở các thời điểm khác nhau.
+3. Đối chiếu miss/hit/refresh bằng counter và nội dung thay đổi; phân biệt Data Cache, memoization và cache trình duyệt.
 
-Lab đáp ứng phần Server Components, server fetching, Suspense và caching trong [REQUIRE.md](../../REQUIRE.md), cùng yêu cầu starter/bài tập/đáp án trong [PROBLEM.md](../../PROBLEM.md). Streaming + Data Cache tận dụng mock có độ trễ và bộ đếm origin sẵn có, cho kết quả kiểm tra được trong một buổi. Watchlist và tìm kiếm phù hợp cho lab tiếp theo về mutation hoặc state; lab này tập trung mô hình render của Next.js.
+**Bộ tài liệu:** [starter](starter.patch), [phiếu thực hành](WORKSHEET.md), [đáp án](SOLUTION.md). Đọc đáp án sau khi làm ba bài.
 
-**Phạm vi đo:** Next production và Data Cache chạy thật; TMDB được thay bằng mock loopback. Credits bị trì hoãn 2,5 giây, similar 4 giây, TTL mock 15 giây. Thời điểm nhận HTML không đồng nghĩa thời điểm trình duyệt vẽ hay tương tác; không suy ra Lighthouse/Core Web Vitals, hiệu năng TMDB thật hoặc cache CDN.
+## 2. Chuẩn bị trước buổi học
 
-| Chặng | Phút | Đầu ra |
-| --- | ---: | --- |
-| Chuẩn bị | 10 | Starter, mock và production server |
-| Đọc luồng render | 10 | Sơ đồ luồng và dự đoán |
-| Sửa streaming | 25 | Kiểm chứng trước/sau sửa |
-| Đo Data Cache | 20 | Counter và hai phiên bản nội dung |
-| Hoàn thiện bài nộp | 10 | Phiếu kết quả, giải thích, minh chứng |
+- Node.js **>=24**, npm, Git và quyền chạy server HTTP trên `127.0.0.1`.
+- Source MovieHub đi kèm lab, có thư mục `.git`; không cần tài khoản hay API key TMDB thật.
+- Internet để cài dependency và tải Google Fonts khi build. Mock TMDB không làm build hoàn toàn offline.
+- Bash hoặc PowerShell; các lệnh thực hành bên dưới dùng chung cho cả hai. Không cần Chrome hay ba terminal.
+- Next.js **16.4.5**, React **19.2.8**, `cacheComponents: false`; giữ `package-lock.json`.
 
-## 2. Chuẩn bị starter — 10 phút
-
-### Môi trường và bản làm bài
-
-Cần Node.js **>=24**, npm, Git và Internet cho `npm ci`/Google Fonts khi build. Chặng thủ công cần ba terminal; Bash dùng `curl`, PowerShell dùng `Invoke-WebRequest`/`Invoke-RestMethod`. Bộ nghiệm thu cuối cần Chrome/Chromium.
-
-Thực hành trên **bản sao project riêng có thư mục `.git`**, giữ cả thư mục lab này. Có thể sao chép checkout hiện tại bằng công cụ hệ điều hành, bỏ `node_modules`, `.next` và `.next-evidence`, rồi chạy `npm ci` trong bản sao. Cách này giữ được lab chưa commit; `git clone` chỉ lấy nội dung đã commit. Mọi lệnh bên dưới chạy từ gốc bản sao đó. Trước khi áp dụng patch, bảo đảm trang chi tiết phim không có thay đổi riêng cần giữ.
+Làm trên **bản sao riêng** của source; bỏ `node_modules`, `.next`, `.next-evidence` khi sao chép, giữ `.git` và thư mục lab. Nếu lab chưa commit, `git clone` không mang theo thay đổi đó. Mở terminal ở gốc bản sao, chạy trước buổi học:
 
 ```sh
 node --version
-git rev-parse HEAD
+git --version
 npm ci
+git rev-parse HEAD
 git diff HEAD -- "app/movie/[id]/page.tsx"
+```
+
+Diff cuối phải trống. Nếu trang phim có sửa riêng, giữ sửa đổi đó và dùng bản sao sạch khác; không dùng `git reset --hard`. Khắc phục lỗi cài dependency/tải font trước khi tính thời gian thực hành.
+
+## 3. Bài 1 — Đọc luồng và dự đoán, 7 phút
+
+**Bước 1.** Tạo trạng thái starter và lưu mốc so sánh:
+
+```sh
 git apply --check labs/streaming-cache/starter.patch
 git apply labs/streaming-cache/starter.patch
+node -e "const fs = require('node:fs'); fs.mkdirSync('labs/streaming-cache/work', { recursive: true }); fs.copyFileSync('app/movie/[id]/page.tsx', 'labs/streaming-cache/work/page.starter.txt', fs.constants.COPYFILE_EXCL)"
 ```
 
-Nếu `git diff` có thay đổi trước khi áp dụng, dùng bản sao sạch hoặc giữ thay đổi của bạn riêng trước. Nếu `--check` thất bại, dừng và xem phần xử lý lỗi; không ép áp dụng patch.
+Nếu `--check` thất bại, dừng và xem mục 7; không ép áp dụng. Nếu snapshot báo `EEXIST`, giữ bản cũ và dùng bản sao mới cho lượt khác. Snapshot `.txt` không bị TypeScript coi là một trang mới.
 
-Starter thêm hai lời gọi dữ liệu phụ vào `Promise.all` được `await` trước `return` trong trang phim. Đây là **tình huống chặn có chủ ý để thực hành**, không phải lỗi được phát hiện trong sản phẩm. Bản ứng dụng gốc đã có lời giải. Patch giữ nguyên hai Suspense, skeleton, giao diện và validation.
+Starter thêm `getMovieCredits(id)` và `getSimilarMovies(id)` vào `Promise.all` trước `return`. Đây là tình huống chặn **cố ý để học**, không phải lỗi được phát hiện trong sản phẩm gốc. Không cần gõ lại giao diện hay skeleton.
 
-### Terminal A — mock TMDB
+**Bước 2.** Đọc các phần liên quan:
 
-Bash:
-
-```bash
-EVIDENCE_PORT=4100 node scripts/mock-tmdb-evidence.mjs
-```
-
-PowerShell:
-
-```powershell
-$env:EVIDENCE_PORT='4100'
-node scripts/mock-tmdb-evidence.mjs
-```
-
-Giữ terminal mở. Mock chỉ lắng nghe `127.0.0.1`; `http://127.0.0.1:4100/_counts` trả bộ đếm theo đường dẫn. Log `START` ghi khi request tới, `END` ghi khi response hoàn tất. Log bỏ query chứa khóa.
-
-### Terminal B — build và chạy production
-
-Bash:
-
-```bash
-export NEXT_TELEMETRY_DISABLED=1
-export MOVIEHUB_EVIDENCE_BUILD=1
-export TMDB_BASE_URL=http://127.0.0.1:4100/3
-export TMDB_API_KEY=evidence-only
-export TMDB_MOCK_REVALIDATE_SECONDS=15
-npm run build
-```
-
-Sau khi build thành công, chạy trong **cùng terminal**:
-
-```bash
-npm run start -- --hostname 127.0.0.1 --port 3000
-```
-
-PowerShell:
-
-```powershell
-$env:NEXT_TELEMETRY_DISABLED='1'
-$env:MOVIEHUB_EVIDENCE_BUILD='1'
-$env:TMDB_BASE_URL='http://127.0.0.1:4100/3'
-$env:TMDB_API_KEY='evidence-only'
-$env:TMDB_MOCK_REVALIDATE_SECONDS='15'
-npm run build
-```
-
-Sau khi build thành công:
-
-```powershell
-npm run start -- --hostname 127.0.0.1 --port 3000
-```
-
-Build lab nằm trong `.next-evidence`; khóa `evidence-only` là giả. Không cần sửa `.env.local`. Giữ terminal B mở. Cấu hình TTL ngắn chỉ chấp nhận HTTP `127.0.0.1` và số nguyên 1–60 giây; giữ validation này.
-
-## 3. Đọc luồng render — 10 phút
-
-Đọc các vị trí sau, vẽ luồng request và đánh dấu nơi chạy server/client:
-
-| Vị trí | Điều cần tìm |
+| File | Điều cần xác định |
 | --- | --- |
-| `app/movie/[id]/page.tsx` | `await params`, validation ID, metadata, chi tiết phim, chỗ chờ trước `return`, hai Suspense |
-| `components/server/CastList.tsx`, `SimilarMovies.tsx` | Async Server Components; nơi fetch dữ liệu phụ và xử lý lỗi |
-| `components/client/CastSlider.tsx`, `SimilarMoviesSlider.tsx` | Tương tác phía trình duyệt; dữ liệu/nội dung nhận từ server |
-| `services/client.ts`, `services/movies.ts` | Khóa server, timeout, `next.revalidate` và TTL override dành cho mock |
-| `scripts/mock-tmdb-evidence.mjs` | Độ trễ, counter và `tagline` đổi theo số request |
+| `app/movie/[id]/page.tsx` | Dữ liệu cần trước `return`, hai Suspense và dữ liệu bị chờ thêm |
+| `components/server/CastList.tsx`, `SimilarMovies.tsx` | Nơi fetch dữ liệu phụ, xử lý lỗi và dựng nội dung |
+| `components/client/CastSlider.tsx`, `SimilarMoviesSlider.tsx` | Tương tác chạy ở trình duyệt |
+| `services/client.ts` | API key, timeout, `next.revalidate`, giới hạn TTL mock |
 
-Trả lời **trước khi chạy thử**:
+**Bước 3.** Điền Bài 1 trong phiếu: vẽ luồng request, đánh dấu nơi giữ khóa, dự đoán vì sao hai Suspense chưa giúp nội dung chính đến sớm. Chưa xem đáp án.
 
-1. Nội dung nào cần chờ để dựng thông tin phim chính? Credits/similar có cần chặn nội dung chính không?
-2. Hai Suspense còn nguyên trong starter. Vì sao chúng có thể không giúp nội dung chính đến sớm?
-3. Trong DevTools trình duyệt có thấy request trực tiếp đến TMDB với API key không? Quan sát upstream ở đâu?
+**Đạt khi:** phân biệt được nơi fetch và nơi tương tác; chỉ ra `await` ở cha diễn ra trước khi hai Suspense được render.
 
-## 4. Bài tập sửa streaming — 25 phút
+## 4. Bài 2 — Sửa và kiểm chứng streaming, 18 phút
 
-### Trước sửa
-
-Ở terminal C, đặt URL IPv4 khớp server như dưới đây. Script tự chọn ID mới mỗi lượt để tránh cache cũ:
-
-Bash:
-
-```bash
-EVIDENCE_BASE_URL=http://127.0.0.1:3000 node scripts/verify-stream-evidence.mjs
-```
-
-PowerShell:
-
-```powershell
-$env:EVIDENCE_BASE_URL='http://127.0.0.1:3000'
-node scripts/verify-stream-evidence.mjs
-```
-
-Ghi lỗi và exit code (`echo $?` trong Bash; `$LASTEXITCODE` trong PowerShell). Starter phải bị từ chối bởi kiểm tra streaming, ví dụ thiếu fallback hoặc kết quả không đến đủ muộn so với `main`. Tên assertion cụ thể phụ thuộc cách Next gom chunk. Lỗi kết nối, build hoặc HTTP timeout không phải kết quả mong đợi.
-
-Chụp/lưu lệnh, lỗi, exit code, thời điểm và Git HEAD vào phiếu. Lượt verifier thủ công này không sinh `run_id`/fingerprint; đánh dấu là log thủ công, tách khỏi bộ JSON nghiệm thu tự động cuối bài.
-
-Để quan sát trực tiếp, mở một `/movie/<ID-số-dương-mới>` khác chưa từng dùng. Ghi nhận thông tin chính/skeleton/kết quả xuất hiện; không dùng ID đó cho phép đo HTTP lạnh.
-
-### Sửa
-
-1. Chỉ ra hai lời gọi dữ liệu phụ đang bị chờ trước `return` trong trang phim.
-2. Bỏ việc chờ dư thừa đó và import không còn dùng. Giữ fetch trong `CastList` và `SimilarMovies`, dưới hai Suspense độc lập.
-3. Giữ nguyên validation ID, xử lý lỗi, skeleton, `data-stream`, `data-movie-id` và Server/Client boundary.
-4. Dừng terminal B bằng `Ctrl+C`. Chạy lại `npm run build` với cấu hình lab còn trong terminal; chỉ khi build thành công mới chạy lại lệnh `npm run start` ở trên. Production không tự cập nhật khi sửa source.
-5. Chạy lại trình kiểm chứng ở terminal C với ID mới.
-
-Sau sửa, script phải kết thúc với exit code 0 và JSON có `events.main`, hai fallback, `cast_result`, `similar_result`. Nội dung chính/fallback đến ở chunk trước kết quả phụ; mỗi kết quả phụ đến ít nhất 1.000 ms sau `main` theo điều kiện mock. Không yêu cầu số chunk hay thời gian tuyệt đối cố định.
-
-**Câu hỏi:** Vì sao hai API chạy bằng `Promise.all` vẫn có thể chặn trang? Vì sao tăng số chunk transport chưa đủ chứng minh streaming hữu ích?
-
-## 5. Bài tập Data Cache — 20 phút
-
-Giữ bản đã sửa và hai server đang chạy. Thực hiện cả khối lệnh liên tục, tránh chờ nhập từng dòng quá TTL. Dùng cùng ID trong toàn bộ khối; đường dẫn chưa có trong counter được tính là 0. Không mở URL đó trong trình duyệt khi đang đo.
-
-Bash, terminal C:
-
-```bash
-lab_id=$(node -p 'Date.now()')
-lab_url="http://127.0.0.1:3000/movie/$lab_id"
-# Before: tìm /movie/$lab_id và ba suffix /videos, /credits, /similar; chưa có = 0.
-curl -fsS http://127.0.0.1:4100/_counts
-# Cold miss: đọc hết response trước khi kiểm tra counter.
-curl -fsS "$lab_url" -o /dev/null
-curl -fsS http://127.0.0.1:4100/_counts
-# Warm hit: bốn counter giữ nguyên.
-curl -fsS "$lab_url" -o /dev/null
-curl -fsS http://127.0.0.1:4100/_counts
-# TTL hết hạn; request này có thể nhận bản cũ và kích hoạt refresh nền.
-sleep 16
-curl -fsS "$lab_url" -o /dev/null
-sleep 5
-curl -fsS http://127.0.0.1:4100/_counts
-# Origin đã END cả bốn response; request sau dùng bản đã refresh.
-curl -fsS "$lab_url" -o /dev/null
-curl -fsS http://127.0.0.1:4100/_counts
-echo "$lab_url"
-```
-
-PowerShell, terminal C:
-
-```powershell
-$labId=[DateTimeOffset]::UtcNow.ToUnixTimeMilliseconds()
-$labUrl="http://127.0.0.1:3000/movie/$labId"
-# Before: tìm bốn đường dẫn của ID này; chưa có = 0.
-Invoke-RestMethod 'http://127.0.0.1:4100/_counts' | ConvertTo-Json
-$labFirst=Invoke-WebRequest -UseBasicParsing $labUrl
-Invoke-RestMethod 'http://127.0.0.1:4100/_counts' | ConvertTo-Json
-$null=Invoke-WebRequest -UseBasicParsing $labUrl
-Invoke-RestMethod 'http://127.0.0.1:4100/_counts' | ConvertTo-Json
-Start-Sleep -Seconds 16
-$null=Invoke-WebRequest -UseBasicParsing $labUrl
-Start-Sleep -Seconds 5
-Invoke-RestMethod 'http://127.0.0.1:4100/_counts' | ConvertTo-Json
-$labRefreshed=Invoke-WebRequest -UseBasicParsing $labUrl
-Invoke-RestMethod 'http://127.0.0.1:4100/_counts' | ConvertTo-Json
-$labUrl
-```
-
-Counter đếm khi request **bắt đầu**. Nếu sau 5 giây terminal A chưa có `END` cho refresh, đợi `END` rồi mới gọi lại route. Kiểm tra log thay vì coi thời gian chờ cố định là bằng chứng response đã hoàn tất.
-
-Kỳ vọng cho từng endpoint: **0, 1, 1, 2, 2** tương ứng before/miss/hit/refresh/hit sau refresh. Sau bước cuối có thể mở URL vừa in để xem `tagline` “Phiên bản 2”. Với PowerShell có thể so `$labFirst.Content` và `$labRefreshed.Content`; bộ nghiệm thu phía dưới kiểm tra nội dung tự động trên cả hai nền tảng.
-
-**Câu hỏi:** Request đầu sau khi hết TTL có bắt buộc trả “Phiên bản 2” không? Vì sao counter tăng chưa chứng minh refresh đã xong? Vì sao `generateMetadata` và trang cùng đọc chi tiết phim không đủ để kết luận origin nhận hai request? `AbortSignal` trong helper ảnh hưởng gì đến request memoization?
-
-## 6. Nghiệm thu, phiếu kết quả — 10 phút
-
-Dừng cả terminal B và A bằng `Ctrl+C`. Lệnh sau dùng được trong Bash và PowerShell:
+**Bước 4.** Trên starter, chạy:
 
 ```sh
 npm run lab
 ```
 
-Đây là lệnh gọi lại bộ kiểm chứng hiện có bằng `cross-env` đã cài trong project. Bộ này tự chọn cổng, build production, đo streaming/cache và chạy thêm kiểm tra Watchlist/tương tác Chrome; tự dừng server khi xong. Kết quả nằm trong `labs/streaming-cache/evidence/latest/`; không ghi đè minh chứng mẫu `starter/` và `solution/`.
+Lệnh tự chạy lint/test, mock TMDB, build production, typecheck và kiểm tra HTTP; tự chọn cổng và dừng server khi xong. Dòng `Evidence directory:` in thư mục kết quả **ngay đầu lượt chạy**. Mỗi lượt nằm riêng dưới `labs/streaming-cache/evidence/runs/`; ghi lại đường dẫn đó.
 
-Khi muốn lưu từng lượt vào tên riêng, dùng `npm run evidence` với biến môi trường như dưới đây:
+Starter phải kết thúc với exit code **1** vì streaming, ví dụ `cast_result must arrive progressively, at least 1000ms after main HTML in this mock`. Xem exit code ngay sau lệnh:
 
-Bash:
-
-```bash
-MOVIEHUB_EVIDENCE_DIR=labs/streaming-cache/evidence/my-solution npm run evidence
-```
-
-PowerShell:
-
-```powershell
-$env:MOVIEHUB_EVIDENCE_DIR='labs/streaming-cache/evidence/my-solution'
-npm run evidence
-```
-
-Nếu Chrome chưa được phát hiện, đặt `CHROME_BIN` thành đường dẫn executable trước khi chạy; trên Windows, ví dụ `$env:CHROME_BIN='C:\Program Files\Google\Chrome\Application\chrome.exe'` nếu Chrome nằm ở đó. Đọc `mock-runtime.json`: chỉ đạt khi `status=passed`; các JSON cùng lượt phải có cùng `run_id` và `source_sha256`.
-
-Mở terminal mới sau lab để bỏ cấu hình mock. Nếu giữ terminal cũ, gỡ các biến lab trước khi chạy ứng dụng với TMDB thật. Không chia sẻ API key thật, giá trị cookie hoặc `.env.local`.
-
-### Phiếu nộp bài
-
-Sao chép [WORKSHEET.md](WORKSHEET.md), điền bằng số liệu của lần chạy của bạn. Phiếu có bảng năm marker, counter bốn endpoint, thông tin phiên bản, câu hỏi giải thích và checklist bài nộp. Các ô trống dành cho người học.
-
-Nộp phiếu đã điền, diff sửa và log/ảnh liên quan. Minh chứng tự động gồm `mock-runtime.json`, `streaming-mock.json`, `cache-mock.json` cùng log build/test/typecheck/lint; giữ các tệp cùng lượt trong một thư mục. Starter và solution là hai trạng thái mã khác nhau nên có fingerprint khác nhau; không ghép chúng thành một lượt đo.
-
-| Tiêu chí | Điểm |
-| --- | ---: |
-| Đúng boundary, vị trí fetch, bảo vệ khóa server | 2 |
-| Sửa đúng chỗ await; có bằng chứng thất bại trước, đạt sau | 3 |
-| Counter đủ bốn endpoint; nội dung thay đổi sau refresh | 3 |
-| Giải thích revalidation, memoization và giới hạn mock/HTTP | 2 |
-
-[Đáp án và minh chứng bàn giao](SOLUTION.md) dành cho đối chiếu sau khi làm bài. Không chép số liệu bàn giao vào phiếu rồi coi là lần chạy của mình.
-
-### Xử lý lỗi
-
-| Triệu chứng | Cách xử lý |
+| Bash | PowerShell |
 | --- | --- |
-| Patch không áp dụng | Kiểm tra đúng thư mục, patch đã áp dụng chưa và route có sửa riêng không; dùng bản sao sạch, không dùng `git reset --hard` |
-| `EADDRINUSE` | Dừng server lab cũ của mình; nếu đổi cổng, sửa đồng bộ URL mock/Next và `EVIDENCE_BASE_URL` |
-| Build không tải được Google Fonts | Khôi phục kết nối HTTPS rồi build lại; mock TMDB không làm build hoàn toàn offline |
-| Source đã sửa nhưng kết quả cũ | Dừng Next production, build lại với cấu hình lab rồi start lại |
-| Streaming verifier thất bại trên bản sửa | Dùng ID mới, tránh prefetch/browser cùng ID; kiểm tra server production đúng bản build, marker và log mock |
-| Counter không đúng kỳ vọng | Giữ một ID trong chuỗi cache; chạy các lệnh liên tục; xem TTL, request dư và `START`/`END` |
-| Tổng nghiệm thu thất bại | Đọc `mock-runtime.json` và log; lỗi Chrome/lint/build không được tính là starter thất bại đúng cơ chế |
-| Test `lab starter patch round-trips...` thất bại | Patch không khớp trang hiện tại hoặc thiếu Git; dùng đúng bản project đi kèm lab, giữ thay đổi riêng trước khi chỉnh lại |
+| `echo $?` | `$LASTEXITCODE` |
 
-## 7. Nguồn nghiên cứu
+Mở `mock-runtime.json`: `verification=lab`, `status=failed`, `error` thuộc streaming. Log lint/test/build/typecheck và `routes-http.json` phải cho thấy các bước trước đó đạt. Lỗi tải font, kết nối hoặc build **không** phải thất bại mong đợi. Starter dừng trước bước cache nên chưa có `cache-mock.json` là bình thường.
 
-Đối chiếu tài liệu **đi kèm Next 16.4.5 trong `node_modules/next/dist/docs/`**, vì tài liệu trực tuyến có thể cập nhật sau phiên bản đang dùng:
+**Bước 5.** Sửa `app/movie/[id]/page.tsx`:
 
-- [Fetching Data và Suspense](https://nextjs.org/docs/app/getting-started/fetching-data), bản local `01-app/01-getting-started/06-fetching-data.md`: fetch chậm và vị trí ranh giới streaming.
-- [Server và Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components), bản local `01-app/01-getting-started/05-server-and-client-components.md`: boundary và dữ liệu phía server.
-- [fetch API](https://nextjs.org/docs/app/api-reference/functions/fetch), bản local `01-app/03-api-reference/04-functions/fetch.md`: `next.revalidate`, cache opt-in, memoization và `AbortSignal`.
-- [Caching khi không bật Cache Components](https://nextjs.org/docs/app/guides/caching-without-cache-components), bản local `01-app/02-guides/caching-without-cache-components.md`: mô hình phù hợp `cacheComponents: false` của repo.
-- [Hợp đồng kiến trúc/giao diện](../../DESIGN.md) và [bản giải thích tiếng Việt](../../DESIGN_SYSTEM.md): giữ Server Components, bảo vệ khóa và diễn giải đúng Data Cache/ISR.
+1. Bỏ hai lời gọi dữ liệu phụ đang bị chờ trong `Promise.all` trước `return`, dọn hai import thừa.
+2. Giữ fetch trong `CastList` và `SimilarMovies`, dưới hai Suspense riêng.
+3. Giữ validation ID, xử lý lỗi, skeleton, `data-stream`, `data-movie-id` và Server/Client boundary. Không chuyển trang sang Client Component.
+
+**Bước 6.** Chạy lại:
+
+```sh
+npm run lab
+```
+
+Lệnh build lại mã đã sửa, dùng ID mới và tạo thư mục kết quả mới. Cần đạt:
+
+- Exit code **0**, `mock-runtime.json` có `verification=lab`, `status=passed`.
+- `streaming-mock.json` có đủ `main`, `cast_fallback`, `similar_fallback`, `cast_result`, `similar_result` trong `events`.
+- Nội dung chính/fallback đến ở chunk trước kết quả phụ; mỗi kết quả phụ cách `main` ít nhất 1.000 ms theo điều kiện mock này.
+
+Ghi số liệu của **cùng lượt solution** vào phiếu. Không yêu cầu số chunk hay thời gian tuyệt đối giống mẫu.
+
+**Bước 7.** Tạo diff so với snapshot starter:
+
+```sh
+git diff --no-index -- labs/streaming-cache/work/page.starter.txt "app/movie/[id]/page.tsx"
+```
+
+Lưu diff vào bài nộp. Với lệnh này, exit code **1 nghĩa là có khác biệt**, 0 là không khác biệt, lớn hơn 1 là lỗi. Snapshot cần thiết vì sửa đúng có thể trở về nguyên bản HEAD, khiến `git diff` thông thường trống.
+
+**Đạt khi:** có lỗi streaming trước sửa, kết quả đạt sau sửa và diff giải thích được. Giữ comment starter cũng hợp lệ nếu không còn hai lời gọi chặn.
+
+## 5. Bài 3 — Đối chiếu Data Cache, 10 phút
+
+**Bước 8.** Trước khi đọc `cache-mock.json`, dự đoán counter cho một endpoint ở năm mốc: trước tải, cold miss, warm hit, refresh sau TTL và hit sau refresh. Điền dự đoán trong phiếu.
+
+**Bước 9.** Mở `cache-mock.json` của **lượt solution vừa chạy**, đối chiếu bốn endpoint của cùng ID:
+
+- `/movie/<id>` và các suffix `/videos`, `/credits`, `/similar`.
+- Năm trường `before`, `miss`, `hit`, `after_expiry`, `warm_after_refresh`.
+- `content_before`, `content_after`, `ttl_seconds`, `cache_components` và mô tả request trong `steps`.
+
+Điền counter, nội dung trước/sau và dự đoán nào cần sửa. Script thực hiện HTTP request thật tới Next production; mock origin tăng counter, chờ TTL và đổi dữ liệu. Đây là kết quả lần chạy của bạn, không phải bảng số liệu dựng sẵn.
+
+**Bước 10.** Trả lời:
+
+1. Request đầu sau TTL có bắt buộc nhận ngay dữ liệu mới không? Vì sao?
+2. Counter tăng ở `START` hay `END`? Điều gì chứng minh refresh đã sẵn sàng?
+3. Vì sao không quy kết kết quả cho cache trình duyệt hoặc memoization? `AbortSignal` trong helper ảnh hưởng gì?
+4. Route đọc cookie Watchlist nhưng fetch TMDB có cache: nên mô tả mô hình render/cache thế nào?
+
+**Đạt khi:** đối chiếu đủ bốn endpoint, xác nhận nội dung thay đổi và giải thích stale-while-revalidate. Không suy hiệu năng TMDB thật từ mock.
+
+## 6. Nộp bài — 5 phút
+
+Nộp [phiếu đã điền](WORKSHEET.md), diff so với starter và hai thư mục kết quả của chính bạn:
+
+- **Starter:** `mock-runtime.json` báo lỗi streaming; log lint/test/build/typecheck và `routes-http.json` cho thấy các bước trước đó đạt.
+- **Solution:** `mock-runtime.json`, `streaming-mock.json`, `cache-mock.json` cùng log lint/test/build/typecheck.
+- Mỗi bộ phải cùng `run_id` và `source_sha256`. Starter và solution là hai trạng thái nguồn khác nhau; không ghép artifact của chúng.
+
+Khai phần tự làm và phần có AI hỗ trợ. Không nộp API key thật, cookie hay `.env.local`. Ô trống trong phiếu dành cho người học, không phải dữ liệu nhóm đã thu thập.
+
+## 7. Lỗi thường gặp và kinh nghiệm đã kiểm chứng
+
+Hai lỗi sau đã được tái hiện khi hoàn thiện bản lab trước; đây là lỗi công cụ/hướng dẫn lab, không phải bằng chứng AI trả lời sai:
+
+| Lỗi đã gặp | Nguyên nhân | Cách bản mới xử lý |
+| --- | --- | --- |
+| Sửa đúng nhưng test patch thất bại khi giữ comment | Test coi khớp patch là điều kiện đúng của lời giải | Tách test patch thành kiểm tra đóng gói; nghiệm thu học viên bằng streaming/cache |
+| Sửa xong nhưng `git diff` trống | Source bàn giao vốn đã có lời giải | Lưu snapshot starter rồi dùng `git diff --no-index` |
+
+Các tình huống dưới đây là hướng dẫn xử lý; không mặc định đều từng xảy ra với mọi thành viên:
+
+| Triệu chứng | Kiểm tra và xử lý |
+| --- | --- |
+| Patch không áp dụng | Đúng gốc project chưa, starter đã áp dụng chưa, trang có sửa riêng không? Dùng bản sao sạch; không ép patch |
+| `EEXIST` khi lưu snapshot | Giữ snapshot cũ; dùng bản sao mới cho lượt khác |
+| Build không tải được Google Fonts | Kiểm tra HTTPS/Internet rồi chạy lại; không tính đây là lỗi streaming |
+| `Local HTTP is blocked by the sandbox` hoặc lỗi quyền mở server | Cho phép công cụ chạy loopback trong môi trường của bạn rồi chạy lại |
+| Streaming không đạt sau sửa | Kiểm tra đúng file, hai lời gọi ở cha đã bỏ chưa; chạy lại `npm run lab` để build mới |
+| Đọc nhầm kết quả starter/solution | Đối chiếu đường dẫn, `run_id`, fingerprint và `status`; không lấy số từ thư mục lịch sử |
+
+Chưa có log đủ để khẳng định nhóm đã gặp mọi lỗi chuyên môn trong bảng xử lý. Tình huống chặn của starter được tạo có chủ đích và khai riêng.
+
+## 8. Phạm vi và nguồn
+
+Next production, Suspense, Data Cache và HTTP chạy thật; TMDB dùng mock loopback. Credits chậm 2,5 giây, similar chậm 4 giây, TTL mock 15 giây; TTL dịch vụ thật giữ nguyên. Thời điểm nhận HTML không phải FCP/LCP hay thời điểm hydration. Counter không phải thời gian phản hồi; route SSR có Data Cache không đồng nghĩa ISR toàn trang.
+
+Đối chiếu tài liệu đúng phiên bản trong `node_modules/next/dist/docs/` sau `npm ci`:
+
+- [Fetching Data và Suspense](https://nextjs.org/docs/app/getting-started/fetching-data), bản local `01-app/01-getting-started/06-fetching-data.md`.
+- [Server và Client Components](https://nextjs.org/docs/app/getting-started/server-and-client-components), bản local `01-app/01-getting-started/05-server-and-client-components.md`.
+- [fetch API](https://nextjs.org/docs/app/api-reference/functions/fetch), bản local `01-app/03-api-reference/04-functions/fetch.md`: `next.revalidate`, memoization và `AbortSignal`.
+- [Caching khi không bật Cache Components](https://nextjs.org/docs/app/guides/caching-without-cache-components), bản local `01-app/02-guides/caching-without-cache-components.md`.
+
+**Đối chiếu yêu cầu của thầy:** mục 1 nêu lý do chọn/năng lực đạt được (D0); mục 2 chuẩn bị môi trường; mục 3–5 có bước đánh số, starter và ba bài tập; [SOLUTION.md](SOLUTION.md) có đáp án; mục 7 nêu lỗi và nguồn xác nhận. Ảnh chỉ có chi tiết điểm D0; tài liệu không tự suy ra thang điểm D1–D3.

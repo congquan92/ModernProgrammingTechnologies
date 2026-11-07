@@ -12,7 +12,11 @@ import { verifyBrowser } from "./verify-browser-evidence.mjs";
 
 const root = fileURLToPath(new URL("../", import.meta.url));
 process.chdir(root);
-const output = pathToFileURL(resolve(process.env.MOVIEHUB_EVIDENCE_DIR || "baocao/evidence") + sep);
+const lab = process.argv.includes("--lab");
+const runID = new Date().toISOString();
+const output = pathToFileURL(resolve(process.env.MOVIEHUB_EVIDENCE_DIR || (lab
+  ? `labs/streaming-cache/evidence/runs/${runID.replaceAll(/[:.]/g, "-")}`
+  : "baocao/evidence")) + sep);
 await mkdir(output, { recursive: true });
 const git = (...args) => execFileSync("git", args, { encoding: "utf8", windowsHide: true }).trim();
 async function fingerprint() {
@@ -29,12 +33,15 @@ const metadata = {
   git_head: git("rev-parse", "HEAD"),
   working_tree_dirty: git("status", "--porcelain").length > 0,
   source_sha256: await fingerprint(),
-  run_id: new Date().toISOString(),
+  run_id: runID,
   node: process.version,
   next: JSON.parse(await readFile("node_modules/next/package.json", "utf8")).version,
   platform: process.platform,
   mode: "production; controlled loopback TMDB mock; Cache Components disabled",
-  scope: "HTTP streaming, Data Cache, Server Actions and Chrome interaction checks; no CWV/CDN claims",
+  verification: lab ? "lab" : "full",
+  scope: lab
+    ? "HTTP streaming and Data Cache with baseline checks; no Watchlist/Chrome/CWV/CDN claims"
+    : "HTTP streaming, Data Cache, Server Actions and Chrome interaction checks; no CWV/CDN claims",
 };
 const header = (command) => Object.entries({ ...metadata, command }).map(([key, value]) => `${key}: ${value}`).join("\n") + "\n\n";
 const saveJSON = (name, value) => writeFile(new URL(name, output), JSON.stringify({ ...metadata, ...value }, null, 2) + "\n");
@@ -96,6 +103,7 @@ async function waitFor(url, child) {
   throw new Error(`Server did not become ready: ${url}`);
 }
 
+console.log(`Evidence directory: ${fileURLToPath(output)}`);
 await saveJSON("mock-runtime.json", { status: "running" });
 try {
   // These checks do not need an API key or a running server.
@@ -181,42 +189,46 @@ try {
       { input: `GET /movie/${id} (after refresh)`, counts: warm, result: "hit; refreshed data cached" },
     ] });
 
-  // Resolve build-specific action IDs, never hard-code them or log cookie values.
-  const manifest = JSON.parse(await readFile(".next-evidence/server/server-reference-manifest.json", "utf8"));
-  const actionID = Object.entries(manifest.node).find(([, entry]) => entry.exportedName === "toggleWatchlist")?.[0];
-  assert.ok(actionID, "Missing toggleWatchlist action in production manifest");
-  let cookie = "";
-  const action = async () => {
-    const response = await fetch(`${baseURL}/movie/${id}`, {
-      method: "POST",
-      headers: { "Next-Action": actionID, "Content-Type": "text/plain;charset=UTF-8", Origin: baseURL, ...(cookie ? { Cookie: cookie } : {}) },
-      body: JSON.stringify([Number(id)]),
-      signal: AbortSignal.timeout(30_000),
-    });
-    assert.equal(response.status, 200);
-    const setCookie = response.headers.getSetCookie().find((value) => value.startsWith("mh_watchlist="));
-    assert.ok(setCookie, "Server Action must send the watchlist cookie");
-    assert.match(setCookie, /httponly/i);
-    assert.match(setCookie, /;\s*secure(?:;|$)/i);
-    assert.match(setCookie, /samesite=lax/i);
-    cookie = setCookie.split(";")[0];
-    await response.text();
-  };
-  assert.ok(!(await getHTML("/watchlist")).includes(`Phim minh chứng ${id}`));
-  await action();
-  const saved = await getHTML("/watchlist", cookie);
-  assert.ok(saved.includes(`Phim minh chứng ${id}`), "Saved movie must appear on server-rendered watchlist");
-  const reload = await getHTML("/watchlist", cookie);
-  assert.ok(reload.includes(`Phim minh chứng ${id}`), "Saved state must persist on a fresh HTTP request (reload)");
-  assert.ok(!(await getHTML("/watchlist")).includes(`Phim minh chứng ${id}`), "A separate cookie jar must remain empty");
-  await action();
-  assert.ok(!(await getHTML("/watchlist", cookie)).includes(`Phim minh chứng ${id}`), "Removed movie must disappear");
-  assert.ok(!(await getHTML("/watchlist", cookie)).includes(`Phim minh chứng ${id}`), "Removal must persist after reload");
-  await saveJSON("watchlist-http.json", { route: `/movie/${id}`, add_post: 200, cookie_flags: ["Secure", "HttpOnly", "SameSite=Lax"], saved_on_watchlist: true, persisted_after_reload: true, separate_cookie_jar_empty: true, removed_on_watchlist: true, removal_persisted_after_reload: true, cookie_values: "omitted", scope: "real production Server Action HTTP requests; browser interaction/video not measured" });
-  console.log("Checking search, filters, optimistic rollback and dialog focus in Chrome...");
-  await saveJSON("browser-interactions.json", await verifyBrowser(baseURL, id));
+  const artifacts = ["build-mock-output.txt", "routes-http.json", "streaming-mock.json", "cache-mock.json"];
+  if (!lab) {
+    // Resolve build-specific action IDs, never hard-code them or log cookie values.
+    const manifest = JSON.parse(await readFile(".next-evidence/server/server-reference-manifest.json", "utf8"));
+    const actionID = Object.entries(manifest.node).find(([, entry]) => entry.exportedName === "toggleWatchlist")?.[0];
+    assert.ok(actionID, "Missing toggleWatchlist action in production manifest");
+    let cookie = "";
+    const action = async () => {
+      const response = await fetch(`${baseURL}/movie/${id}`, {
+        method: "POST",
+        headers: { "Next-Action": actionID, "Content-Type": "text/plain;charset=UTF-8", Origin: baseURL, ...(cookie ? { Cookie: cookie } : {}) },
+        body: JSON.stringify([Number(id)]),
+        signal: AbortSignal.timeout(30_000),
+      });
+      assert.equal(response.status, 200);
+      const setCookie = response.headers.getSetCookie().find((value) => value.startsWith("mh_watchlist="));
+      assert.ok(setCookie, "Server Action must send the watchlist cookie");
+      assert.match(setCookie, /httponly/i);
+      assert.match(setCookie, /;\s*secure(?:;|$)/i);
+      assert.match(setCookie, /samesite=lax/i);
+      cookie = setCookie.split(";")[0];
+      await response.text();
+    };
+    assert.ok(!(await getHTML("/watchlist")).includes(`Phim minh chứng ${id}`));
+    await action();
+    const saved = await getHTML("/watchlist", cookie);
+    assert.ok(saved.includes(`Phim minh chứng ${id}`), "Saved movie must appear on server-rendered watchlist");
+    const reload = await getHTML("/watchlist", cookie);
+    assert.ok(reload.includes(`Phim minh chứng ${id}`), "Saved state must persist on a fresh HTTP request (reload)");
+    assert.ok(!(await getHTML("/watchlist")).includes(`Phim minh chứng ${id}`), "A separate cookie jar must remain empty");
+    await action();
+    assert.ok(!(await getHTML("/watchlist", cookie)).includes(`Phim minh chứng ${id}`), "Removed movie must disappear");
+    assert.ok(!(await getHTML("/watchlist", cookie)).includes(`Phim minh chứng ${id}`), "Removal must persist after reload");
+    await saveJSON("watchlist-http.json", { route: `/movie/${id}`, add_post: 200, cookie_flags: ["Secure", "HttpOnly", "SameSite=Lax"], saved_on_watchlist: true, persisted_after_reload: true, separate_cookie_jar_empty: true, removed_on_watchlist: true, removal_persisted_after_reload: true, cookie_values: "omitted", scope: "real production Server Action HTTP requests; browser interaction/video not measured" });
+    console.log("Checking search, filters, optimistic rollback and dialog focus in Chrome...");
+    await saveJSON("browser-interactions.json", await verifyBrowser(baseURL, id));
+    artifacts.push("watchlist-http.json", "browser-interactions.json");
+  }
   assert.equal(await fingerprint(), metadata.source_sha256, "Source files changed during verification; rerun npm run evidence");
-  await saveJSON("mock-runtime.json", { status: "passed", build_errors: 0, build_warnings: 0, base_url: baseURL, tmdb_origin: env.TMDB_BASE_URL, mock_ttl_seconds: 15, build_directory: ".next-evidence", artifacts: ["build-mock-output.txt", "routes-http.json", "streaming-mock.json", "cache-mock.json", "watchlist-http.json", "browser-interactions.json"] });
+  await saveJSON("mock-runtime.json", { status: "passed", build_errors: 0, build_warnings: 0, base_url: baseURL, tmdb_origin: env.TMDB_BASE_URL, mock_ttl_seconds: 15, build_directory: ".next-evidence", artifacts });
   console.log(`Evidence saved in ${fileURLToPath(output)}. Mock measurements are not TMDB/CWV benchmarks.`);
 } catch (error) {
   if (error.results) await saveJSON("browser-interactions.json", { checks: error.results });
